@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">BitLabs SDK</string>
+
+    <string name="web_toolbar_header">Encuesta</string>
+    <string name="leave_dialog_title">Por favor, seleccione una razón para dejar la encuesta</string>
+    <string name="leave_reason_sensitive">Demasiado sensible</string>
+    <string name="leave_reason_uninteresting">Sin interés</string>
+    <string name="leave_reason_technical">Fallas técnicas</string>
+    <string name="leave_reason_too_long">Demasiado tiempo</string>
+    <string name="leave_reason_other">Otras razones</string>
+    <string name="leave_dialog_continue">Continúe la encuesta</string>
+    <string name="desktop_mode_title">Error en la encuesta</string>
+    <string name="desktop_mode_message">Si tiene un error en la visualización de una encuesta, podemos intentar arreglarlo. Sin embargo, es posible que sea excluido de la encuesta. Por favor, utilice esta función sólo si no puede continuar de otra manera.</string>
+    <string name="desktop_mode_continue">Cambiar la visualización</string>
+    <string name="desktop_mode_cancel">Cancelar</string>
+
+</resources>

@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">BitLabs SDK</string>
+
+    <string name="web_toolbar_header">Enquête</string>
+    <string name="leave_dialog_title">Veuillez choisir une raison pour quitter l\'enquête</string>
+    <string name="leave_reason_sensitive">Trop sensible</string>
+    <string name="leave_reason_uninteresting">Intéressant</string>
+    <string name="leave_reason_technical">Défauts techniques</string>
+    <string name="leave_reason_too_long">Trop long</string>
+    <string name="leave_reason_other">Autres raisons</string>
+    <string name="leave_dialog_continue">Poursuivre l\'enquête</string>
+    <string name="desktop_mode_title">Erreur d\'enquête</string>
+    <string name="desktop_mode_message">Si vous avez une erreur dans l\'affichage d\'une enquête, nous pouvons essayer de la corriger. Toutefois, il est possible que vous soyez exclu de l\'enquête. Veuillez n\'utiliser cette fonction que si vous ne pouvez pas continuer autrement.</string>
+    <string name="desktop_mode_continue">Modifier l\'affichage</string>
+    <string name="desktop_mode_cancel">Annuler</string>
+
+</resources>

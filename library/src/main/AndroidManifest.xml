@@ -1,0 +1,20 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="ai.bitlabs.sdk">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <application
+        android:supportsRtl="true"
+        android:usesCleartextTraffic="true">
+
+        <activity
+            android:name="ai.bitlabs.sdk.WebActivity"
+            android:configChanges="orientation|screenSize"
+            android:noHistory="true"
+            android:screenOrientation="sensor"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+    </application>
+
+</manifest>

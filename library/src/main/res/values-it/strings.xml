@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">BitLabs SDK</string>
+
+    <string name="web_toolbar_header">Sondaggio</string>
+    <string name="leave_dialog_title">Si prega di selezionare un motivo per lasciare il sondaggio</string>
+    <string name="leave_reason_sensitive">Troppo sensibile</string>
+    <string name="leave_reason_uninteresting">Poco interessante</string>
+    <string name="leave_reason_technical">Guasti tecnici</string>
+    <string name="leave_reason_too_long">Troppo lungo</string>
+    <string name="leave_reason_other">Altri motivi</string>
+    <string name="leave_dialog_continue">Continua il sondaggio</string>
+    <string name="desktop_mode_title">Errore di rilevamento</string>
+    <string name="desktop_mode_message">Se si verifica un errore nella visualizzazione di un sondaggio, possiamo provare a correggerlo. Tuttavia, è possibile che siate esclusi dal sondaggio. La preghiamo di utilizzare questa funzione solo se non potrebbe continuare altrimenti.</string>
+    <string name="desktop_mode_continue">Cambia visualizzazione</string>
+    <string name="desktop_mode_cancel">Annulla</string>
+
+</resources>

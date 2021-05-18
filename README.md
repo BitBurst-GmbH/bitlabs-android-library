@@ -13,11 +13,6 @@ Add the following above the __dependencies__ section of your app level build.gra
 ```
 repositories {
     maven {
-        url "https://dl.bintray.com/bitburst/mobile"
-    }
-}
-repositories {
-    maven {
         url 'https://jitpack.io'
     }
 }

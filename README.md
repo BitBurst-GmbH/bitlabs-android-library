@@ -1,7 +1,11 @@
 ## BitLabs Android SDK
 
+[![](https://jitpack.io/v/BitBurst-GmbH/bitlabs-android-library.svg)](https://jitpack.io/#BitBurst-GmbH/bitlabs-android-library)
+
 Official Android SDK for BitBurst's BitLabs. We have an example app that can be used for
 reference on how to integrate this SDK. Take a look at `/example` for more details.
+
+Read the complete documentation here: https://bitlabs.ai/integrations/android-sdk
 
 ### Dependencies
 
@@ -12,6 +16,11 @@ repositories {
         url "https://dl.bintray.com/bitburst/mobile"
     }
 }
+repositories {
+    maven {
+        url 'https://jitpack.io'
+    }
+}
 ```
 
 Then add the dependency in the same file:
@@ -19,7 +28,7 @@ Then add the dependency in the same file:
 dependencies {
     // other dependencies
 
-    implementation 'ai.bitlabs:sdk:1.1.7'
+    implementation 'com.github.BitBurst-GmbH:bitlabs-android-library:1.1.10'
 
     // other dependencies
 }

@@ -1,0 +1,32 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 30
+
+    defaultConfig {
+        applicationId "ai.bitlabs.example"
+        minSdkVersion 16
+        targetSdkVersion 30
+        versionCode 12
+        versionName "1.1.0"
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    ndkVersion '22.0.7026061'
+    buildToolsVersion '30.0.3'
+}
+
+//repositories {
+//    maven { url 'https://jitpack.io' }
+//}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+
+    //implementation 'com.github.BitBurst-GmbH:bitlabs-android-sdk:1.1.10'
+    implementation project(':library')
+}

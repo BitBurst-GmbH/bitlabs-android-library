@@ -27,6 +27,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
 
-    //implementation 'com.github.BitBurst-GmbH:bitlabs-android-library:1.1.10'
+    // NOTE: you want to use the commented-out implementation for your app
+    //implementation 'com.github.BitBurst-GmbH:bitlabs-android-library:<VERSION>'
     implementation project(':library')
 }

@@ -11,7 +11,6 @@
         <activity
             android:name="ai.bitlabs.sdk.WebActivity"
             android:configChanges="orientation|screenSize"
-            android:noHistory="true"
             android:screenOrientation="sensor"
             android:theme="@style/AppTheme.NoActionBar" />
 

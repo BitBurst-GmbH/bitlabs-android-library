@@ -7,6 +7,7 @@ import android.telephony.TelephonyManager
 import android.util.Log
 import com.android.volley.RequestQueue
 import com.android.volley.Response
+import com.android.volley.VolleyError
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import org.json.JSONException
@@ -74,6 +75,15 @@ class BitLabsSDK {
         }
     }
 
+    private fun VolleyError.toError(): Error {
+        return if (networkResponse != null && networkResponse.data != null) {
+            val responseData = String(networkResponse.data, Charsets.UTF_8)
+            Error("backend error: $responseData")
+        } else {
+            Error("network error: ${message ?: this}")
+        }
+    }
+
     private fun hasSurveyAvailable(listener: Listener<Boolean>?, errorListener: ErrorListener?) {
         val platform = if (isTablet) "TABLET" else "MOBILE"
 
@@ -94,10 +104,7 @@ class BitLabsSDK {
                     errorListener?.onError(Error(e))
                 }
             },
-            { error ->
-                val responseData = String(error.networkResponse.data, Charsets.UTF_8)
-                errorListener?.onError(Error("network error: $responseData"))
-            }
+            { error -> errorListener?.onError(error.toError()) }
         )
         requestQueue?.add(req)
     }
@@ -108,9 +115,7 @@ class BitLabsSDK {
             "https://api.bitlabs.ai/v1/client/networks/$networkID/surveys/$surveyID/leave",
             JSONObject(mapOf("reason" to reason)),
             {},
-            { error ->
-                Log.e("BitLabs", "survey leave send error: ${error.networkResponse.data}")
-            }
+            { error -> Log.e("BitLabs", "survey leave send error: ${error.toError()}") }
         )
         requestQueue?.add(req)
     }

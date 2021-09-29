@@ -23,7 +23,7 @@ Then add the dependency in the same file:
 dependencies {
     // other dependencies
 
-    implementation 'com.github.BitBurst-GmbH:bitlabs-android-library:1.1.10'
+    implementation 'com.github.BitBurst-GmbH:bitlabs-android-library:1.1.11'
 
     // other dependencies
 }
@@ -36,7 +36,7 @@ user.
 
 Use `BitLabsSDK.init(<context>, "YOUR-TOKEN", "YOUR-USER-ID");` to initialize the SDK.
 
-With `BitLabsSDK.surveyAvailable();` you can check if a survey is available for the user.
+With `BitLabsSDK.hasSurveys();` you can check if a survey is available for the user.
 
 With `BitLabsSDK.show(<context>);` you can open our preconfigured web activity which shows
 your offerwall.

@@ -23,7 +23,7 @@ Then add the dependency in the same file:
 dependencies {
     // other dependencies
 
-    implementation 'com.github.BitBurst-GmbH:bitlabs-android-library:1.2.1'
+    implementation 'com.github.BitBurst-GmbH:bitlabs-android-library:1.2.0'
 
     // other dependencies
 }

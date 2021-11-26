@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">BitLabs SDK</string>
 
     <string name="web_toolbar_header">Encuesta</string>
     <string name="leave_dialog_title">Por favor, seleccione una razón para dejar la encuesta</string>

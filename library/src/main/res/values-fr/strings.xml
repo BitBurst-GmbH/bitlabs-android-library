@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">BitLabs SDK</string>
 
     <string name="web_toolbar_header">Enquête</string>
     <string name="leave_dialog_title">Veuillez choisir une raison pour quitter l\'enquête</string>

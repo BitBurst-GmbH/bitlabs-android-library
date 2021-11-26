@@ -25,6 +25,9 @@ public class MainActivity extends AppCompatActivity {
         tags.put("is_premium", true);
         BitLabsSDK.Companion.setTags(tags);
 
+        // Get client-side callbacks to reward the user (We highly recommend using server-to-server callbacks!)
+        BitLabsSDK.Companion.onReward(payout->Log.e("BitLabs", "BitLabs payout of: " + payout));
+
         findViewById(R.id.open).setOnClickListener(view ->
                 BitLabsSDK.Companion.hasSurveys(
                         // NOTE: the offerwall can be shown without checking for surveys first

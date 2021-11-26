@@ -15,17 +15,13 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.browser.customtabs.CustomTabsIntent
-import com.android.volley.Response
-import com.android.volley.toolbox.JsonObjectRequest
-import com.android.volley.toolbox.Volley
-import org.json.JSONObject
 import java.io.Serializable
 
 data class WebActivityParams(var token: String, var userID: String) : Serializable {
-    var tags: Map<String, Any>? = null
+    var tags: MutableMap<String, Any>? = mutableMapOf()
 
     @Transient
-    private var _url: String? = null;
+    private var _url: String? = null
     val url: String
         get() {
             if (_url == null) {
@@ -40,7 +36,7 @@ data class WebActivityParams(var token: String, var userID: String) : Serializab
 
 class WebActivity : AppCompatActivity() {
     companion object {
-        const val BUNDLE_KEY_DATA = "data";
+        const val BUNDLE_KEY_DATA = "data"
     }
 
     private var webView: WebView? = null
@@ -51,6 +47,8 @@ class WebActivity : AppCompatActivity() {
 
     private var lastNetworkID: String? = null
     private var lastSurveyID: String? = null
+
+    private var totalReward: Float = 0.0F
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,8 +62,6 @@ class WebActivity : AppCompatActivity() {
             return
         }
         params = paramsRaw
-
-        Log.i("BitLabs", "Base URL: ${params.url}")
 
         toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -103,6 +99,11 @@ class WebActivity : AppCompatActivity() {
 
                 if (url.contains("web.bitlabs.ai")) {
                     hideToolbar()
+
+                    if(url.contains("survey/complete") || url.contains("survey/screenout")){
+                        val uri = Uri.parse(url)
+                        uri.getQueryParameter("val")?.let { totalReward += it.toFloat() }
+                    }
                 } else {
                     showToolbar()
 
@@ -220,5 +221,10 @@ class WebActivity : AppCompatActivity() {
         if (item.itemId == android.R.id.home)
             leaveSurveyAlert()
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onStop() {
+        BitLabsSDK.rewardListener?.onReward(totalReward)
+        super.onStop()
     }
 }

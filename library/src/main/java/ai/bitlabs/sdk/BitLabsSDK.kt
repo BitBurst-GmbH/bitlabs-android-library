@@ -1,5 +1,6 @@
 package ai.bitlabs.sdk
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -10,10 +11,15 @@ import com.android.volley.Response
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
+import com.unity3d.player.UnityPlayer
 import org.json.JSONException
 import org.json.JSONObject
 
 class BitLabsSDK {
+    interface RewardListener<T> {
+        fun onReward(payout: Float)
+    }
+
     interface Listener<T> {
         fun onResponse(response: T)
     }
@@ -24,6 +30,7 @@ class BitLabsSDK {
 
     companion object {
         internal val instance = BitLabsSDK()
+        var rewardListener: RewardListener<Float>? = null
 
         fun init(context: Context, token: String, userID: String) {
             if (token.isEmpty() || userID.isEmpty())
@@ -44,8 +51,41 @@ class BitLabsSDK {
             instance.hasSurveyAvailable(listener, errorListener)
         }
 
+        fun hasSurveys(gameObject: String) {
+            hasSurveys(
+                object: Listener<Boolean> {
+                    override fun onResponse(response: Boolean) {
+                        UnityPlayer.UnitySendMessage(gameObject, "OnHasSurveys", response.toString())
+                    }
+                },
+                object: ErrorListener {
+                    override fun onError(error: Error) {
+                        Log.e("BitLabsActivity", error.toString())
+                    }
+                }
+            )
+        }
+
+        fun onReward(listener: RewardListener<Float>?) {
+            rewardListener = listener
+        }
+
+        fun onReward(gameObject: String) {
+            onReward(
+                object: RewardListener<Float> {
+                    override fun onReward(payout: Float) {
+                        UnityPlayer.UnitySendMessage(gameObject, "OnReward", payout.toString())
+                    }
+                }
+            )
+        }
+
         fun setTags(tags: Map<String, Any>) {
-            instance.config?.tags = tags
+            instance.config?.tags = tags.toMutableMap()
+        }
+
+        fun appendTag(key: String, value: Any) {
+            instance.config?.tags?.put(key, value)
         }
 
         fun show(context: Context) {

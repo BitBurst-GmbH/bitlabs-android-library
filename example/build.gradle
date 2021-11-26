@@ -1,14 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
 
     defaultConfig {
         applicationId "ai.bitlabs.example"
         minSdkVersion 16
-        targetSdkVersion 30
-        versionCode 12
-        versionName "1.1.0"
+        targetSdkVersion 31
+        versionCode 14
+        versionName "1.2.0"
     }
 
     compileOptions {
@@ -24,8 +24,8 @@ repositories {
 }
 
 dependencies {
-    implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    implementation 'androidx.appcompat:appcompat:1.4.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.2'
 
     // NOTE: you want to use the commented-out implementation for your app
     //implementation 'com.github.BitBurst-GmbH:bitlabs-android-library:<VERSION>'

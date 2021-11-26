@@ -12,7 +12,8 @@
             android:name="ai.bitlabs.sdk.WebActivity"
             android:configChanges="orientation|screenSize"
             android:screenOrientation="sensor"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            android:exported="true"/>
 
     </application>
 

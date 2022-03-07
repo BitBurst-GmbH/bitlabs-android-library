@@ -26,7 +26,11 @@ data class WebActivityParams(var token: String, var userID: String) : Serializab
         get() {
             if (_url == null) {
                 val builder = Uri.parse("https://web.bitlabs.ai").buildUpon()
-                builder.appendQueryParameter("token", token).appendQueryParameter("uid", userID)
+                builder
+                    .appendQueryParameter("token", token)
+                    .appendQueryParameter("uid", userID)
+                    .appendQueryParameter("os", "ANDROID")
+                    .appendQueryParameter("sdk", "NATIVE")
                 tags?.forEach { e -> builder.appendQueryParameter(e.key, e.value.toString()) }
                 _url = builder.build().toString()
             }

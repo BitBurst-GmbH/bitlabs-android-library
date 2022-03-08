@@ -17,7 +17,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.browser.customtabs.CustomTabsIntent
 import java.io.Serializable
 
-data class WebActivityParams(var token: String, var userID: String) : Serializable {
+data class WebActivityParams(var token: String, var userID: String, var sdk: String = "NATIVE") : Serializable {
     var tags: MutableMap<String, Any>? = mutableMapOf()
 
     @Transient
@@ -30,7 +30,7 @@ data class WebActivityParams(var token: String, var userID: String) : Serializab
                     .appendQueryParameter("token", token)
                     .appendQueryParameter("uid", userID)
                     .appendQueryParameter("os", "ANDROID")
-                    .appendQueryParameter("sdk", "NATIVE")
+                    .appendQueryParameter("sdk", sdk)
                 tags?.forEach { e -> builder.appendQueryParameter(e.key, e.value.toString()) }
                 _url = builder.build().toString()
             }

@@ -88,9 +88,10 @@ class BitLabsSDK {
             instance.config?.tags?.put(key, value)
         }
 
-        fun show(context: Context) {
+        @JvmOverloads fun show(context: Context, sdk: String = "NATIVE") {
             val intent = Intent(context, WebActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            instance.config?.sdk = sdk
             intent.putExtra(WebActivity.BUNDLE_KEY_DATA, instance.config)
             context.startActivity(intent)
         }

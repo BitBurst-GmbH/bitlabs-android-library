@@ -1,5 +1,6 @@
 package ai.bitlabs.sdk
 
+import ai.bitlabs.sdk.data.model.WebActivityParams
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -80,18 +81,18 @@ class BitLabsSDK {
             )
         }
 
-        fun setTags(tags: Map<String, Any>) {
+        fun setTags(tags: Map<String, String>) {
             instance.config?.tags = tags.toMutableMap()
         }
 
-        fun appendTag(key: String, value: Any) {
+        fun appendTag(key: String, value: String) {
             instance.config?.tags?.put(key, value)
         }
 
         fun show(context: Context) {
             val intent = Intent(context, WebActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
-            intent.putExtra(WebActivity.BUNDLE_KEY_DATA, instance.config)
+            intent.putExtra(BUNDLE_KEY_PARAMS, instance.config)
             context.startActivity(intent)
         }
     }
@@ -110,7 +111,7 @@ class BitLabsSDK {
         override fun getHeaders(): MutableMap<String?, String?> {
             return mutableMapOf(
                 "X-Api-Token" to config?.token,
-                "X-User-Id" to config?.userID,
+                "X-User-Id" to config?.uid,
             )
         }
     }

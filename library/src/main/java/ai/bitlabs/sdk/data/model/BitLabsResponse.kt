@@ -1,8 +1,8 @@
 package ai.bitlabs.sdk.data.model
 
 data class BitLabsResponse(
-    val data: CheckSurveysResponse,
-    val error: BitLabsError,
+    val data: CheckSurveysResponse?,
+    val error: BitLabsError?,
     val status: String,
     val trace_id: String
 )

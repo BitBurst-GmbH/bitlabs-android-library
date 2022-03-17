@@ -17,7 +17,7 @@ import androidx.appcompat.widget.Toolbar
 private const val TAG = "BL WebActivity"
 const val BUNDLE_KEY_PARAMS = "bundle-key-params"
 
-class WebActivity : AppCompatActivity() {
+internal class WebActivity : AppCompatActivity() {
 
     private var webView: WebView? = null
     private var toolbar: Toolbar? = null
@@ -25,10 +25,10 @@ class WebActivity : AppCompatActivity() {
 
     private lateinit var params: WebActivityParams
 
-    private var lastNetworkID: String? = null
-    private var lastSurveyID: String? = null
+    private var networkId: String? = null
+    private var surveyId: String? = null
 
-    private var totalReward: Float = 0.0F
+    private var reward: Float = 0.0F
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,6 +52,27 @@ class WebActivity : AppCompatActivity() {
             webView?.loadUrl(params.getURL())
     }
 
+    override fun onBackPressed() {
+        if (toolbar?.visibility == View.VISIBLE)
+            leaveSurveyAlert()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        webView?.saveState(outState)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        webView?.restoreState(savedInstanceState)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home)
+            leaveSurveyAlert()
+        return super.onOptionsItemSelected(item)
+    }
+
     private fun bindUI() {
         toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -71,12 +92,12 @@ class WebActivity : AppCompatActivity() {
         webView?.setup(this) { isPageOfferWall, url ->
             if (isPageOfferWall) {
                 if (url.contains("survey/complete") || url.contains("survey/screenout"))
-                    Uri.parse(url).getQueryParameter("val")?.let { totalReward += it.toFloat() }
+                    Uri.parse(url).getQueryParameter("val")?.let { reward += it.toFloat() }
             } else {
                 Regex("/networks/(\\d+)/surveys/(\\d+)").find(url)?.let { match ->
-                    val (network_id, survey_id) = match.destructured
-                    lastNetworkID = network_id
-                    lastSurveyID = survey_id
+                    val (networkId, surveyId) = match.destructured
+                    this.networkId = networkId
+                    this.surveyId = surveyId
                 }
             }
 
@@ -117,33 +138,7 @@ class WebActivity : AppCompatActivity() {
         toggleToolbar(true)
         webView?.loadUrl(params.getURL())
 
-        if (lastNetworkID != null && lastSurveyID != null)
-            BitLabsSDK.instance.reportSurveyLeave(lastNetworkID ?: "", lastSurveyID ?: "", reason)
-    }
-
-    override fun onBackPressed() {
-        if (toolbar?.visibility == View.VISIBLE)
-            leaveSurveyAlert()
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        webView?.saveState(outState)
-    }
-
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-        webView?.restoreState(savedInstanceState)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == android.R.id.home)
-            leaveSurveyAlert()
-        return super.onOptionsItemSelected(item)
-    }
-
-    override fun onStop() {
-        BitLabsSDK.rewardListener?.onReward(totalReward)
-        super.onStop()
+        if (networkId != null && surveyId != null)
+            params.leaveSurveyListener.leaveSurvey(networkId!!, surveyId!!, reason, reward)
     }
 }

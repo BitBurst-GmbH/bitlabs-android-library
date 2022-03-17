@@ -1,5 +1,5 @@
 package ai.bitlabs.sdk.data.model
 
-data class Reason(
+data class LeaveReason(
     val reason: String
 )

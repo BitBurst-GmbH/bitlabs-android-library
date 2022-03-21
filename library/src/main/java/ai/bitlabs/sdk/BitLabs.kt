@@ -36,15 +36,15 @@ class BitLabs(private val token: String, private val uid: String) : Serializable
             )
     }
 
-    fun setOnReward(onRewardListener: OnRewardListener) {
+    fun setOnRewardListener(onRewardListener: OnRewardListener) {
         this.onRewardListener = onRewardListener
     }
 
-    fun setOnReward(gameObject: String) = setOnReward { payout ->
+    fun setOnRewardListener(gameObject: String) = setOnRewardListener { payout ->
         UnityPlayer.UnitySendMessage(gameObject, "BitLabs - OnReward", payout.toString())
     }
 
-    fun appendTag(key: String, value: String) {
+    fun addTag(key: String, value: String) {
         tags[key] = value
     }
 

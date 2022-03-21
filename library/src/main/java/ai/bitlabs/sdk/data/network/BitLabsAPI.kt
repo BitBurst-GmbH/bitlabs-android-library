@@ -33,7 +33,8 @@ internal interface BitLabsAPI {
             this.uid = uid
         }
 
-        internal operator fun invoke(): BitLabsAPI = instance ?: Retrofit.Builder()
+        internal operator fun invoke(): BitLabsAPI = instance
+            ?: Retrofit.Builder()
             .baseUrl("https://api.bitlabs.ai/v1/")
             .client(OkHttpClient.Builder().addInterceptor { chain ->
                 chain.run {

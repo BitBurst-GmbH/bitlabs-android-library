@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
         bitLabs.setTags(tags);
 
         // Get client-side callbacks to reward the user (We highly recommend using server-to-server callbacks!)
-        bitLabs.setOnReward(payout -> Log.i("BitLabs", "BitLabs payout of: " + payout));
+        bitLabs.setOnRewardListener(payout -> Log.i("BitLabs", "BitLabs payout of: " + payout));
 
         findViewById(R.id.open).setOnClickListener(view -> bitLabs.launchOfferWall(this));
     }

@@ -10,14 +10,16 @@ internal data class WebActivityParams(
     private val tags: MutableMap<String, Any> = mutableMapOf(),
     val leaveSurveyListener: LeaveSurveyListener
 ) : Serializable {
-    private var url: String = ""
+    private var url: String? = null
 
-    fun getURL() =
-        url.takeIf { it.isNotEmpty() } ?: with(Uri.parse("https://web.bitlabs.ai").buildUpon()) {
-            appendQueryParameter("token", token)
-            appendQueryParameter("uid", uid)
-            tags.forEach { tag -> appendQueryParameter(tag.key, tag.value.toString()) }
-            url = build().toString()
-            url
-        }
+    fun getURL() = url ?: buildURL()
+
+    private fun buildURL() =
+        Uri.parse("https://web.bitlabs.ai").buildUpon()
+            .appendQueryParameter("token", token)
+            .appendQueryParameter("uid", uid)
+            .apply { tags.forEach { tag -> appendQueryParameter(tag.key, tag.value.toString()) } }
+            .build()
+            .toString()
+            .also { url = it }
 }

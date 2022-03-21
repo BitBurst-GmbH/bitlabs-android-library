@@ -8,24 +8,18 @@ import ai.bitlabs.sdk.util.OnRewardListener
 import android.content.Context
 import android.content.Intent
 import com.unity3d.player.UnityPlayer
+import java.io.Serializable
 
-class BitLabs(private val token: String, private val uid: String) {
+class BitLabs(private val token: String, private val uid: String) : Serializable {
     var tags: MutableMap<String, Any> = mutableMapOf()
     private val leaveSurveyListener: LeaveSurveyListener
     private var onRewardListener: OnRewardListener? = null
     private val bitLabsRepo = BitLabsRepository(token, uid)
 
     init {
-        leaveSurveyListener = object : LeaveSurveyListener {
-            override fun leaveSurvey(
-                networkId: String,
-                surveyId: String,
-                reason: String,
-                payout: Float
-            ) {
-                bitLabsRepo.leaveSurvey(networkId, surveyId, reason) {
-                    onRewardListener?.onReward(payout)
-                }
+        leaveSurveyListener = LeaveSurveyListener { networkId, surveyId, reason, payout ->
+            bitLabsRepo.leaveSurvey(networkId, surveyId, reason) {
+                onRewardListener?.onReward(payout)
             }
         }
     }
@@ -55,8 +49,9 @@ class BitLabs(private val token: String, private val uid: String) {
     }
 
     fun launchOfferWall(context: Context) =
-        context.startActivity(Intent(context, WebActivity::class.java).run {
+        with(Intent(context, WebActivity::class.java)) {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
             putExtra(BUNDLE_KEY_PARAMS, WebActivityParams(token, uid, tags, leaveSurveyListener))
-        })
+            context.startActivity(this)
+        }
 }

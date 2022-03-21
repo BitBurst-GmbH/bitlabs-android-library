@@ -10,6 +10,6 @@ fun interface OnResponseListener {
     fun onResponse(response: Boolean?)
 }
 
-internal interface LeaveSurveyListener : Serializable {
+internal fun interface LeaveSurveyListener : Serializable {
     fun leaveSurvey(networkId: String, surveyId: String, reason: String, payout: Float)
 }

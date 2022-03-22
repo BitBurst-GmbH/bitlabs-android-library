@@ -73,9 +73,14 @@ class BitLabs(private val token: String, private val uid: String) : Serializable
      * It's recommended that that you use a context you know the lifecycle of
      * in order to avoid memory leaks and other issues associated with Activities.
      */
-    fun launchOfferWall(context: Context) = with(Intent(context, WebActivity::class.java)) {
-        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
-        putExtra(BUNDLE_KEY_PARAMS, WebActivityParams(token, uid, tags, leaveSurveyListener))
-        context.startActivity(this)
-    }
+    @JvmOverloads
+    fun launchOfferWall(context: Context, sdk: String = "NATIVE") =
+        with(Intent(context, WebActivity::class.java)) {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            putExtra(
+                BUNDLE_KEY_PARAMS,
+                WebActivityParams(token, uid, sdk, tags, leaveSurveyListener)
+            )
+            context.startActivity(this)
+        }
 }

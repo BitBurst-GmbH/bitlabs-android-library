@@ -15,6 +15,7 @@ import java.io.Serializable
 internal data class WebActivityParams(
     private val token: String,
     private val uid: String,
+    private val sdk: String,
     private val tags: Map<String, Any> = mapOf(),
     val leaveSurveyListener: LeaveSurveyListener
 ) : Serializable {
@@ -27,6 +28,8 @@ internal data class WebActivityParams(
         .parse("https://web.bitlabs.ai").buildUpon()
         .appendQueryParameter("token", token)
         .appendQueryParameter("uid", uid)
+        .appendQueryParameter("os", "ANDROID")
+        .appendQueryParameter("sdk", sdk)
         .apply { tags.forEach { tag -> appendQueryParameter(tag.key, tag.value.toString()) } }
         .build()
         .toString()

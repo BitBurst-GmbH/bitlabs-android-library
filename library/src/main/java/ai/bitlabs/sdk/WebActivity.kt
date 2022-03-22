@@ -1,6 +1,8 @@
 package ai.bitlabs.sdk
 
 import ai.bitlabs.sdk.data.model.WebActivityParams
+import ai.bitlabs.sdk.util.BUNDLE_KEY_PARAMS
+import ai.bitlabs.sdk.util.TAG
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -14,9 +16,9 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 
-private const val TAG = "BL WebActivity"
-const val BUNDLE_KEY_PARAMS = "bundle-key-params"
-
+/**
+ * The [Activity][AppCompatActivity] that will provide a [WebView] to launch the OfferWall.
+ */
 internal class WebActivity : AppCompatActivity() {
 
     private var webView: WebView? = null
@@ -35,7 +37,7 @@ internal class WebActivity : AppCompatActivity() {
         setContentView(R.layout.activity_web)
 
         params = intent.extras?.getSerializable(BUNDLE_KEY_PARAMS) as? WebActivityParams ?: run {
-            Log.e(TAG, "No bundle data found!")
+            Log.e(TAG, "WebActivity - No bundle data found!")
             finish()
             return
         }
@@ -49,12 +51,12 @@ internal class WebActivity : AppCompatActivity() {
 
 
         if (savedInstanceState == null)
-            webView?.loadUrl(params.getURL())
+            webView?.loadUrl(params.url)
     }
 
     override fun onBackPressed() {
         if (toolbar?.visibility == View.VISIBLE)
-            leaveSurveyAlert()
+            showLeaveSurveyAlertDialog()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -69,10 +71,11 @@ internal class WebActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home)
-            leaveSurveyAlert()
+            showLeaveSurveyAlertDialog()
         return super.onOptionsItemSelected(item)
     }
 
+    /** A function to configure all UI elements and the logic behind them, if any. */
     private fun bindUI() {
         toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -85,10 +88,7 @@ internal class WebActivity : AppCompatActivity() {
 
         webView = findViewById(R.id.web)
         webView?.scrollBarStyle = WebView.SCROLLBARS_OUTSIDE_OVERLAY
-        setupWebView()
-    }
 
-    private fun setupWebView() {
         webView?.setup(this) { isPageOfferWall, url ->
             if (isPageOfferWall) {
                 if (url.contains("survey/complete") || url.contains("survey/screenout"))
@@ -100,25 +100,25 @@ internal class WebActivity : AppCompatActivity() {
                     this.surveyId = surveyId
                 }
             }
-
             toggleToolbar(isPageOfferWall)
         }
     }
 
+    /** Shows or hides some UI elements according to whether [isPageOfferWall] is `true` or `false`. */
     private fun toggleToolbar(isPageOfferWall: Boolean) {
         toolbar?.visibility = if (isPageOfferWall) View.GONE else View.VISIBLE
         closeButton?.visibility = if (isPageOfferWall) View.VISIBLE else View.GONE
         (if (isPageOfferWall) closeButton else toolbar)?.bringToFront()
 
-        webView
-            ?.apply { isScrollbarFadingEnabled = !isPageOfferWall }
-            ?.settings?.run {
-                setSupportZoom(!isPageOfferWall)
-                builtInZoomControls = !isPageOfferWall
-            }
+        webView?.isScrollbarFadingEnabled = !isPageOfferWall
+        webView?.settings?.run {
+            setSupportZoom(!isPageOfferWall)
+            builtInZoomControls = !isPageOfferWall
+        }
     }
 
-    private fun leaveSurveyAlert() {
+    /** Shows the Alert Dialog that lets the user choose a reason why they want to leave the survey. */
+    private fun showLeaveSurveyAlertDialog() {
         val options = arrayOf("SENSITIVE", "UNINTERESTING", "TECHNICAL", "TOO_LONG", "OTHER")
         val optionsDisplay = arrayOf(
             getString(R.string.leave_reason_sensitive),
@@ -134,9 +134,10 @@ internal class WebActivity : AppCompatActivity() {
             .show()
     }
 
+    /** Goes back to the OfferWall and triggers the [WebActivityParams.leaveSurveyListener] */
     private fun leaveSurvey(reason: String) {
         toggleToolbar(true)
-        webView?.loadUrl(params.getURL())
+        webView?.loadUrl(params.url)
 
         if (networkId != null && surveyId != null)
             params.leaveSurveyListener.leaveSurvey(networkId!!, surveyId!!, reason, reward)

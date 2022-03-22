@@ -11,6 +11,13 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
 
+/**
+ * Responsible for communication with the BitLabs API
+ *
+ * This is a Singleton, so once it has been initialised for the first time,
+ * there will always be exactly one instance that's accessible to the main process.
+ * Publishers using the library won't be able to control the lifecycle of this instance.
+ * */
 internal interface BitLabsAPI {
 
     @GET("client/check?platform=MOBILE")
@@ -33,8 +40,7 @@ internal interface BitLabsAPI {
             this.uid = uid
         }
 
-        internal operator fun invoke(): BitLabsAPI = instance
-            ?: Retrofit.Builder()
+        internal operator fun invoke(): BitLabsAPI = instance ?: Retrofit.Builder()
             .baseUrl("https://api.bitlabs.ai/v1/")
             .client(OkHttpClient.Builder().addInterceptor { chain ->
                 chain.run {

@@ -10,6 +10,7 @@ import android.webkit.*
 import androidx.annotation.RequiresApi
 import androidx.browser.customtabs.CustomTabsIntent
 
+/** An extension to add all necessary configurations for the [WebActivity.webView] */
 @SuppressLint("SetJavaScriptEnabled")
 fun WebView.setup(
     context: Context,

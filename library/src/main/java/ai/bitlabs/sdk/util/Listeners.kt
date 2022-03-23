@@ -10,8 +10,8 @@ fun interface OnRewardListener : Serializable {
 
 
 /** Interface definition for a callback to be invoked when a response is received from [BitLabsAPI]. */
-fun interface OnResponseListener {
-    fun onResponse(response: Boolean?)
+fun interface OnResponseListener<T> {
+    fun onResponse(response: T?)
 }
 
 

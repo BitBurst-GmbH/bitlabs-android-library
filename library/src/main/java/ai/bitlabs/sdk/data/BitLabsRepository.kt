@@ -20,7 +20,7 @@ internal class BitLabsRepository(token: String, uid: String) : Serializable {
         BitLabsAPI.setup(token, uid)
     }
 
-    internal fun hasSurveys(onResponseListener: OnResponseListener) =
+    internal fun hasSurveys(onResponseListener: OnResponseListener<Boolean>) =
         BitLabsAPI().checkSurveys().enqueue(object : Callback<BitLabsResponse> {
             override fun onResponse(
                 call: Call<BitLabsResponse>,
@@ -46,7 +46,7 @@ internal class BitLabsRepository(token: String, uid: String) : Serializable {
         networkId: String,
         surveyId: String,
         reason: String,
-        onResponseListener: OnResponseListener
+        onResponseListener: OnResponseListener<Unit>
     ) = BitLabsAPI().leaveSurvey(networkId, surveyId, LeaveReason(reason))
         .enqueue(object : Callback<BitLabsResponse> {
             override fun onResponse(
@@ -54,7 +54,7 @@ internal class BitLabsRepository(token: String, uid: String) : Serializable {
                 response: Response<BitLabsResponse>
             ) {
                 if (response.isSuccessful)
-                    onResponseListener.onResponse(true)
+                    onResponseListener.onResponse(Unit)
                 else {
                     response.errorBody()?.body()?.error?.details?.run {
                         Log.e(TAG, "LeaveSurvey $http - $msg")

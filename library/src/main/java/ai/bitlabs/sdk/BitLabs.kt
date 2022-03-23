@@ -38,9 +38,10 @@ class BitLabs(private val token: String, private val uid: String) : Serializable
      * If you want to perform background checks if surveys are available, this is the best option.
      *
      * @param[onResponseListener] The callback to execute when a response is received, the boolean
-     * parameter is `true` if an action can be performed and `false` otherwise.
+     * parameter is `true` if an action can be performed and `false` otherwise. If it's `null`,
+     * then there has been an internal error which is most probably logged with 'BitLabs' as a tag.
      */
-    fun hasSurveys(onResponseListener: OnResponseListener) =
+    fun hasSurveys(onResponseListener: OnResponseListener<Boolean>) =
         bitLabsRepo.hasSurveys(onResponseListener)
 
     /** Don't use this method, use [BitLabs.hasSurveys] instead. */
@@ -70,6 +71,7 @@ class BitLabs(private val token: String, private val uid: String) : Serializable
 
     /**
      * Launches the OfferWall from the [context] of the Activity you pass.
+     *
      * It's recommended that that you use a context you know the lifecycle of
      * in order to avoid memory leaks and other issues associated with Activities.
      */

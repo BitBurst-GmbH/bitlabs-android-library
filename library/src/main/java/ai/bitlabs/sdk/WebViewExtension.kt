@@ -10,17 +10,22 @@ import android.webkit.*
 import androidx.annotation.RequiresApi
 import androidx.browser.customtabs.CustomTabsIntent
 
-/** An extension to add all necessary configurations for the [WebActivity.webView] */
+/** Adds all necessary configurations for the its receiver [WebActivity.webView] */
 @SuppressLint("SetJavaScriptEnabled")
 fun WebView.setup(
     context: Context,
     onShouldOverrideUrlLoading: (isPageOfferWall: Boolean, url: String) -> Unit
 ) {
+
+    if (Build.VERSION.SDK_INT >= 21)
+        CookieManager.getInstance().setAcceptThirdPartyCookies(this, true)
+    else
+        CookieManager.getInstance().setAcceptCookie(true)
+
     this.setLayerType(
         if (Build.VERSION.SDK_INT >= 19) View.LAYER_TYPE_HARDWARE else View.LAYER_TYPE_SOFTWARE,
         null
     )
-
 
     this.webChromeClient = object : WebChromeClient() {
         override fun onCreateWindow(
@@ -53,13 +58,13 @@ fun WebView.setup(
     }
 
     this.settings.run {
-        javaScriptEnabled = true
-        javaScriptCanOpenWindowsAutomatically = true
-        setSupportMultipleWindows(true)
-        domStorageEnabled = true
-        allowFileAccess = true
         databaseEnabled = true
+        allowFileAccess = true
+        javaScriptEnabled = true
+        domStorageEnabled = true
+        setSupportMultipleWindows(true)
         cacheMode = WebSettings.LOAD_NO_CACHE
+        javaScriptCanOpenWindowsAutomatically = true
 
         if (Build.VERSION.SDK_INT >= 17) mediaPlaybackRequiresUserGesture = false
     }

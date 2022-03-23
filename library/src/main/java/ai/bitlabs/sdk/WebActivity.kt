@@ -44,12 +44,6 @@ internal class WebActivity : AppCompatActivity() {
 
         bindUI()
 
-        if (Build.VERSION.SDK_INT >= 21)
-            CookieManager.getInstance().setAcceptThirdPartyCookies(webView, true)
-        else
-            CookieManager.getInstance().setAcceptCookie(true)
-
-
         if (savedInstanceState == null)
             webView?.loadUrl(params.url)
     }
@@ -134,7 +128,7 @@ internal class WebActivity : AppCompatActivity() {
             .show()
     }
 
-    /** Goes back to the OfferWall and triggers the [WebActivityParams.leaveSurveyListener] */
+    /** Loads the OfferWall page and triggers the [WebActivityParams.leaveSurveyListener] */
     private fun leaveSurvey(reason: String) {
         toggleToolbar(true)
         webView?.loadUrl(params.url)

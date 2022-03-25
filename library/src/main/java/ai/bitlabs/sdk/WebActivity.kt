@@ -4,12 +4,10 @@ import ai.bitlabs.sdk.data.model.WebActivityParams
 import ai.bitlabs.sdk.util.BUNDLE_KEY_PARAMS
 import ai.bitlabs.sdk.util.TAG
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
-import android.webkit.CookieManager
 import android.webkit.WebView
 import android.widget.ImageView
 import androidx.appcompat.app.AlertDialog
@@ -25,7 +23,7 @@ internal class WebActivity : AppCompatActivity() {
     private var toolbar: Toolbar? = null
     private var closeButton: ImageView? = null
 
-    private lateinit var params: WebActivityParams
+    private lateinit var url: String
 
     private var networkId: String? = null
     private var surveyId: String? = null
@@ -36,7 +34,7 @@ internal class WebActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_web)
 
-        params = intent.extras?.getSerializable(BUNDLE_KEY_PARAMS) as? WebActivityParams ?: run {
+        url = intent.extras?.getString(BUNDLE_KEY_PARAMS) ?: run {
             Log.e(TAG, "WebActivity - No bundle data found!")
             finish()
             return
@@ -45,7 +43,7 @@ internal class WebActivity : AppCompatActivity() {
         bindUI()
 
         if (savedInstanceState == null)
-            webView?.loadUrl(params.url)
+            webView?.loadUrl(url)
     }
 
     override fun onBackPressed() {
@@ -131,9 +129,9 @@ internal class WebActivity : AppCompatActivity() {
     /** Loads the OfferWall page and triggers the [WebActivityParams.leaveSurveyListener] */
     private fun leaveSurvey(reason: String) {
         toggleToolbar(true)
-        webView?.loadUrl(params.url)
+        webView?.loadUrl(url)
 
         if (networkId != null && surveyId != null)
-            params.leaveSurveyListener.leaveSurvey(networkId!!, surveyId!!, reason, reward)
+            BitLabs.leaveSurvey(networkId!!, surveyId!!, reason, reward)
     }
 }

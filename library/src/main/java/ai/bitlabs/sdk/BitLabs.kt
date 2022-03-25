@@ -3,32 +3,38 @@ package ai.bitlabs.sdk
 import ai.bitlabs.sdk.data.BitLabsRepository
 import ai.bitlabs.sdk.data.model.WebActivityParams
 import ai.bitlabs.sdk.util.BUNDLE_KEY_PARAMS
-import ai.bitlabs.sdk.util.LeaveSurveyListener
 import ai.bitlabs.sdk.util.OnResponseListener
 import ai.bitlabs.sdk.util.OnRewardListener
+import ai.bitlabs.sdk.util.TAG
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import com.unity3d.player.UnityPlayer
-import java.io.Serializable
 
 /**
  * The main class including all the library functions to use in your code.
- * @param token Your App Token, found in your [BitLabs Dashboard](https://dashboard.bitlabs.ai/).
- * @param uid The id of the current user, this id is for you to keep track of which user got what.
  */
-class BitLabs(private val token: String, private val uid: String) : Serializable {
+object BitLabs {
+    internal var token: String = ""
+    internal var uid: String = ""
+
     /** These will be added as query parameters to the OfferWall Link */
     var tags: MutableMap<String, Any> = mutableMapOf()
-    private val leaveSurveyListener: LeaveSurveyListener
-    private var onRewardListener: OnRewardListener? = null
-    private val bitLabsRepo = BitLabsRepository(token, uid)
 
-    init {
-        leaveSurveyListener = LeaveSurveyListener { networkId, surveyId, reason, payout ->
-            bitLabsRepo.leaveSurvey(networkId, surveyId, reason) {
-                onRewardListener?.onReward(payout)
-            }
-        }
+    private var bitLabsRepo: BitLabsRepository? = null
+    private var onRewardListener: OnRewardListener? = null
+
+
+    /**
+     * This is the essential function. Without it, the library will not function properly.
+     * So make sure you call it before using the library's functions
+     * @param token Your App Token, found in your [BitLabs Dashboard](https://dashboard.bitlabs.ai/).
+     * @param uid The id of the current user, this id is for you to keep track of which user got what.
+     */
+    fun configure(token: String, uid: String) {
+        this.token = token
+        this.uid = uid
+        bitLabsRepo = BitLabsRepository()
     }
 
     /** Determines whether the user can perform an action in the OfferWall
@@ -41,8 +47,9 @@ class BitLabs(private val token: String, private val uid: String) : Serializable
      * parameter is `true` if an action can be performed and `false` otherwise. If it's `null`,
      * then there has been an internal error which is most probably logged with 'BitLabs' as a tag.
      */
-    fun hasSurveys(onResponseListener: OnResponseListener<Boolean>) =
-        bitLabsRepo.hasSurveys(onResponseListener)
+    fun hasSurveys(onResponseListener: OnResponseListener<Boolean>) = ifConfigured {
+        bitLabsRepo?.hasSurveys(onResponseListener)
+    }
 
     /** Don't use this method, use [BitLabs.hasSurveys] instead. */
     fun hasSurveys(gameObject: String) = hasSurveys { hasSurveys ->
@@ -76,13 +83,21 @@ class BitLabs(private val token: String, private val uid: String) : Serializable
      * in order to avoid memory leaks and other issues associated with Activities.
      */
     @JvmOverloads
-    fun launchOfferWall(context: Context, sdk: String = "NATIVE") =
+    fun launchOfferWall(context: Context, sdk: String = "NATIVE") = ifConfigured {
         with(Intent(context, WebActivity::class.java)) {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
-            putExtra(
-                BUNDLE_KEY_PARAMS,
-                WebActivityParams(token, uid, sdk, tags, leaveSurveyListener)
-            )
+            putExtra(BUNDLE_KEY_PARAMS, WebActivityParams(token, uid, sdk, tags).url)
             context.startActivity(this)
         }
+    }
+
+    internal fun leaveSurvey(networkId: String, surveyId: String, reason: String, payout: Float) =
+        bitLabsRepo?.leaveSurvey(networkId, surveyId, reason) { onRewardListener?.onReward(payout) }
+
+    private inline fun ifConfigured(block: () -> Unit) {
+        val isConfigured = token.isNotBlank().and(uid.isNotBlank()).and(bitLabsRepo != null)
+
+        if (isConfigured) block()
+        else Log.e(TAG, "You should configure BitLabs first. Call BitLabs::configure()")
+    }
 }

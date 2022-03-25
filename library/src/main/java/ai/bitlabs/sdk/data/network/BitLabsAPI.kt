@@ -1,5 +1,6 @@
 package ai.bitlabs.sdk.data.network
 
+import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.data.model.BitLabsResponse
 import ai.bitlabs.sdk.data.model.LeaveReason
 import okhttp3.OkHttpClient
@@ -32,13 +33,6 @@ internal interface BitLabsAPI {
 
     companion object {
         private var instance: BitLabsAPI? = null
-        private var token = ""
-        private var uid = ""
-
-        internal fun setup(token: String, uid: String) {
-            this.token = token
-            this.uid = uid
-        }
 
         internal operator fun invoke(): BitLabsAPI = instance ?: Retrofit.Builder()
             .baseUrl("https://api.bitlabs.ai/v1/")
@@ -46,8 +40,8 @@ internal interface BitLabsAPI {
                 chain.run {
                     proceed(
                         request().newBuilder()
-                            .addHeader("X-Api-Token", token)
-                            .addHeader("X-User-Id", uid)
+                            .addHeader("X-Api-Token", BitLabs.token)
+                            .addHeader("X-User-Id", BitLabs.uid)
                             .build()
                     )
                 }

@@ -1,24 +1,19 @@
 package ai.bitlabs.sdk.data.model
 
 import ai.bitlabs.sdk.WebActivity
-import ai.bitlabs.sdk.util.LeaveSurveyListener
 import android.net.Uri
-import java.io.Serializable
 
 /**
  * This class holds the parameters of the [WebActivity] responsible to launch the OfferWall.
- * @constructor A Constructor that holds the values ([token], [uid], [tags], [leaveSurveyListener])
+ * @constructor A Constructor that holds the values ([token], [uid], [tags])
  * which will be used in the [WebActivity] to launch the OfferWall correctly.
- * @property leaveSurveyListener The callback function that will be triggered upon the successful
- * leave of a survey
  */
 internal data class WebActivityParams(
     private val token: String,
     private val uid: String,
     private val sdk: String,
-    private val tags: Map<String, Any> = mapOf(),
-    val leaveSurveyListener: LeaveSurveyListener
-) : Serializable {
+    private val tags: Map<String, Any> = mapOf()
+) {
     var url: String = ""
         get() = field.takeIf { it.isNotEmpty() } ?: buildUrl()
         private set

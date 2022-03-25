@@ -13,14 +13,14 @@ import ai.bitlabs.sdk.BitLabs;
 public class MainActivity extends AppCompatActivity {
     private final String TAG = "Example";
 
-    BitLabs bitLabs;
+    BitLabs bitLabs = BitLabs.INSTANCE;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        bitLabs = new BitLabs("YOUR-APP-TOKEN", "USER-ID");
+        bitLabs.configure("YOUR-APP-TOKEN", "USER-ID");
 
         bitLabs.hasSurveys(hasSurveys -> Log.i(TAG, hasSurveys != null ? hasSurveys.toString() : "NULL -  Check BitLabs Logs"));
 

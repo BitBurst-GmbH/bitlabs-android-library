@@ -11,15 +11,9 @@ import android.util.Log
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.io.Serializable
 
 /** This class is the point of communication between the data and [BitLabs] */
-internal class BitLabsRepository(token: String, uid: String) : Serializable {
-
-    init {
-        BitLabsAPI.setup(token, uid)
-    }
-
+internal class BitLabsRepository {
     internal fun hasSurveys(onResponseListener: OnResponseListener<Boolean>) =
         BitLabsAPI().checkSurveys().enqueue(object : Callback<BitLabsResponse> {
             override fun onResponse(

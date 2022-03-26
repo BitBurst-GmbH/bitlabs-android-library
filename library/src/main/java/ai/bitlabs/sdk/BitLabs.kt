@@ -13,6 +13,9 @@ import com.unity3d.player.UnityPlayer
 
 /**
  * The main class including all the library functions to use in your code.
+ *
+ * This is a singleton object, so you'll have one instance throughout the whole
+ * main process(app lifecycle).
  */
 object BitLabs {
     internal var token: String = ""
@@ -31,10 +34,10 @@ object BitLabs {
      * @param token Your App Token, found in your [BitLabs Dashboard](https://dashboard.bitlabs.ai/).
      * @param uid The id of the current user, this id is for you to keep track of which user got what.
      */
-    fun configure(token: String, uid: String) {
+    fun init(token: String, uid: String) {
         this.token = token
         this.uid = uid
-        bitLabsRepo = BitLabsRepository()
+        bitLabsRepo = BitLabsRepository(token, uid)
     }
 
     /** Determines whether the user can perform an action in the OfferWall
@@ -47,7 +50,7 @@ object BitLabs {
      * parameter is `true` if an action can be performed and `false` otherwise. If it's `null`,
      * then there has been an internal error which is most probably logged with 'BitLabs' as a tag.
      */
-    fun hasSurveys(onResponseListener: OnResponseListener<Boolean>) = ifConfigured {
+    fun hasSurveys(onResponseListener: OnResponseListener<Boolean>) = ifInitialised {
         bitLabsRepo?.hasSurveys(onResponseListener)
     }
 
@@ -83,7 +86,7 @@ object BitLabs {
      * in order to avoid memory leaks and other issues associated with Activities.
      */
     @JvmOverloads
-    fun launchOfferWall(context: Context, sdk: String = "NATIVE") = ifConfigured {
+    fun launchOfferWall(context: Context, sdk: String = "NATIVE") = ifInitialised {
         with(Intent(context, WebActivity::class.java)) {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
             putExtra(BUNDLE_KEY_PARAMS, WebActivityParams(token, uid, sdk, tags).url)
@@ -94,10 +97,14 @@ object BitLabs {
     internal fun leaveSurvey(networkId: String, surveyId: String, reason: String, payout: Float) =
         bitLabsRepo?.leaveSurvey(networkId, surveyId, reason) { onRewardListener?.onReward(payout) }
 
-    private inline fun ifConfigured(block: () -> Unit) {
-        val isConfigured = token.isNotBlank().and(uid.isNotBlank()).and(bitLabsRepo != null)
+    /**
+     * Checks whether [token] and [uid] have been set and aren't blank/empty and
+     * [bitLabsRepo] is initialised and executes the [block] accordingly.
+     */
+    private inline fun ifInitialised(block: () -> Unit) {
+        val isInitialised = token.isNotBlank().and(uid.isNotBlank()).and(bitLabsRepo != null)
 
-        if (isConfigured) block()
-        else Log.e(TAG, "You should configure BitLabs first. Call BitLabs::configure()")
+        if (isInitialised) block()
+        else Log.e(TAG, "You should initialise BitLabs first! Call BitLabs::init()")
     }
 }

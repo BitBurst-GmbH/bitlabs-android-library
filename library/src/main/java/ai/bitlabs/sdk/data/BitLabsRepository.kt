@@ -8,14 +8,33 @@ import ai.bitlabs.sdk.data.network.BitLabsAPI
 import ai.bitlabs.sdk.util.OnResponseListener
 import ai.bitlabs.sdk.util.TAG
 import android.util.Log
+import okhttp3.OkHttpClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 /** This class is the point of communication between the data and [BitLabs] */
-internal class BitLabsRepository {
+internal class BitLabsRepository(token: String, uid: String) {
+    private val bitLabsAPI = Retrofit.Builder()
+        .baseUrl("https://api.bitlabs.ai/v1/")
+        .client(OkHttpClient.Builder().addInterceptor { chain ->
+            chain.run {
+                proceed(
+                    request().newBuilder()
+                        .addHeader("X-Api-Token", BitLabs.token)
+                        .addHeader("X-User-Id", BitLabs.uid)
+                        .build()
+                )
+            }
+        }.build())
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+        .create(BitLabsAPI::class.java)
+
     internal fun hasSurveys(onResponseListener: OnResponseListener<Boolean>) =
-        BitLabsAPI().checkSurveys().enqueue(object : Callback<BitLabsResponse> {
+        bitLabsAPI.checkSurveys().enqueue(object : Callback<BitLabsResponse> {
             override fun onResponse(
                 call: Call<BitLabsResponse>,
                 response: Response<BitLabsResponse>
@@ -41,7 +60,7 @@ internal class BitLabsRepository {
         surveyId: String,
         reason: String,
         onResponseListener: OnResponseListener<Unit>
-    ) = BitLabsAPI().leaveSurvey(networkId, surveyId, LeaveReason(reason))
+    ) = bitLabsAPI.leaveSurvey(networkId, surveyId, LeaveReason(reason))
         .enqueue(object : Callback<BitLabsResponse> {
             override fun onResponse(
                 call: Call<BitLabsResponse>,

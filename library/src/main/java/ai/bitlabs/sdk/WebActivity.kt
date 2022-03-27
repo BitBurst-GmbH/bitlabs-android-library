@@ -1,72 +1,79 @@
 package ai.bitlabs.sdk
 
-import android.annotation.SuppressLint
+import ai.bitlabs.sdk.data.model.WebActivityParams
+import ai.bitlabs.sdk.util.BUNDLE_KEY_PARAMS
+import ai.bitlabs.sdk.util.TAG
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.os.Message
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
-import android.webkit.*
+import android.webkit.WebView
 import android.widget.ImageView
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.browser.customtabs.CustomTabsIntent
-import java.io.Serializable
 
-data class WebActivityParams(var token: String, var userID: String, var sdk: String = "NATIVE") : Serializable {
-    var tags: MutableMap<String, Any>? = mutableMapOf()
-
-    @Transient
-    private var _url: String? = null
-    val url: String
-        get() {
-            if (_url == null) {
-                val builder = Uri.parse("https://web.bitlabs.ai").buildUpon()
-                builder
-                    .appendQueryParameter("token", token)
-                    .appendQueryParameter("uid", userID)
-                    .appendQueryParameter("os", "ANDROID")
-                    .appendQueryParameter("sdk", sdk)
-                tags?.forEach { e -> builder.appendQueryParameter(e.key, e.value.toString()) }
-                _url = builder.build().toString()
-            }
-            return _url ?: ""
-        }
-}
-
-class WebActivity : AppCompatActivity() {
-    companion object {
-        const val BUNDLE_KEY_DATA = "data"
-    }
+/**
+ * The [Activity][AppCompatActivity] that will provide a [WebView] to launch the OfferWall.
+ */
+internal class WebActivity : AppCompatActivity() {
 
     private var webView: WebView? = null
     private var toolbar: Toolbar? = null
     private var closeButton: ImageView? = null
 
-    private lateinit var params: WebActivityParams
+    private lateinit var url: String
 
-    private var lastNetworkID: String? = null
-    private var lastSurveyID: String? = null
+    private var networkId: String? = null
+    private var surveyId: String? = null
 
-    private var totalReward: Float = 0.0F
+    private var reward: Float = 0.0F
 
-    @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_web)
 
-        val paramsRaw = intent.extras?.getSerializable(BUNDLE_KEY_DATA) as? WebActivityParams
-        if (paramsRaw == null) {
-            Log.e("BitLabs", "no bundle data supplied to web activity")
+        url = intent.extras?.getString(BUNDLE_KEY_PARAMS) ?: run {
+            Log.e(TAG, "WebActivity - No bundle data found!")
             finish()
             return
         }
-        params = paramsRaw
 
+        bindUI()
+
+        if (savedInstanceState == null)
+            webView?.loadUrl(url)
+    }
+
+    override fun onBackPressed() {
+        if (toolbar?.visibility == View.VISIBLE)
+            showLeaveSurveyAlertDialog()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        webView?.saveState(outState)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        webView?.restoreState(savedInstanceState)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home)
+            showLeaveSurveyAlertDialog()
+        return super.onOptionsItemSelected(item)
+    }
+
+    override fun onStop() {
+        BitLabs.onRewardListener?.onReward(reward)
+        super.onStop()
+    }
+
+    /** A function to configure all UI elements and the logic behind them, if any. */
+    private fun bindUI() {
         toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -74,115 +81,41 @@ class WebActivity : AppCompatActivity() {
 
         closeButton = findViewById(R.id.close)
         closeButton?.setOnClickListener { finish() }
-        hideToolbar()
+        toggleToolbar(true)
 
         webView = findViewById(R.id.web)
         webView?.scrollBarStyle = WebView.SCROLLBARS_OUTSIDE_OVERLAY
-        webView?.webChromeClient = object : WebChromeClient() {
-            override fun onCreateWindow(
-                view: WebView,
-                dialog: Boolean,
-                userGesture: Boolean,
-                resultMsg: Message
-            ): Boolean {
-                val result = view.hitTestResult
-                var data = result.extra
-                if (data == null)
-                    data = view.url
-                val builder = CustomTabsIntent.Builder()
-                val customTabsIntent = builder.build()
-                customTabsIntent.launchUrl(this@WebActivity, Uri.parse(data))
-                return false
-            }
-        }
-        webView?.webViewClient = object : WebViewClient() {
-            override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
-                if (url == null) {
-                    return false
+
+        webView?.setup(this) { isPageOfferWall, url ->
+            if (isPageOfferWall) {
+                if (url.contains("survey/complete") || url.contains("survey/screenout"))
+                    Uri.parse(url).getQueryParameter("val")?.let { reward += it.toFloat() }
+            } else {
+                Regex("/networks/(\\d+)/surveys/(\\d+)").find(url)?.let { match ->
+                    val (networkId, surveyId) = match.destructured
+                    this.networkId = networkId
+                    this.surveyId = surveyId
                 }
-
-                if (url.contains("web.bitlabs.ai")) {
-                    hideToolbar()
-
-                    if(url.contains("survey/complete") || url.contains("survey/screenout")){
-                        val uri = Uri.parse(url)
-                        uri.getQueryParameter("val")?.let { totalReward += it.toFloat() }
-                    }
-                } else {
-                    showToolbar()
-
-                    val match = Regex("/networks/(\\d+)/surveys/(\\d+)").find(url)
-                    if (match != null) {
-                        val (network_id, survey_id) = match.destructured
-                        lastNetworkID = network_id
-                        lastSurveyID = survey_id
-                    }
-                }
-
-                webView?.loadUrl(url)
-                return true
             }
-
-            @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-            override fun onPageFinished(view: WebView?, url: String?) {
-                CookieManager.getInstance().flush()
-            }
-        }
-
-        val settings = webView?.settings
-        settings?.javaScriptEnabled = true
-        settings?.javaScriptCanOpenWindowsAutomatically = true
-        settings?.setSupportMultipleWindows(true)
-        settings?.domStorageEnabled = true
-        settings?.allowFileAccess = true
-        settings?.databaseEnabled = true
-        settings?.cacheMode = WebSettings.LOAD_NO_CACHE
-
-        if (Build.VERSION.SDK_INT >= 17) {
-            settings?.mediaPlaybackRequiresUserGesture = false
-        }
-        if (Build.VERSION.SDK_INT >= 19) {
-            webView?.setLayerType(View.LAYER_TYPE_HARDWARE, null)
-        } else {
-            webView?.setLayerType(View.LAYER_TYPE_SOFTWARE, null)
-        }
-        if (Build.VERSION.SDK_INT >= 21) {
-            CookieManager.getInstance().setAcceptThirdPartyCookies(webView, true)
-        } else {
-            CookieManager.getInstance().setAcceptCookie(true)
-        }
-
-        if (savedInstanceState == null) {
-            webView?.loadUrl(params.url)
+            toggleToolbar(isPageOfferWall)
         }
     }
 
-    private fun hideToolbar() {
-        toolbar?.visibility = View.GONE
-        closeButton?.visibility = View.VISIBLE
-        closeButton?.bringToFront()
+    /** Shows or hides some UI elements according to whether [isPageOfferWall] is `true` or `false`. */
+    private fun toggleToolbar(isPageOfferWall: Boolean) {
+        toolbar?.visibility = if (isPageOfferWall) View.GONE else View.VISIBLE
+        closeButton?.visibility = if (isPageOfferWall) View.VISIBLE else View.GONE
+        (if (isPageOfferWall) closeButton else toolbar)?.bringToFront()
 
-        val settings = webView?.settings
-        settings?.setSupportZoom(false)
-        settings?.builtInZoomControls = false
-        settings?.displayZoomControls = true
-        webView?.isScrollbarFadingEnabled = false
+        webView?.isScrollbarFadingEnabled = !isPageOfferWall
+        webView?.settings?.run {
+            setSupportZoom(!isPageOfferWall)
+            builtInZoomControls = !isPageOfferWall
+        }
     }
 
-    private fun showToolbar() {
-        toolbar?.visibility = View.VISIBLE
-        toolbar?.bringToFront()
-        closeButton?.visibility = View.GONE
-
-        val settings = webView?.settings
-        settings?.setSupportZoom(true)
-        settings?.builtInZoomControls = true
-        settings?.displayZoomControls = false
-        webView?.scrollBarStyle = WebView.SCROLLBARS_OUTSIDE_OVERLAY
-        webView?.isScrollbarFadingEnabled = true
-    }
-
-    private fun leaveSurveyAlert() {
+    /** Shows the Alert Dialog that lets the user choose a reason why they want to leave the survey. */
+    private fun showLeaveSurveyAlertDialog() {
         val options = arrayOf("SENSITIVE", "UNINTERESTING", "TECHNICAL", "TOO_LONG", "OTHER")
         val optionsDisplay = arrayOf(
             getString(R.string.leave_reason_sensitive),
@@ -198,37 +131,12 @@ class WebActivity : AppCompatActivity() {
             .show()
     }
 
+    /** Loads the OfferWall page and triggers the [WebActivityParams.leaveSurveyListener] */
     private fun leaveSurvey(reason: String) {
-        hideToolbar()
-        webView?.loadUrl(params.url)
+        toggleToolbar(true)
+        webView?.loadUrl(url)
 
-        if (lastNetworkID != null && lastSurveyID != null)
-            BitLabsSDK.instance.reportSurveyLeave(lastNetworkID ?: "", lastSurveyID ?: "", reason)
-    }
-
-    override fun onBackPressed() {
-        if (toolbar?.visibility == View.VISIBLE)
-            leaveSurveyAlert()
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        webView?.saveState(outState)
-    }
-
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-        webView?.restoreState(savedInstanceState)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == android.R.id.home)
-            leaveSurveyAlert()
-        return super.onOptionsItemSelected(item)
-    }
-
-    override fun onStop() {
-        BitLabsSDK.rewardListener?.onReward(totalReward)
-        super.onStop()
+        if (networkId != null && surveyId != null)
+            BitLabs.leaveSurvey(networkId!!, surveyId!!, reason, reward)
     }
 }

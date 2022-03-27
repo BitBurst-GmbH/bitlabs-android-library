@@ -1,6 +1,7 @@
 <resources>
 
     <string name="web_toolbar_header">Umfrage</string>
+
     <string name="leave_dialog_title">Bitte wähle einen Grund für das Verlassen der Umfrage</string>
     <string name="leave_reason_sensitive">Zu sensibel</string>
     <string name="leave_reason_uninteresting">Uninteressant</string>
@@ -8,8 +9,13 @@
     <string name="leave_reason_too_long">Zu lang</string>
     <string name="leave_reason_other">Andere Gründe</string>
     <string name="leave_dialog_continue">Umfrage weitermachen</string>
+
     <string name="desktop_mode_title">Fehler bei der Umfrage</string>
-    <string name="desktop_mode_message">Wenn du einen Fehler in der Anzeige einer Umfrage hast, können wir versuchen, ihn zu beheben. Es ist jedoch möglich, dass du von der Umfrage ausgeschlossen wirst. Bitte benutze diese Funktion nur, wenn du sonst nicht weitermachen könntest.</string>
+    <string name="desktop_mode_message">
+        Wenn du einen Fehler in der Anzeige einer Umfrage hast, können wir versuchen, ihn zu beheben.
+        Es ist jedoch möglich, dass du von der Umfrage ausgeschlossen wirst.
+        Bitte benutze diese Funktion nur, wenn du sonst nicht weitermachen könntest.
+    </string>
     <string name="desktop_mode_continue">Anzeige ändern</string>
     <string name="desktop_mode_cancel">Abbrechen</string>
 

@@ -8,32 +8,31 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.util.HashMap;
 import java.util.Map;
 
-import ai.bitlabs.sdk.BitLabsSDK;
+import ai.bitlabs.sdk.BitLabs;
 
 public class MainActivity extends AppCompatActivity {
+    private final String TAG = "Example";
+
+    BitLabs bitLabs = BitLabs.INSTANCE;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        BitLabsSDK.Companion.init(MainActivity.this, "YOUR_TOKEN", "YOUR_USER_ID");
+        bitLabs.init("YOUR-APP-TOKEN", "USER-ID");
+
+        bitLabs.hasSurveys(hasSurveys -> Log.i(TAG, hasSurveys != null ? hasSurveys.toString() : "NULL -  Check BitLabs Logs"));
 
         // optionally add custom tags to your users
         Map<String, Object> tags = new HashMap<>();
         tags.put("my_tag", "new_user");
         tags.put("is_premium", true);
-        BitLabsSDK.Companion.setTags(tags);
+        bitLabs.setTags(tags);
 
         // Get client-side callbacks to reward the user (We highly recommend using server-to-server callbacks!)
-        BitLabsSDK.Companion.onReward(payout->Log.e("BitLabs", "BitLabs payout of: " + payout));
+        bitLabs.setOnRewardListener(payout -> Log.i("BitLabs", "Reward payout: " + payout));
 
-        findViewById(R.id.open).setOnClickListener(view ->
-                BitLabsSDK.Companion.hasSurveys(
-                        // NOTE: the offerwall can be shown without checking for surveys first
-                        response -> BitLabsSDK.Companion.show(this),
-                        error -> Log.e("BitLabs", error.toString())
-                )
-        );
+        findViewById(R.id.open).setOnClickListener(view -> bitLabs.launchOfferWall(this));
     }
 }

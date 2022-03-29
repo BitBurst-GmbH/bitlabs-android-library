@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
 
         bitLabs.init("YOUR-APP-TOKEN", "USER-ID");
 
-        bitLabs.hasSurveys(hasSurveys -> Log.i(TAG, hasSurveys != null ? hasSurveys.toString() : "NULL -  Check BitLabs Logs"));
+        bitLabs.checkSurveys(hasSurveys -> Log.i(TAG, hasSurveys != null ? hasSurveys.toString() : "NULL -  Check BitLabs Logs"));
 
         // optionally add custom tags to your users
         Map<String, Object> tags = new HashMap<>();

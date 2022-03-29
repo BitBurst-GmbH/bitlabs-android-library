@@ -50,16 +50,16 @@ object BitLabs {
      * parameter is `true` if an action can be performed and `false` otherwise. If it's `null`,
      * then there has been an internal error which is most probably logged with 'BitLabs' as a tag.
      */
-    fun hasSurveys(onResponseListener: OnResponseListener<Boolean>) = ifInitialised {
-        bitLabsRepo?.hasSurveys(onResponseListener)
+    fun checkSurveys(onResponseListener: OnResponseListener<Boolean>) = ifInitialised {
+        bitLabsRepo?.checkSurveys(onResponseListener)
     }
 
-    /** Don't use this method, use [BitLabs.hasSurveys] instead. */
-    fun hasSurveys(gameObject: String) = hasSurveys { hasSurveys ->
+    /** Don't use this method, use [BitLabs.checkSurveys] instead. */
+    fun checkSurveys(gameObject: String) = checkSurveys { hasSurveys ->
         if (hasSurveys != null)
             UnityPlayer.UnitySendMessage(
                 gameObject,
-                "BitLabs - hasSurveys",
+                "BitLabs - checkSurveys",
                 if (hasSurveys) "Found Surveys!" else "No Surveys!"
             )
     }

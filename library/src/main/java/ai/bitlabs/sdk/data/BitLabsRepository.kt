@@ -33,7 +33,7 @@ internal class BitLabsRepository(token: String, uid: String) {
         .build()
         .create(BitLabsAPI::class.java)
 
-    internal fun hasSurveys(onResponseListener: OnResponseListener<Boolean>) =
+    internal fun checkSurveys(onResponseListener: OnResponseListener<Boolean>) =
         bitLabsAPI.checkSurveys().enqueue(object : Callback<BitLabsResponse> {
             override fun onResponse(
                 call: Call<BitLabsResponse>,

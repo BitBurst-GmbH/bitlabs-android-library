@@ -23,6 +23,15 @@ android {
         versionName "1.2.2"
     }
 
+    flavorDimensions "sdk"
+
+    productFlavors {
+        bare {}
+        unity {
+            versionNameSuffix "-unity"
+        }
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -48,7 +57,7 @@ afterEvaluate {
         publications {
             // Creates a Maven publication called "release".
             release(MavenPublication) {
-                from components.release
+                from components.bareRelease
                 groupId = 'ai.bitlabs'
                 artifactId = 'sdk'
                 version = '1.2.2'

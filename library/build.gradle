@@ -1,17 +1,12 @@
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
-    id 'maven-publish'
 }
 
 repositories {
     mavenCentral()
     google()
-    maven { url "https://jitpack.io" }
 }
-
-group = 'ai.bitlabs'
-version = '1.2.2'
 
 android {
     compileSdkVersion 31
@@ -23,13 +18,13 @@ android {
         versionName "1.2.2"
     }
 
-    flavorDimensions "sdk"
+    defaultPublishConfig 'core'
+
+    flavorDimensions 'sdk'
 
     productFlavors {
-        bare {}
-        unity {
-            versionNameSuffix "-unity"
-        }
+        core {}
+        unity {}
     }
 
     compileOptions {
@@ -48,20 +43,6 @@ dependencies {
     api 'androidx.core:core-ktx:1.7.0'
     api 'androidx.browser:browser:1.4.0'
 
-    api "com.squareup.retrofit2:retrofit:2.9.0"
-    api "com.squareup.retrofit2:converter-gson:2.9.0"
-}
-
-afterEvaluate {
-    publishing {
-        publications {
-            // Creates a Maven publication called "release".
-            release(MavenPublication) {
-                from components.bareRelease
-                groupId = 'ai.bitlabs'
-                artifactId = 'sdk'
-                version = '1.2.2'
-            }
-        }
-    }
+    api 'com.squareup.retrofit2:retrofit:2.9.0'
+    api 'com.squareup.retrofit2:converter-gson:2.9.0'
 }

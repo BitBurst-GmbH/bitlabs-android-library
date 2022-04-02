@@ -77,7 +77,7 @@ object BitLabs {
         }
     }
 
-    internal fun leaveSurvey(networkId: String, surveyId: String, reason: String, payout: Float) =
+    internal fun leaveSurvey(networkId: String, surveyId: String, reason: String) =
         bitLabsRepo?.leaveSurvey(networkId, surveyId, reason) { }
 
     /**

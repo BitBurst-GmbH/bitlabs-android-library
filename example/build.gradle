@@ -14,7 +14,7 @@ android {
     flavorDimensions "sdk"
 
     productFlavors {
-        bare {}
+        core {}
         unity {}
     }
 

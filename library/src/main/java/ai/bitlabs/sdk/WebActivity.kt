@@ -137,6 +137,6 @@ internal class WebActivity : AppCompatActivity() {
         webView?.loadUrl(url)
 
         if (networkId != null && surveyId != null)
-            BitLabs.leaveSurvey(networkId!!, surveyId!!, reason, reward)
+            BitLabs.leaveSurvey(networkId!!, surveyId!!, reason)
     }
 }

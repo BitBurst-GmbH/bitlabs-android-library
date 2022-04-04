@@ -85,16 +85,15 @@ object BitLabs {
      * It's recommended that that you use a context you know the lifecycle of
      * in order to avoid memory leaks and other issues associated with Activities.
      */
-    @JvmOverloads
-    fun launchOfferWall(context: Context, sdk: String = "NATIVE") = ifInitialised {
+    fun launchOfferWall(context: Context) = ifInitialised {
         with(Intent(context, WebActivity::class.java)) {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
-            putExtra(BUNDLE_KEY_PARAMS, WebActivityParams(token, uid, sdk, tags).url)
+            putExtra(BUNDLE_KEY_PARAMS, WebActivityParams(token, uid, "UNITY", tags).url)
             context.startActivity(this)
         }
     }
 
-    internal fun leaveSurvey(networkId: String, surveyId: String, reason: String, payout: Float) =
+    internal fun leaveSurvey(networkId: String, surveyId: String, reason: String) =
         bitLabsRepo?.leaveSurvey(networkId, surveyId, reason) { }
 
     /**

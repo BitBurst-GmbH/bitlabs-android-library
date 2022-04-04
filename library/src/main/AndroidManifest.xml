@@ -4,22 +4,14 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
-    <application
-        android:usesCleartextTraffic="true">
+    <application android:usesCleartextTraffic="true">
 
         <activity
             android:name="ai.bitlabs.sdk.WebActivity"
             android:configChanges="orientation|screenSize"
+            android:exported="true"
             android:screenOrientation="sensor"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:exported="true"/>
-
-        <activity
-            android:name="ai.bitlabs.sdk.WActivity"
-            android:configChanges="orientation|screenSize"
-            android:screenOrientation="sensor"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:exported="true"/>
+            android:theme="@style/AppTheme.NoActionBar" />
 
     </application>
 

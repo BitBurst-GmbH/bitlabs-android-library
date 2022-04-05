@@ -53,7 +53,7 @@ object BitLabs {
         bitLabsRepo?.checkSurveys(onResponseListener)
     }
 
-    /** Registers an [OnRewardListener] callback to be invoked when a Survey is completed by the user. */
+    /** Registers an [OnRewardListener] callback to be invoked when the OfferWall is exited by the user. */
     fun setOnRewardListener(onRewardListener: OnRewardListener) {
         this.onRewardListener = onRewardListener
     }

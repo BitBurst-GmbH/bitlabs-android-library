@@ -45,33 +45,22 @@ object BitLabs {
      * of the [OnResponseListener.onResponse].
      *
      * If you want to perform background checks if surveys are available, this is the best option.
-     *
-     * @param[onResponseListener] The callback to execute when a response is received, the boolean
-     * parameter is `true` if an action can be performed and `false` otherwise. If it's `null`,
-     * then there has been an internal error which is most probably logged with 'BitLabs' as a tag.
      */
-    fun checkSurveys(onResponseListener: OnResponseListener<Boolean>) = ifInitialised {
-        bitLabsRepo?.checkSurveys(onResponseListener)
-    }
-
-    /** Don't use this method, use [BitLabs.checkSurveys] instead. */
-    fun checkSurveys(gameObject: String) = checkSurveys { hasSurveys ->
-        if (hasSurveys != null)
-            UnityPlayer.UnitySendMessage(
+    fun checkSurveys(gameObject: String) = ifInitialised {
+        bitLabsRepo?.checkSurveys { hasSurveys ->
+            hasSurveys ?: UnityPlayer.UnitySendMessage(
                 gameObject,
-                "BitLabs - checkSurveys",
-                if (hasSurveys) "Found Surveys!" else "No Surveys!"
+                "onCheckSurveysResponse",
+                hasSurveys.toString()
             )
+        }
     }
 
-    /** Registers an [OnRewardListener] callback to be invoked when a Survey is completed by the user. */
-    fun setOnRewardListener(onRewardListener: OnRewardListener) {
-        this.onRewardListener = onRewardListener
-    }
-
-    /** Don't use this method, use [BitLabs.setOnRewardListener] instead */
-    fun setOnRewardListener(gameObject: String) = setOnRewardListener { payout ->
-        UnityPlayer.UnitySendMessage(gameObject, "BitLabs - OnReward", payout.toString())
+    /** Registers an [OnRewardListener] callback to be invoked when the OfferWall is exited by the user. */
+    fun setOnRewardListener(gameObject: String) {
+        onRewardListener = OnRewardListener { payout ->
+            UnityPlayer.UnitySendMessage(gameObject, "onReward", payout.toString())
+        }
     }
 
     /** Adds a new tag([key]:[value] pair) to [BitLabs.tags] */

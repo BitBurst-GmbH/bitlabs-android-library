@@ -48,18 +48,14 @@ object BitLabs {
      */
     fun checkSurveys(gameObject: String) = ifInitialised {
         bitLabsRepo?.checkSurveys { hasSurveys ->
-            hasSurveys ?: UnityPlayer.UnitySendMessage(
-                gameObject,
-                "onCheckSurveysResponse",
-                hasSurveys.toString()
-            )
+            UnityPlayer.UnitySendMessage(gameObject, "checkSurveysCallback", hasSurveys.toString())
         }
     }
 
     /** Registers an [OnRewardListener] callback to be invoked when the OfferWall is exited by the user. */
     fun setOnRewardListener(gameObject: String) {
         onRewardListener = OnRewardListener { payout ->
-            UnityPlayer.UnitySendMessage(gameObject, "onReward", payout.toString())
+            UnityPlayer.UnitySendMessage(gameObject, "rewardCallback", payout.toString())
         }
     }
 

@@ -48,7 +48,6 @@ object BitLabs {
      */
     fun checkSurveys(gameObject: String) = ifInitialised {
         bitLabsRepo?.checkSurveys { hasSurveys ->
-            Log.d(TAG, "Calling checkSurveys")
             UnityPlayer.UnitySendMessage(gameObject, "checkSurveysCallback", hasSurveys.toString())
         }
     }

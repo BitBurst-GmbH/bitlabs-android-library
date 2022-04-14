@@ -9,9 +9,13 @@
         <activity
             android:name="ai.bitlabs.sdk.WebActivity"
             android:configChanges="orientation|screenSize"
-            android:exported="true"
+            android:exported="false"
             android:screenOrientation="sensor"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.webkit.WebView.EnableSafeBrowsing"
+                android:value="true" />
+        </activity>
 
     </application>
 

@@ -5,6 +5,7 @@ import ai.bitlabs.sdk.data.model.*
 import ai.bitlabs.sdk.data.network.BitLabsAPI
 import ai.bitlabs.sdk.util.OnResponseListener
 import ai.bitlabs.sdk.util.TAG
+import ai.bitlabs.sdk.util.randomSurvey
 import android.util.Log
 import okhttp3.OkHttpClient
 import retrofit2.Call
@@ -80,24 +81,27 @@ internal class BitLabsRepository(token: String, uid: String) {
             }
         })
 
-    internal fun getActions(onResponseListener: OnResponseListener<Data>) =
+    internal fun getSurveys(onResponseListener: OnResponseListener<List<Survey>>) =
         bitLabsAPI.getActions().enqueue(object : Callback<GetActionsResponse> {
             override fun onResponse(
                 call: Call<GetActionsResponse>,
                 response: Response<GetActionsResponse>
             ) {
-                if (response.isSuccessful)
-                    onResponseListener.onResponse(response.body()!!.data)
-                else {
+                if (response.isSuccessful && response.body() != null) {
+                    val surveys = response.body()!!.data.surveys.ifEmpty {
+                        (1..3).map { randomSurvey(it) }
+                    }
+                    onResponseListener.onResponse(surveys)
+                } else {
                     response.errorBody()?.body()?.error?.details?.run {
-                        Log.e(TAG, "LeaveSurvey $http - $msg")
+                        Log.e(TAG, "GetSurveys $http - $msg")
                     }
                     onResponseListener.onResponse(null)
                 }
             }
 
             override fun onFailure(call: Call<GetActionsResponse>, t: Throwable) {
-                Log.e(TAG, "GetActions Failure - ${t.message ?: "Unknown Error"}")
+                Log.e(TAG, "GetSurveys Failure - ${t.message ?: "Unknown Error"}")
                 onResponseListener.onResponse(null)
             }
         })

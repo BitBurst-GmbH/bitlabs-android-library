@@ -1,6 +1,10 @@
 package ai.bitlabs.sdk.data.model
 
 
+import ai.bitlabs.sdk.WebActivity
+import ai.bitlabs.sdk.util.BUNDLE_KEY_PARAMS
+import android.content.Context
+import android.content.Intent
 import com.squareup.moshi.Json
 
 data class Survey(
@@ -13,10 +17,13 @@ data class Survey(
     val details: Details,
     val rating: Int,
     val link: String,
-    val score: Double,
     @Json(name = "missing_questions") val missingQuestions: Int
 ) {
-    fun open() {
-        // open link
+    fun open(context: Context) {
+        with(Intent(context, WebActivity::class.java)) {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            putExtra(BUNDLE_KEY_PARAMS, link)
+            context.startActivity(this)
+        }
     }
 }

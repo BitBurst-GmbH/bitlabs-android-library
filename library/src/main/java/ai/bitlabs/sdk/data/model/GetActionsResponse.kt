@@ -4,8 +4,9 @@ package ai.bitlabs.sdk.data.model
 import com.squareup.moshi.Json
 
 data class GetActionsResponse(
-    val `data`: Data,
-    val error: Error,
-    val status: String,
-    @Json(name = "trace_id") val traceId: String
+    @Json(name = "is_new_user") val isNewUser: Boolean,
+    @Json(name = "start_bonus") val startBonus: StartBonus,
+    @Json(name = "restriction_reason") val restrictionReason: RestrictionReason,
+    val surveys: List<Survey>,
+    val qualification: Qualification
 )

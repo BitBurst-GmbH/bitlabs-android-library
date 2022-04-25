@@ -1,6 +1,7 @@
 package ai.bitlabs.sdk
 
 import ai.bitlabs.sdk.data.BitLabsRepository
+import ai.bitlabs.sdk.data.model.Data
 import ai.bitlabs.sdk.data.model.WebActivityParams
 import ai.bitlabs.sdk.util.BUNDLE_KEY_PARAMS
 import ai.bitlabs.sdk.util.OnResponseListener
@@ -52,6 +53,11 @@ object BitLabs {
     fun checkSurveys(onResponseListener: OnResponseListener<Boolean>) = ifInitialised {
         bitLabsRepo?.checkSurveys(onResponseListener)
     }
+
+    fun getActions(onResponseListener: OnResponseListener<Data>) = ifInitialised {
+        bitLabsRepo?.getActions(onResponseListener)
+    }
+
 
     /** Registers an [OnRewardListener] callback to be invoked when the OfferWall is exited by the user. */
     fun setOnRewardListener(onRewardListener: OnRewardListener) {

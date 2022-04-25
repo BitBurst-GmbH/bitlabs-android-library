@@ -1,6 +1,7 @@
 package ai.bitlabs.sdk.data.network
 
 import ai.bitlabs.sdk.data.model.BitLabsResponse
+import ai.bitlabs.sdk.data.model.GetActionsResponse
 import ai.bitlabs.sdk.data.model.LeaveReason
 import retrofit2.Call
 import retrofit2.http.Body
@@ -21,4 +22,7 @@ internal interface BitLabsAPI {
         @Path("surveyId") surveyId: String,
         @Body leaveReason: LeaveReason
     ): Call<BitLabsResponse>
+
+    @GET("client/actions?platform=MOBILE")
+    fun getActions(): Call<GetActionsResponse>
 }

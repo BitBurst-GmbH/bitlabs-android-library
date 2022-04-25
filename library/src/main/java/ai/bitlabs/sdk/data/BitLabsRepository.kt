@@ -1,9 +1,7 @@
 package ai.bitlabs.sdk.data
 
 import ai.bitlabs.sdk.BitLabs
-import ai.bitlabs.sdk.data.model.BitLabsResponse
-import ai.bitlabs.sdk.data.model.LeaveReason
-import ai.bitlabs.sdk.data.model.body
+import ai.bitlabs.sdk.data.model.*
 import ai.bitlabs.sdk.data.network.BitLabsAPI
 import ai.bitlabs.sdk.util.OnResponseListener
 import ai.bitlabs.sdk.util.TAG
@@ -13,7 +11,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.converter.moshi.MoshiConverterFactory
 
 /** This class is the point of communication between the data and [BitLabs] */
 internal class BitLabsRepository(token: String, uid: String) {
@@ -29,7 +27,7 @@ internal class BitLabsRepository(token: String, uid: String) {
                 )
             }
         }.build())
-        .addConverterFactory(GsonConverterFactory.create())
+        .addConverterFactory(MoshiConverterFactory.create())
         .build()
         .create(BitLabsAPI::class.java)
 
@@ -78,6 +76,28 @@ internal class BitLabsRepository(token: String, uid: String) {
 
             override fun onFailure(call: Call<BitLabsResponse>, t: Throwable) {
                 Log.e(TAG, "LeaveSurvey Failure - ${t.message ?: "Unknown Error"}")
+                onResponseListener.onResponse(null)
+            }
+        })
+
+    internal fun getActions(onResponseListener: OnResponseListener<Data>) =
+        bitLabsAPI.getActions().enqueue(object : Callback<GetActionsResponse> {
+            override fun onResponse(
+                call: Call<GetActionsResponse>,
+                response: Response<GetActionsResponse>
+            ) {
+                if (response.isSuccessful)
+                    onResponseListener.onResponse(response.body()!!.data)
+                else {
+                    response.errorBody()?.body()?.error?.details?.run {
+                        Log.e(TAG, "LeaveSurvey $http - $msg")
+                    }
+                    onResponseListener.onResponse(null)
+                }
+            }
+
+            override fun onFailure(call: Call<GetActionsResponse>, t: Throwable) {
+                Log.e(TAG, "GetActions Failure - ${t.message ?: "Unknown Error"}")
                 onResponseListener.onResponse(null)
             }
         })

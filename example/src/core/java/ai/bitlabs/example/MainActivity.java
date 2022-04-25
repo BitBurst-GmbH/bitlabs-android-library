@@ -20,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        bitLabs.init("YOUR-APP-TOKEN", "USER-ID");
+        bitLabs.init("46d31e1e-315a-4b52-b0de-eca6062163af", "USER-ID");
 
         bitLabs.checkSurveys(hasSurveys -> Log.i(TAG, hasSurveys != null ? hasSurveys.toString() : "NULL -  Check BitLabs Logs"));
 
@@ -32,6 +32,13 @@ public class MainActivity extends AppCompatActivity {
 
         // Get client-side callbacks to reward the user (We highly recommend using server-to-server callbacks!)
         bitLabs.setOnRewardListener(payout -> Log.i("BitLabs", "Reward payout: " + payout));
+
+        bitLabs.getActions(data -> {
+            if (data == null)
+                Log.e(TAG, "NULL -  Check BitLabs Logs");
+            else
+                Log.i(TAG, data.getSurveys().toString());
+        });
 
         findViewById(R.id.open).setOnClickListener(view -> bitLabs.launchOfferWall(this));
     }

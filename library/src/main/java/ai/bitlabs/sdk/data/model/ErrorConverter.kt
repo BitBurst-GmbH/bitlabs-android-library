@@ -1,6 +1,6 @@
 package ai.bitlabs.sdk.data.model
 
-import com.google.gson.GsonBuilder
+import com.squareup.moshi.Moshi
 import okhttp3.ResponseBody
 
 /**
@@ -9,7 +9,7 @@ import okhttp3.ResponseBody
  */
 internal fun ResponseBody.body(): BitLabsResponse? =
     try {
-        GsonBuilder().create().fromJson(this.string(), BitLabsResponse::class.java)
+        Moshi.Builder().build().adapter(BitLabsResponse::class.java).fromJson(this.string())
     } catch (e: Exception) {
         null
     }

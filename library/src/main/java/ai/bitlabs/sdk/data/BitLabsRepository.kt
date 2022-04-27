@@ -5,6 +5,7 @@ import ai.bitlabs.sdk.data.model.*
 import ai.bitlabs.sdk.data.network.BitLabsAPI
 import ai.bitlabs.sdk.util.OnResponseListener
 import ai.bitlabs.sdk.util.TAG
+import ai.bitlabs.sdk.util.body
 import ai.bitlabs.sdk.util.randomSurvey
 import android.util.Log
 import okhttp3.OkHttpClient
@@ -39,6 +40,8 @@ internal class BitLabsRepository(token: String, uid: String) {
                 response: Response<BitLabsResponse<CheckSurveysResponse>>
             ) {
                 if (response.isSuccessful) {
+                    Log.i(TAG, response.body().toString())
+                    Log.i(TAG, call.request().toString())
                     onResponseListener.onResponse(response.body()?.data?.hasSurveys)
                 } else {
                     response.errorBody()?.body<CheckSurveysResponse>()?.error?.details?.run {

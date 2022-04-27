@@ -6,7 +6,9 @@ import ai.bitlabs.sdk.util.BUNDLE_KEY_PARAMS
 import android.content.Context
 import android.content.Intent
 import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
+@JsonClass(generateAdapter = true)
 data class Survey(
     @Json(name = "network_id") val networkId: Int,
     val id: Int,

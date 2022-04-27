@@ -1,8 +1,8 @@
-package ai.bitlabs.sdk.data.model
+package ai.bitlabs.sdk.util
 
+import ai.bitlabs.sdk.data.model.BitLabsResponse
 import com.squareup.moshi.Moshi
 import okhttp3.ResponseBody
-import java.lang.reflect.TypeVariable
 
 /**
  * Returns a [BitLabsResponse] object converted from JSON.

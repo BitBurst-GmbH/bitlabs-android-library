@@ -2,8 +2,10 @@ package ai.bitlabs.sdk.data.model
 
 
 import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
-data class Question(
+@JsonClass(generateAdapter = true)
+internal data class Question(
     @Json(name = "network_id") val networkId: Int,
     val id: String,
     val country: String,

@@ -40,8 +40,6 @@ internal class BitLabsRepository(token: String, uid: String) {
                 response: Response<BitLabsResponse<CheckSurveysResponse>>
             ) {
                 if (response.isSuccessful) {
-                    Log.i(TAG, response.body().toString())
-                    Log.i(TAG, call.request().toString())
                     onResponseListener.onResponse(response.body()?.data?.hasSurveys)
                 } else {
                     response.errorBody()?.body<CheckSurveysResponse>()?.error?.details?.run {

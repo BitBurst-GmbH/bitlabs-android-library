@@ -19,7 +19,7 @@ data class Survey(
     val details: Details,
     val rating: Int,
     val link: String,
-    @Json(name = "missing_questions") val missingQuestions: Int
+    @Json(name = "missing_questions") val missingQuestions: Int?
 ) {
     fun open(context: Context) {
         with(Intent(context, WebActivity::class.java)) {

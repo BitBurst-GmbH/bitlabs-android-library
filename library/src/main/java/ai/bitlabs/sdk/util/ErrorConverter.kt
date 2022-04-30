@@ -10,7 +10,10 @@ import okhttp3.ResponseBody
  */
 internal inline fun <reified T> ResponseBody.body(): BitLabsResponse<T>? =
     try {
-        Moshi.Builder().build().adapter<BitLabsResponse<T>>(BitLabsResponse::class.java).fromJson(this.string())
+        Moshi.Builder()
+            .build()
+            .adapter<BitLabsResponse<T>>(BitLabsResponse::class.java)
+            .fromJson(this.string())
     } catch (e: Exception) {
         null
     }

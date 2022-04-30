@@ -66,7 +66,7 @@ object BitLabs {
      * which is most probably logged with 'BitLabs' as a tag.
      */
     fun getSurveys(onResponseListener: OnResponseListener<List<Survey>>) = ifInitialised {
-        bitLabsRepo?.getSurveys(onResponseListener)
+        bitLabsRepo?.getSurveys("NATIVE", onResponseListener)
     }
 
 
@@ -95,7 +95,7 @@ object BitLabs {
     }
 
     internal fun leaveSurvey(networkId: String, surveyId: String, reason: String) =
-        bitLabsRepo?.leaveSurvey(networkId, surveyId, reason) { }
+        bitLabsRepo?.leaveSurvey(networkId, surveyId, reason)
 
     /**
      * Checks whether [token] and [uid] have been set and aren't blank/empty and

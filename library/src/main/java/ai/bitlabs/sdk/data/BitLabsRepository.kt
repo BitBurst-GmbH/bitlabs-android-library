@@ -58,41 +58,33 @@ internal class BitLabsRepository(token: String, uid: String) {
             }
         })
 
-    internal fun leaveSurvey(
-        networkId: String,
-        surveyId: String,
-        reason: String,
-        onResponseListener: OnResponseListener<Unit>
-    ) = bitLabsAPI.leaveSurvey(networkId, surveyId, LeaveReason(reason))
-        .enqueue(object : Callback<BitLabsResponse<Unit>> {
-            override fun onResponse(
-                call: Call<BitLabsResponse<Unit>>,
-                response: Response<BitLabsResponse<Unit>>
-            ) {
-                if (response.isSuccessful)
-                    onResponseListener.onResponse(Unit)
-                else {
-                    response.errorBody()?.body<Void>()?.error?.details?.run {
+    internal fun leaveSurvey(networkId: String, surveyId: String, reason: String) =
+        bitLabsAPI.leaveSurvey(networkId, surveyId, LeaveReason(reason))
+            .enqueue(object : Callback<BitLabsResponse<Unit>> {
+                override fun onResponse(
+                    call: Call<BitLabsResponse<Unit>>,
+                    response: Response<BitLabsResponse<Unit>>
+                ) {
+                    if (response.isSuccessful)
+                        Log.i(TAG, "LeaveSurvey - Success")
+                    else response.errorBody()?.body<Unit>()?.error?.details?.run {
                         Log.e(TAG, "LeaveSurvey $http - $msg")
                     }
-                    onResponseListener.onResponse(null)
                 }
-            }
 
-            override fun onFailure(call: Call<BitLabsResponse<Unit>>, t: Throwable) {
-                Log.e(TAG, "LeaveSurvey Failure - ${t.message ?: "Unknown Error"}")
-                onResponseListener.onResponse(null)
-            }
-        })
+                override fun onFailure(call: Call<BitLabsResponse<Unit>>, t: Throwable) {
+                    Log.e(TAG, "LeaveSurvey Failure - ${t.message ?: "Unknown Error"}")
+                }
+            })
 
-    internal fun getSurveys(onResponseListener: OnResponseListener<List<Survey>>) =
-        bitLabsAPI.getActions().enqueue(object : Callback<BitLabsResponse<GetActionsResponse>> {
+    internal fun getSurveys(sdk: String, onResponseListener: OnResponseListener<List<Survey>>) =
+        bitLabsAPI.getActions(sdk).enqueue(object : Callback<BitLabsResponse<GetActionsResponse>> {
             override fun onResponse(
                 call: Call<BitLabsResponse<GetActionsResponse>>,
                 response: Response<BitLabsResponse<GetActionsResponse>>
             ) {
                 if (response.isSuccessful && response.body() != null) {
-                    val surveys = response.body()!!.data?.surveys?.ifEmpty {
+                    val surveys = response.body()?.data?.surveys?.ifEmpty {
                         (1..3).map { randomSurvey(it) }
                     }
                     onResponseListener.onResponse(surveys)

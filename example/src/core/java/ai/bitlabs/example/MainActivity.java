@@ -20,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        bitLabs.init("46d31e1e-315a-4b52-b0de-eca6062163af", "USER-ID");
+        bitLabs.init("YOUR-APP-TOKEN", "USER-ID");
 
         bitLabs.checkSurveys(hasSurveys -> Log.i(TAG, hasSurveys != null ? hasSurveys.toString() : "NULL -  Check BitLabs Logs"));
 

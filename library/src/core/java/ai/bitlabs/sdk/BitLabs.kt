@@ -1,6 +1,7 @@
 package ai.bitlabs.sdk
 
 import ai.bitlabs.sdk.data.BitLabsRepository
+import ai.bitlabs.sdk.data.model.Survey
 import ai.bitlabs.sdk.data.model.WebActivityParams
 import ai.bitlabs.sdk.util.BUNDLE_KEY_PARAMS
 import ai.bitlabs.sdk.util.OnResponseListener
@@ -39,7 +40,8 @@ object BitLabs {
         bitLabsRepo = BitLabsRepository(token, uid)
     }
 
-    /** Determines whether the user can perform an action in the OfferWall
+    /**
+     * Determines whether the user can perform an action in the OfferWall
      * (either opening a survey or answering qualifications) and then executes your implementation
      * of the [OnResponseListener.onResponse].
      *
@@ -52,6 +54,21 @@ object BitLabs {
     fun checkSurveys(onResponseListener: OnResponseListener<Boolean>) = ifInitialised {
         bitLabsRepo?.checkSurveys(onResponseListener)
     }
+
+    /**
+     * Fetches a list of surveys the user can open.
+     *
+     * If the user still has to answer a qualification before more surveys can be returned,
+     * then this will return 3 random Surveys just for display.
+     *
+     * @param[onResponseListener] The callback to execute when a response is received.
+     * Its parameter is the list of surveys. If it's `null`, then there has been an internal error
+     * which is most probably logged with 'BitLabs' as a tag.
+     */
+    fun getSurveys(onResponseListener: OnResponseListener<List<Survey>>) = ifInitialised {
+        bitLabsRepo?.getSurveys("NATIVE", onResponseListener)
+    }
+
 
     /** Registers an [OnRewardListener] callback to be invoked when the OfferWall is exited by the user. */
     fun setOnRewardListener(onRewardListener: OnRewardListener) {
@@ -78,7 +95,7 @@ object BitLabs {
     }
 
     internal fun leaveSurvey(networkId: String, surveyId: String, reason: String) =
-        bitLabsRepo?.leaveSurvey(networkId, surveyId, reason) { }
+        bitLabsRepo?.leaveSurvey(networkId, surveyId, reason)
 
     /**
      * Checks whether [token] and [uid] have been set and aren't blank/empty and

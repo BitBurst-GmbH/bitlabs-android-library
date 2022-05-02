@@ -1,9 +1,7 @@
 package ai.bitlabs.sdk.data.model
 
 import ai.bitlabs.sdk.WebActivity
-import ai.bitlabs.sdk.util.TAG
 import android.net.Uri
-import android.util.Log
 
 /**
  * This class holds the parameters of the [WebActivity] responsible to launch the OfferWall.
@@ -30,8 +28,5 @@ internal data class WebActivityParams(
         .apply { tags.forEach { tag -> appendQueryParameter(tag.key, tag.value.toString()) } }
         .build()
         .toString()
-        .also {
-            url = it
-            Log.i(TAG, url)
-        }
+        .also { url = it }
 }

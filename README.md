@@ -5,8 +5,6 @@
 Official Android SDK for BitBurst's BitLabs. We have an example app that can be used for
 reference on how to integrate this SDK. Take a look at `/example` for more details.
 
-Read the complete documentation here: https://bitlabs.ai/integrations/android-sdk
-
 ### Dependencies
 
 Add the following above the __dependencies__ section of your app level build.gradle file:

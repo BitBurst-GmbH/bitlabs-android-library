@@ -1,6 +1,7 @@
 package ai.bitlabs.sdk
 
 import ai.bitlabs.sdk.data.BitLabsRepository
+import ai.bitlabs.sdk.data.model.Survey
 import ai.bitlabs.sdk.data.model.WebActivityParams
 import ai.bitlabs.sdk.util.BUNDLE_KEY_PARAMS
 import ai.bitlabs.sdk.util.OnResponseListener
@@ -9,6 +10,7 @@ import ai.bitlabs.sdk.util.TAG
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import com.squareup.moshi.Moshi
 import com.unity3d.player.UnityPlayer
 
 /**
@@ -42,13 +44,33 @@ object BitLabs {
 
     /** Determines whether the user can perform an action in the OfferWall
      * (either opening a survey or answering qualifications) and then executes your implementation
-     * of the [OnResponseListener.onResponse].
+     * of the checkSurveysCallback().
      *
      * If you want to perform background checks if surveys are available, this is the best option.
      */
     fun checkSurveys(gameObject: String) = ifInitialised {
         bitLabsRepo?.checkSurveys { hasSurveys ->
             UnityPlayer.UnitySendMessage(gameObject, "checkSurveysCallback", hasSurveys.toString())
+        }
+    }
+
+    /**
+     * Fetches a list of surveys the user can open.
+     *
+     * If the user still has to answer a qualification before more surveys can be returned,
+     * then this will return 3 random Surveys just for display.
+     *
+     * The getSurveysCallback() is executed when a response is received.
+     * Its parameter is the String in format of JSON list of surveys in . If it's `null`,
+     * then there has been an internal error which is most probably logged with 'BitLabs' as a tag.
+     */
+    fun getSurveys(gameObject: String) = ifInitialised {
+        bitLabsRepo?.getSurveys("UNITY") { surveys ->
+            UnityPlayer.UnitySendMessage(
+                gameObject,
+                "getSurveysCallback",
+                Moshi.Builder().build().adapter<List<Survey>>(List::class.java).toJson(surveys)
+            )
         }
     }
 
@@ -79,7 +101,7 @@ object BitLabs {
     }
 
     internal fun leaveSurvey(networkId: String, surveyId: String, reason: String) =
-        bitLabsRepo?.leaveSurvey(networkId, surveyId, reason) { }
+        bitLabsRepo?.leaveSurvey(networkId, surveyId, reason)
 
     /**
      * Checks whether [token] and [uid] have been set and aren't blank/empty and

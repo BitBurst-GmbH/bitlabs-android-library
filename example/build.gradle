@@ -4,11 +4,11 @@ android {
     compileSdkVersion 31
 
     defaultConfig {
-        applicationId "ai.bitlabs.example"
+        applicationId 'ai.bitlabs.example'
         minSdkVersion 16
         targetSdkVersion 31
-        versionCode 19
-        versionName "2.1.3"
+        versionCode 20
+        versionName '2.2.0'
     }
 
     flavorDimensions "sdk"

@@ -2,7 +2,6 @@ plugins {
     id 'com.android.library'
     id 'kotlin-android'
     id 'maven-publish'
-    id 'com.google.devtools.ksp' version '1.6.10-1.0.2'
 }
 
 repositories {
@@ -11,7 +10,7 @@ repositories {
 }
 
 group 'ai.bitlabs'
-version '2.2.1'
+version '2.2.2'
 
 android {
     compileSdkVersion 31
@@ -19,7 +18,7 @@ android {
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 31
-        versionCode 21
+        versionCode 22
         versionName version
     }
 
@@ -41,16 +40,13 @@ android {
 }
 
 dependencies {
-    unityCompileOnly files('libs/classes.jar')
+    unityImplementation files('libs/classes.jar')
     implementation 'androidx.appcompat:appcompat:1.4.1'
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'androidx.browser:browser:1.4.0'
 
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-moshi:2.9.0'
-    coreImplementation 'com.squareup.moshi:moshi-kotlin:1.13.0'
-    unityImplementation 'com.squareup.moshi:moshi-kotlin:1.12.0'
-    ksp 'com.squareup.moshi:moshi-kotlin-codegen:1.12.0'
 }
 
 afterEvaluate {

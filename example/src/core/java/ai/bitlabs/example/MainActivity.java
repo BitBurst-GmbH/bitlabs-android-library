@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
 
         bitLabs.getSurveys(surveys -> {
             if (surveys == null)
-                Log.e(TAG, "NULL -  Check BitLabs Logs");
+                Log.i(TAG, "NULL -  Check BitLabs Logs");
             else {
                 Log.i(TAG, "Surveys: " + surveys);
                 surveys.get(0).open(this);

@@ -58,6 +58,7 @@ fun WebView.setup(
     }
 
     this.settings.run {
+        displayZoomControls = false
         databaseEnabled = true
         allowFileAccess = true
         javaScriptEnabled = true

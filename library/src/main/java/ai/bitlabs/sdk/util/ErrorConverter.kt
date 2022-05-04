@@ -1,6 +1,7 @@
 package ai.bitlabs.sdk.util
 
 import ai.bitlabs.sdk.data.model.BitLabsResponse
+import android.util.Log
 import com.squareup.moshi.Moshi
 import okhttp3.ResponseBody
 
@@ -15,5 +16,6 @@ internal inline fun <reified T> ResponseBody.body(): BitLabsResponse<T>? =
             .adapter<BitLabsResponse<T>>(BitLabsResponse::class.java)
             .fromJson(this.string())
     } catch (e: Exception) {
+        Log.e(TAG, e.toString())
         null
     }

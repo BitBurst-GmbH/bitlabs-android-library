@@ -10,7 +10,7 @@ repositories {
 }
 
 group 'ai.bitlabs'
-version '2.2.2'
+version '2.2.3'
 
 android {
     compileSdkVersion 31
@@ -18,7 +18,7 @@ android {
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 31
-        versionCode 22
+        versionCode 23
         versionName version
     }
 
@@ -40,7 +40,7 @@ android {
 }
 
 dependencies {
-    unityImplementation files('libs/classes.jar')
+    unityCompileOnly files('libs/classes.jar')
     implementation 'androidx.appcompat:appcompat:1.4.1'
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'androidx.browser:browser:1.4.0'

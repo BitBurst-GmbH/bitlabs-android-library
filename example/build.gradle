@@ -7,8 +7,8 @@ android {
         applicationId 'ai.bitlabs.example'
         minSdkVersion 16
         targetSdkVersion 31
-        versionCode 22
-        versionName '2.2.2'
+        versionCode 23
+        versionName '2.2.3'
     }
 
     flavorDimensions "sdk"

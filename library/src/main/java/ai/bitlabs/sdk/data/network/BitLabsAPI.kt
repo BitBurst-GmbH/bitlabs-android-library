@@ -1,9 +1,9 @@
 package ai.bitlabs.sdk.data.network
 
+import ai.bitlabs.sdk.data.model.*
 import ai.bitlabs.sdk.data.model.BitLabsResponse
 import ai.bitlabs.sdk.data.model.CheckSurveysResponse
 import ai.bitlabs.sdk.data.model.GetActionsResponse
-import ai.bitlabs.sdk.data.model.LeaveReason
 import retrofit2.Call
 import retrofit2.http.*
 
@@ -19,7 +19,7 @@ internal interface BitLabsAPI {
         @Path("networkId") networkId: String,
         @Path("surveyId") surveyId: String,
         @Body leaveReason: LeaveReason
-    ): Call<BitLabsResponse<Unit>>
+    ): Call<BitLabsResponse<LeaveResponse>>
 
     @GET("client/actions?platform=MOBILE&os=ANDROID")
     fun getActions(@Query("sdk") sdk: String): Call<BitLabsResponse<GetActionsResponse>>

@@ -60,19 +60,19 @@ internal class BitLabsRepository(token: String, uid: String) {
 
     internal fun leaveSurvey(networkId: String, surveyId: String, reason: String) =
         bitLabsAPI.leaveSurvey(networkId, surveyId, LeaveReason(reason))
-            .enqueue(object : Callback<BitLabsResponse<Unit>> {
+            .enqueue(object : Callback<BitLabsResponse<LeaveResponse>> {
                 override fun onResponse(
-                    call: Call<BitLabsResponse<Unit>>,
-                    response: Response<BitLabsResponse<Unit>>
+                    call: Call<BitLabsResponse<LeaveResponse>>,
+                    response: Response<BitLabsResponse<LeaveResponse>>
                 ) {
                     if (response.isSuccessful)
                         Log.i(TAG, "LeaveSurvey - Success")
-                    else response.errorBody()?.body<Unit>()?.error?.details?.run {
+                    else response.errorBody()?.body<LeaveResponse>()?.error?.details?.run {
                         Log.e(TAG, "LeaveSurvey $http - $msg")
                     }
                 }
 
-                override fun onFailure(call: Call<BitLabsResponse<Unit>>, t: Throwable) {
+                override fun onFailure(call: Call<BitLabsResponse<LeaveResponse>>, t: Throwable) {
                     Log.e(TAG, "LeaveSurvey Failure - ${t.message ?: "Unknown Error"}")
                 }
             })

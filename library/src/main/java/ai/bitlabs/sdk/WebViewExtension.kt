@@ -1,14 +1,17 @@
 package ai.bitlabs.sdk
 
+import ai.bitlabs.sdk.util.TAG
 import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.os.Message
+import android.util.Log
 import android.view.View
 import android.webkit.*
 import androidx.annotation.RequiresApi
 import androidx.browser.customtabs.CustomTabsIntent
+import kotlin.math.log
 
 /** Adds all necessary configurations for the its receiver [WebActivity.webView] */
 @SuppressLint("SetJavaScriptEnabled")
@@ -42,8 +45,22 @@ fun WebView.setup(
 
 
     this.webViewClient = object : WebViewClient() {
+        @Deprecated("Deprecated in Java")
         override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
             if (url == null) return false
+
+            onShouldOverrideUrlLoading(url.contains("web.bitlabs.ai"), url)
+
+            this@setup.loadUrl(url)
+            return true
+        }
+
+        @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+        override fun shouldOverrideUrlLoading(
+            view: WebView?,
+            request: WebResourceRequest?
+        ): Boolean {
+            val url = request?.run { url.toString() } ?: return false
 
             onShouldOverrideUrlLoading(url.contains("web.bitlabs.ai"), url)
 

@@ -9,7 +9,7 @@ import ai.bitlabs.sdk.util.TAG
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import com.squareup.moshi.Moshi
+import com.google.gson.GsonBuilder
 import com.unity3d.player.UnityPlayer
 
 /**
@@ -68,7 +68,7 @@ object BitLabs {
             UnityPlayer.UnitySendMessage(
                 gameObject,
                 "getSurveysCallback",
-                Moshi.Builder().build().adapter<List<Survey>>(List::class.java).toJson(surveys)
+                GsonBuilder().create().toJson(surveys)
             )
         }
     }

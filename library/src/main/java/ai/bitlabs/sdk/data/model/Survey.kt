@@ -3,7 +3,7 @@ package ai.bitlabs.sdk.data.model
 
 import ai.bitlabs.sdk.BitLabs
 import android.content.Context
-import com.squareup.moshi.Json
+import com.google.gson.annotations.SerializedName
 
 /**
  * Represents the survey the user can take.
@@ -19,7 +19,7 @@ import com.squareup.moshi.Json
  * @property[missingQuestions] The amount of questions that have to be answered before the survey is guaranteed to be openable by the user.
  */
 data class Survey(
-    @field:Json(name = "network_id") val networkId: Int,
+    @SerializedName("network_id") val networkId: Int,
     val id: Int,
     val cpi: String,
     val value: String,
@@ -28,7 +28,7 @@ data class Survey(
     val details: Details,
     val rating: Int,
     val link: String,
-    @field:Json(name = "missing_questions") val missingQuestions: Int?
+    @SerializedName("missing_questions") val missingQuestions: Int?
 ) {
     fun open(context: Context) = BitLabs.launchOfferWall(context)
 }

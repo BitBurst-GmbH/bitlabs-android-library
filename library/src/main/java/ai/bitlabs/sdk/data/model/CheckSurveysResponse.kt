@@ -1,7 +1,7 @@
 package ai.bitlabs.sdk.data.model
 
-import com.squareup.moshi.Json
+import com.google.gson.annotations.SerializedName
 
 internal data class CheckSurveysResponse(
-    @field:Json(name = "has_surveys") val hasSurveys: Boolean
+    @SerializedName("has_surveys") val hasSurveys: Boolean
 )

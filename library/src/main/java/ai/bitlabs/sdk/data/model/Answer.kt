@@ -1,9 +1,9 @@
 package ai.bitlabs.sdk.data.model
 
 
-import com.squareup.moshi.Json
+import com.google.gson.annotations.SerializedName
 
 internal data class Answer(
     val code: String,
-    @field:Json(name = "localized_text") val localizedText: String
+    @SerializedName("localized_text") val localizedText: String
 )

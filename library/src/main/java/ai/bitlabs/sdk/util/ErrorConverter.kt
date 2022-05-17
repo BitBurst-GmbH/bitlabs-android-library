@@ -2,8 +2,7 @@ package ai.bitlabs.sdk.util
 
 import ai.bitlabs.sdk.data.model.BitLabsResponse
 import android.util.Log
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.Types
+import com.google.gson.GsonBuilder
 import okhttp3.ResponseBody
 
 /**
@@ -12,15 +11,8 @@ import okhttp3.ResponseBody
  */
 internal inline fun <reified T> ResponseBody.body(): BitLabsResponse<T>? =
     try {
-        Moshi.Builder()
-            .build()
-            .adapter<BitLabsResponse<T>>(
-                Types.newParameterizedType(
-                    BitLabsResponse::class.java,
-                    T::class.java
-                )
-            )
-            .fromJson(this.string())
+        GsonBuilder().create()
+            .fromJson<BitLabsResponse<T>>(this.string(), BitLabsResponse::class.java)
     } catch (e: Exception) {
         Log.e(TAG, e.toString())
         null

@@ -19,7 +19,7 @@ internal interface BitLabsAPI {
         @Path("networkId") networkId: String,
         @Path("surveyId") surveyId: String,
         @Body leaveReason: LeaveReason
-    ): Call<BitLabsResponse<LeaveResponse>>
+    ): Call<BitLabsResponse<Unit>>
 
     @GET("client/actions?platform=MOBILE&os=ANDROID")
     fun getActions(@Query("sdk") sdk: String): Call<BitLabsResponse<GetActionsResponse>>

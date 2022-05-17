@@ -13,7 +13,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
+import retrofit2.converter.gson.GsonConverterFactory
 
 /** This class is the point of communication between the data and [BitLabs] */
 internal class BitLabsRepository(token: String, uid: String) {
@@ -29,7 +29,7 @@ internal class BitLabsRepository(token: String, uid: String) {
                 )
             }
         }.build())
-        .addConverterFactory(MoshiConverterFactory.create())
+        .addConverterFactory(GsonConverterFactory.create())
         .build()
         .create(BitLabsAPI::class.java)
 
@@ -60,19 +60,19 @@ internal class BitLabsRepository(token: String, uid: String) {
 
     internal fun leaveSurvey(networkId: String, surveyId: String, reason: String) =
         bitLabsAPI.leaveSurvey(networkId, surveyId, LeaveReason(reason))
-            .enqueue(object : Callback<BitLabsResponse<LeaveResponse>> {
+            .enqueue(object : Callback<BitLabsResponse<Unit>> {
                 override fun onResponse(
-                    call: Call<BitLabsResponse<LeaveResponse>>,
-                    response: Response<BitLabsResponse<LeaveResponse>>
+                    call: Call<BitLabsResponse<Unit>>,
+                    response: Response<BitLabsResponse<Unit>>
                 ) {
                     if (response.isSuccessful)
                         Log.i(TAG, "LeaveSurvey - Success")
-                    else response.errorBody()?.body<LeaveResponse>()?.error?.details?.run {
+                    else response.errorBody()?.body<Unit>()?.error?.details?.run {
                         Log.e(TAG, "LeaveSurvey $http - $msg")
                     }
                 }
 
-                override fun onFailure(call: Call<BitLabsResponse<LeaveResponse>>, t: Throwable) {
+                override fun onFailure(call: Call<BitLabsResponse<Unit>>, t: Throwable) {
                     Log.e(TAG, "LeaveSurvey Failure - ${t.message ?: "Unknown Error"}")
                 }
             })

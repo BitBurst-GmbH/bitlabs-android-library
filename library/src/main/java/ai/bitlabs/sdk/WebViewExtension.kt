@@ -11,7 +11,6 @@ import android.view.View
 import android.webkit.*
 import androidx.annotation.RequiresApi
 import androidx.browser.customtabs.CustomTabsIntent
-import kotlin.math.log
 
 /** Adds all necessary configurations for the its receiver [WebActivity.webView] */
 @SuppressLint("SetJavaScriptEnabled")
@@ -19,7 +18,6 @@ fun WebView.setup(
     context: Context,
     onShouldOverrideUrlLoading: (isPageOfferWall: Boolean, url: String) -> Unit
 ) {
-
     if (Build.VERSION.SDK_INT >= 21)
         CookieManager.getInstance().setAcceptThirdPartyCookies(this, true)
     else
@@ -37,22 +35,38 @@ fun WebView.setup(
             userGesture: Boolean,
             resultMsg: Message
         ): Boolean {
-            val data = view.hitTestResult.extra ?: view.url
-            CustomTabsIntent.Builder().build().launchUrl(context, Uri.parse(data))
-            return false
+            val newWebView = WebView(view.context)
+            with(resultMsg.obj as WebView.WebViewTransport) { webView = newWebView };
+            resultMsg.sendToTarget()
+
+            newWebView.webViewClient = object : WebViewClient() {
+                @Deprecated("Deprecated in Java")
+                override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
+                    if (url.isNullOrEmpty()) return true
+                    CustomTabsIntent.Builder().build().launchUrl(context, Uri.parse(url))
+                    return false
+                }
+
+                @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+                override fun shouldOverrideUrlLoading(
+                    view: WebView?,
+                    request: WebResourceRequest?
+                ): Boolean {
+                    val url = request?.run { url.toString() } ?: return true
+                    CustomTabsIntent.Builder().build().launchUrl(context, Uri.parse(url))
+                    return false
+                }
+            }
+            return true
         }
     }
-
 
     this.webViewClient = object : WebViewClient() {
         @Deprecated("Deprecated in Java")
         override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
-            if (url == null) return false
-
+            if (url.isNullOrEmpty()) return false
             onShouldOverrideUrlLoading(url.contains("web.bitlabs.ai"), url)
-
-            this@setup.loadUrl(url)
-            return true
+            return false
         }
 
         @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
@@ -61,11 +75,8 @@ fun WebView.setup(
             request: WebResourceRequest?
         ): Boolean {
             val url = request?.run { url.toString() } ?: return false
-
             onShouldOverrideUrlLoading(url.contains("web.bitlabs.ai"), url)
-
-            this@setup.loadUrl(url)
-            return true
+            return false
         }
 
         @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
@@ -75,15 +86,14 @@ fun WebView.setup(
     }
 
     this.settings.run {
-        displayZoomControls = false
         databaseEnabled = true
         allowFileAccess = true
         javaScriptEnabled = true
         domStorageEnabled = true
+        displayZoomControls = false
         setSupportMultipleWindows(true)
         cacheMode = WebSettings.LOAD_NO_CACHE
         javaScriptCanOpenWindowsAutomatically = true
-
         if (Build.VERSION.SDK_INT >= 17) mediaPlaybackRequiresUserGesture = false
     }
 }

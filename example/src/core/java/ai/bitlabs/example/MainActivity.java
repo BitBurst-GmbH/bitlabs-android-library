@@ -20,15 +20,16 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        bitLabs.init("46d31e1e-315a-4b52-b0de-eca6062163af", "USER-ID");
+        bitLabs.init(this, "YOUR_APP_TOKEN", "USER_ID");
 
         bitLabs.checkSurveys(hasSurveys -> Log.i(TAG, hasSurveys != null ? hasSurveys.toString() : "NULL -  Check BitLabs Logs"));
 
         // optionally add custom tags to your users
         Map<String, Object> tags = new HashMap<>();
         tags.put("my_tag", "new_user");
-        tags.put("is_premium", true);
         bitLabs.setTags(tags);
+
+        bitLabs.addTag("is_premium", true);
 
         // Get client-side callbacks to reward the user (We highly recommend using server-to-server callbacks!)
         bitLabs.setOnRewardListener(payout -> Log.i("BitLabs", "Reward payout: " + payout));
@@ -38,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.i(TAG, "NULL -  Check BitLabs Logs");
             else {
                 Log.i(TAG, "Surveys: " + surveys);
-                surveys.get(0).open(this);
+                if (!surveys.isEmpty()) surveys.get(0).open(this);
             }
         });
 

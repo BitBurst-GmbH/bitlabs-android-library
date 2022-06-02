@@ -101,7 +101,7 @@ object BitLabs {
 
     /**
      * Launches the OfferWall from the [context] of the Activity you pass.
-     *
+     * ######
      * It's recommended that that you use a context you know the lifecycle of
      * in order to avoid memory leaks and other issues associated with Activities.
      */

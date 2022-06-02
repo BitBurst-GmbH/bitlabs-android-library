@@ -10,13 +10,4 @@
     <string name="leave_reason_other">Other reasons</string>
     <string name="leave_dialog_continue">Continue the survey</string>
 
-    <string name="desktop_mode_title">Survey issue</string>
-    <string name="desktop_mode_message">
-        If you have an error in the display of a survey, we can try to fix it.
-        But it is possible that you will be banned from the survey.
-        Please use this function only if you would otherwise not be able to continue.
-    </string>
-    <string name="desktop_mode_continue">Fix Survey on own risk</string>
-    <string name="desktop_mode_cancel">Cancel</string>
-
 </resources>

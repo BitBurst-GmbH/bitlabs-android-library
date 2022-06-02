@@ -10,13 +10,4 @@
     <string name="leave_reason_other">Altri motivi</string>
     <string name="leave_dialog_continue">Continua il sondaggio</string>
 
-    <string name="desktop_mode_title">Errore di rilevamento</string>
-    <string name="desktop_mode_message">
-        Se si verifica un errore nella visualizzazione di un sondaggio, possiamo provare a correggerlo.
-        Tuttavia, è possibile che siate esclusi dal sondaggio.
-        La preghiamo di utilizzare questa funzione solo se non potrebbe continuare altrimenti.
-    </string>
-    <string name="desktop_mode_continue">Cambia visualizzazione</string>
-    <string name="desktop_mode_cancel">Annulla</string>
-
 </resources>

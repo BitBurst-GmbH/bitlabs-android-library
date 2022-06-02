@@ -1,6 +1,5 @@
 package ai.bitlabs.sdk
 
-import ai.bitlabs.sdk.BitLabs.init
 import ai.bitlabs.sdk.data.BitLabsRepository
 import ai.bitlabs.sdk.data.model.Survey
 import ai.bitlabs.sdk.data.model.WebActivityParams
@@ -10,10 +9,8 @@ import ai.bitlabs.sdk.util.OnRewardListener
 import ai.bitlabs.sdk.util.TAG
 import android.content.Context
 import android.content.Intent
-import android.os.AsyncTask
 import android.util.Log
 import com.google.android.gms.ads.identifier.AdvertisingIdClient
-import java.lang.Exception
 
 /**
  * The main class including all the library functions to use in your code.
@@ -24,7 +21,7 @@ import java.lang.Exception
 object BitLabs {
     private var uid: String = ""
     private var token: String = ""
-    private var adId: String? = null
+    private var adId: String = ""
 
     /** These will be added as query parameters to the OfferWall Link */
     var tags: MutableMap<String, Any> = mutableMapOf()
@@ -111,7 +108,7 @@ object BitLabs {
     fun launchOfferWall(context: Context) = ifInitialised {
         with(Intent(context, WebActivity::class.java)) {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
-            putExtra(BUNDLE_KEY_PARAMS, WebActivityParams(token, uid, "NATIVE", tags).url)
+            putExtra(BUNDLE_KEY_PARAMS, WebActivityParams(token, uid, "NATIVE", adId, tags).url)
             context.startActivity(this)
         }
     }
@@ -121,7 +118,7 @@ object BitLabs {
 
     private fun determineAdvertisingInfo(context: Context) = Thread {
         try {
-            adId = AdvertisingIdClient.getAdvertisingIdInfo(context).id
+            adId = AdvertisingIdClient.getAdvertisingIdInfo(context).id ?: ""
             Log.d(TAG, "Advertising Id: $adId")
         } catch (e: Exception) {
             Log.e(TAG, "Failed to determine Advertising Id", e)

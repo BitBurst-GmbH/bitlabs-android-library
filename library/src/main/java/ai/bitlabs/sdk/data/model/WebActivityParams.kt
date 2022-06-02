@@ -12,6 +12,7 @@ internal data class WebActivityParams(
     private val token: String,
     private val uid: String,
     private val sdk: String,
+    private val maid: String,
     private val tags: Map<String, Any> = mapOf()
 ) {
     var url: String = ""
@@ -25,6 +26,7 @@ internal data class WebActivityParams(
         .appendQueryParameter("uid", uid)
         .appendQueryParameter("os", "ANDROID")
         .appendQueryParameter("sdk", sdk)
+        .apply { if (maid.isNotEmpty()) appendQueryParameter("maid", maid) }
         .apply { tags.forEach { tag -> appendQueryParameter(tag.key, tag.value.toString()) } }
         .build()
         .toString()

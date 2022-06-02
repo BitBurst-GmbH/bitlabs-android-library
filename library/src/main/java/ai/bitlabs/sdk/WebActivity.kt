@@ -1,6 +1,5 @@
 package ai.bitlabs.sdk
 
-import ai.bitlabs.sdk.data.model.WebActivityParams
 import ai.bitlabs.sdk.util.BUNDLE_KEY_PARAMS
 import ai.bitlabs.sdk.util.TAG
 import android.net.Uri
@@ -131,7 +130,7 @@ internal class WebActivity : AppCompatActivity() {
             .show()
     }
 
-    /** Loads the OfferWall page and triggers the [WebActivityParams.leaveSurveyListener] */
+    /** Loads the OfferWall page and sends the [reason] to the API */
     private fun leaveSurvey(reason: String) {
         toggleToolbar(true)
         webView?.loadUrl(url)

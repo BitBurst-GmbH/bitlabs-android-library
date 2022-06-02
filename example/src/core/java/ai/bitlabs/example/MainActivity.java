@@ -13,7 +13,7 @@ import ai.bitlabs.sdk.BitLabs;
 public class MainActivity extends AppCompatActivity {
     private final String TAG = "Example";
 
-    BitLabs bitLabs = BitLabs.INSTANCE;
+    private final BitLabs bitLabs = BitLabs.INSTANCE;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,8 +21,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         bitLabs.init(this, "YOUR_APP_TOKEN", "USER_ID");
-
-        bitLabs.checkSurveys(hasSurveys -> Log.i(TAG, hasSurveys != null ? hasSurveys.toString() : "NULL -  Check BitLabs Logs"));
 
         // optionally add custom tags to your users
         Map<String, Object> tags = new HashMap<>();
@@ -34,15 +32,21 @@ public class MainActivity extends AppCompatActivity {
         // Get client-side callbacks to reward the user (We highly recommend using server-to-server callbacks!)
         bitLabs.setOnRewardListener(payout -> Log.i("BitLabs", "Reward payout: " + payout));
 
-        bitLabs.getSurveys(surveys -> {
+        findViewById(R.id.btn_check_surveys).setOnClickListener(view -> bitLabs.checkSurveys(hasSurveys ->
+                Log.i(TAG, hasSurveys != null
+                        ? hasSurveys.toString()
+                        : "Couldn't check for surveys -  Check BitLabs Logs"))
+        );
+
+        findViewById(R.id.btn_get_surveys).setOnClickListener(view -> bitLabs.getSurveys(surveys -> {
             if (surveys == null)
-                Log.i(TAG, "NULL -  Check BitLabs Logs");
+                Log.i(TAG, "Couldn't get surveys -  Check BitLabs Logs");
             else {
                 Log.i(TAG, "Surveys: " + surveys);
                 if (!surveys.isEmpty()) surveys.get(0).open(this);
             }
-        });
+        }));
 
-        findViewById(R.id.open).setOnClickListener(view -> bitLabs.launchOfferWall(this));
+        findViewById(R.id.btn_launch_offerwall).setOnClickListener(view -> bitLabs.launchOfferWall(this));
     }
 }

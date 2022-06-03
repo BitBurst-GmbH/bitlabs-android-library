@@ -5,7 +5,7 @@ android {
 
     defaultConfig {
         applicationId 'ai.bitlabs.example'
-        minSdkVersion 16
+        minSdkVersion 19
         targetSdkVersion 31
         versionCode 29
         versionName '2.2.9'

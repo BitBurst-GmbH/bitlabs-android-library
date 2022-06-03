@@ -1,12 +1,10 @@
 package ai.bitlabs.sdk
 
-import ai.bitlabs.sdk.util.TAG
 import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.os.Message
-import android.util.Log
 import android.view.View
 import android.webkit.*
 import androidx.annotation.RequiresApi
@@ -23,10 +21,7 @@ fun WebView.setup(
     else
         CookieManager.getInstance().setAcceptCookie(true)
 
-    this.setLayerType(
-        if (Build.VERSION.SDK_INT >= 19) View.LAYER_TYPE_HARDWARE else View.LAYER_TYPE_SOFTWARE,
-        null
-    )
+    this.setLayerType(View.LAYER_TYPE_HARDWARE, null)
 
     this.webChromeClient = object : WebChromeClient() {
         override fun onCreateWindow(
@@ -36,7 +31,7 @@ fun WebView.setup(
             resultMsg: Message
         ): Boolean {
             val newWebView = WebView(view.context)
-            with(resultMsg.obj as WebView.WebViewTransport) { webView = newWebView };
+            with(resultMsg.obj as WebView.WebViewTransport) { webView = newWebView }
             resultMsg.sendToTarget()
 
             newWebView.webViewClient = object : WebViewClient() {
@@ -93,7 +88,7 @@ fun WebView.setup(
         displayZoomControls = false
         setSupportMultipleWindows(true)
         cacheMode = WebSettings.LOAD_NO_CACHE
+        mediaPlaybackRequiresUserGesture = false
         javaScriptCanOpenWindowsAutomatically = true
-        if (Build.VERSION.SDK_INT >= 17) mediaPlaybackRequiresUserGesture = false
     }
 }

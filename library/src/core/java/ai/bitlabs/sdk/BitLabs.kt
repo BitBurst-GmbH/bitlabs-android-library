@@ -3,9 +3,8 @@ package ai.bitlabs.sdk
 import ai.bitlabs.sdk.data.BitLabsRepository
 import ai.bitlabs.sdk.data.model.Survey
 import ai.bitlabs.sdk.data.model.WebActivityParams
+import ai.bitlabs.sdk.util.*
 import ai.bitlabs.sdk.util.BUNDLE_KEY_PARAMS
-import ai.bitlabs.sdk.util.OnResponseListener
-import ai.bitlabs.sdk.util.OnRewardListener
 import ai.bitlabs.sdk.util.TAG
 import android.content.Context
 import android.content.Intent
@@ -73,9 +72,10 @@ object BitLabs {
      * parameter is `true` if an action can be performed and `false` otherwise. If it's `null`,
      * then there has been an internal error which is most probably logged with 'BitLabs' as a tag.
      */
-    fun checkSurveys(onResponseListener: OnResponseListener<Boolean>) = ifInitialised {
-        bitLabsRepo?.checkSurveys(onResponseListener)
-    }
+    fun checkSurveys(
+        onResponseListener: OnResponseListener<Boolean>,
+        onExceptionListener: OnExceptionListener
+    ) = ifInitialised { bitLabsRepo?.checkSurveys(onResponseListener, onExceptionListener) }
 
     /**
      * Fetches a list of surveys the user can open.
@@ -84,9 +84,10 @@ object BitLabs {
      * Its parameter is the list of surveys. If it's `null`, then there has been an internal error
      * which is most probably logged with 'BitLabs' as a tag.
      */
-    fun getSurveys(onResponseListener: OnResponseListener<List<Survey>>) = ifInitialised {
-        bitLabsRepo?.getSurveys("NATIVE", onResponseListener)
-    }
+    fun getSurveys(
+        onResponseListener: OnResponseListener<List<Survey>>,
+        onExceptionListener: OnExceptionListener
+    ) = ifInitialised { bitLabsRepo?.getSurveys("NATIVE", onResponseListener, onExceptionListener) }
 
 
     /** Registers an [OnRewardListener] callback to be invoked when the OfferWall is exited by the user. */

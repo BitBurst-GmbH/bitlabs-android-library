@@ -20,8 +20,8 @@ import com.unity3d.player.UnityPlayer
  */
 object BitLabs {
     private var uid: String = ""
-    private var token: String = ""
     private var adId: String = ""
+    private var token: String = ""
 
     /** These will be added as query parameters to the OfferWall Link */
     var tags: MutableMap<String, Any> = mutableMapOf()
@@ -69,9 +69,15 @@ object BitLabs {
      * If you want to perform background checks if surveys are available, this is the best option.
      */
     fun checkSurveys(gameObject: String) = ifInitialised {
-        bitLabsRepo?.checkSurveys { hasSurveys ->
+        bitLabsRepo?.checkSurveys({ hasSurveys ->
             UnityPlayer.UnitySendMessage(gameObject, "checkSurveysCallback", hasSurveys.toString())
-        }
+        }, { exception ->
+            UnityPlayer.UnitySendMessage(
+                gameObject,
+                "checkSurveysException",
+                exception.message.toString()
+            )
+        })
     }
 
     /**
@@ -85,13 +91,19 @@ object BitLabs {
      * then there has been an internal error which is most probably logged with 'BitLabs' as a tag.
      */
     fun getSurveys(gameObject: String) = ifInitialised {
-        bitLabsRepo?.getSurveys("UNITY") { surveys ->
+        bitLabsRepo?.getSurveys("UNITY", { surveys ->
             UnityPlayer.UnitySendMessage(
                 gameObject,
                 "getSurveysCallback",
                 GsonBuilder().create().toJson(surveys)
             )
-        }
+        }, { exception ->
+            UnityPlayer.UnitySendMessage(
+                gameObject,
+                "getSurveysException",
+                exception.message.toString()
+            )
+        })
     }
 
     /** Registers an [OnRewardListener] callback to be invoked when the OfferWall is exited by the user. */

@@ -9,5 +9,10 @@ fun interface OnRewardListener {
 
 /** Interface definition for a callback to be invoked when a response is received from [BitLabsAPI]. */
 fun interface OnResponseListener<T> {
-    fun onResponse(response: T?)
+    fun onResponse(response: T)
+}
+
+/** Interface definition for a callback to be invoked when an exception is received from [BitLabsAPI]. */
+fun interface OnExceptionListener {
+    fun onException(exception: Exception)
 }

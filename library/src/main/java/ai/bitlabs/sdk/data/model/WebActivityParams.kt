@@ -1,6 +1,6 @@
 package ai.bitlabs.sdk.data.model
 
-import ai.bitlabs.sdk.WebActivity
+import ai.bitlabs.sdk.views.WebActivity
 import android.net.Uri
 
 /**

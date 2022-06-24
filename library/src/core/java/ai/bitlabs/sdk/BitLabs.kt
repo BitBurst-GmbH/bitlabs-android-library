@@ -6,6 +6,7 @@ import ai.bitlabs.sdk.data.model.WebActivityParams
 import ai.bitlabs.sdk.util.*
 import ai.bitlabs.sdk.util.BUNDLE_KEY_PARAMS
 import ai.bitlabs.sdk.util.TAG
+import ai.bitlabs.sdk.views.WebActivity
 import android.content.Context
 import android.content.Intent
 import android.util.Log

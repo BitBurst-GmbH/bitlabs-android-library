@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
         bitLabs.setOnRewardListener(payout -> Log.i(TAG, "Reward payout: " + payout));
 
         findViewById(R.id.btn_check_surveys).setOnClickListener(view -> bitLabs.checkSurveys(
-                hasSurveys -> Log.i(TAG, hasSurveys ? "Found Surveys": "No Surveys"),
+                hasSurveys -> Log.i(TAG, hasSurveys ? "Found Surveys" : "No Surveys"),
                 e -> Log.e(TAG, "CheckSurveysErr: " + e.getMessage(), e.getCause()))
         );
 

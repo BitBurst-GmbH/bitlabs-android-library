@@ -6,10 +6,14 @@ import ai.bitlabs.sdk.data.model.WebActivityParams
 import ai.bitlabs.sdk.util.*
 import ai.bitlabs.sdk.util.BUNDLE_KEY_PARAMS
 import ai.bitlabs.sdk.util.TAG
+import ai.bitlabs.sdk.views.SurveysAdapter
 import ai.bitlabs.sdk.views.WebActivity
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager.*
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.ads.identifier.AdvertisingIdClient
 
 /**
@@ -114,6 +118,12 @@ object BitLabs {
             context.startActivity(this)
         }
     }
+
+    fun getSurveyWidgets(context: Context, surveys: List<Survey>): RecyclerView =
+        RecyclerView(context).apply {
+            layoutManager = LinearLayoutManager(context, HORIZONTAL, false)
+            adapter = SurveysAdapter(context, surveys)
+        }
 
     internal fun leaveSurvey(networkId: String, surveyId: String, reason: String) =
         bitLabsRepo?.leaveSurvey(networkId, surveyId, reason)

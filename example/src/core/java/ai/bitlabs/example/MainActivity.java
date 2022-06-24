@@ -2,6 +2,7 @@ package ai.bitlabs.example;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.RelativeLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -21,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        bitLabs.init(this, "YOUR_APP_TOKEN", "USER_ID");
+        bitLabs.init(this, "46d31e1e-315a-4b52-b0de-eca6062163af", "USER_ID");
 
         // optionally add custom tags to your users
         Map<String, Object> tags = new HashMap<>();
@@ -38,13 +39,10 @@ public class MainActivity extends AppCompatActivity {
                 e -> Log.e(TAG, "CheckSurveysErr: " + e.getMessage(), e.getCause()))
         );
 
+        RelativeLayout surveyLayout = findViewById(R.id.rl_survey_widgets);
+
         findViewById(R.id.btn_get_surveys).setOnClickListener(view -> bitLabs.getSurveys(
-                surveys -> {
-                    for (Survey survey :
-                            surveys) {
-                        Log.i(TAG, "Survey " + survey.getId() + " in Category " + survey.getDetails().getCategory().getName());
-                    }
-                },
+                surveys -> surveyLayout.addView(bitLabs.getSurveyWidgets(this, surveys)),
                 exception -> Log.e(TAG, "GetSurveysErr: " + exception.getMessage(), exception.getCause()))
         );
 

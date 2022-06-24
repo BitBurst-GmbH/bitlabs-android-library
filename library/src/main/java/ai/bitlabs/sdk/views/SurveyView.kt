@@ -15,31 +15,29 @@ class SurveyView : LinearLayout {
             ratingTV.text = value.toString()
             ratingBar.rating = value.toFloat()
         }
-    var reward = 0.5
+    var reward = "0.5"
         set(value) {
             field = value
-            rewardTV.text = value.toString()
+            rewardTV.text = value
         }
-    var duration = "1 minute"
+    var loi = "1 minute"
         set(value) {
             field = value
-            durationTV.text = value
+            loiTV.text = value
         }
 
     private var ratingTV: TextView
     private var rewardTV: TextView
     private var ratingBar: RatingBar
-    private var durationTV: TextView
+    private var loiTV: TextView
 
     init {
         LayoutInflater.from(context).inflate(R.layout.view_survey, this, true)
 
-        isClickable = true
-
         ratingTV = findViewById(R.id.tv_rating)
         rewardTV = findViewById(R.id.tv_reward)
         ratingBar = findViewById(R.id.rating_bar)
-        durationTV = findViewById(R.id.tv_duration)
+        loiTV = findViewById(R.id.tv_loi)
     }
 
     constructor(context: Context) : super(context) {
@@ -49,15 +47,15 @@ class SurveyView : LinearLayout {
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
         context.withStyledAttributes(attrs, R.styleable.SurveyView) {
             rating = getInt(R.styleable.SurveyView_rating, 3)
-            reward = getFloat(R.styleable.SurveyView_reward, 0.5F).toDouble()
-            duration = getString(R.styleable.SurveyView_duration) ?: "1 minute"
+            reward = getString(R.styleable.SurveyView_reward) ?: reward
+            loi = getString(R.styleable.SurveyView_loi) ?: loi
         }
 
         bindUI()
     }
 
     private fun bindUI() {
-        durationTV.text = duration
+        loiTV.text = loi
         ratingTV.text = rating.toString()
         rewardTV.text = reward.toString()
 

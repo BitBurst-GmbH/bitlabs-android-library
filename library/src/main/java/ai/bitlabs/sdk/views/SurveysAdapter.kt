@@ -15,16 +15,13 @@ class SurveysAdapter(private val context: Context, private val surveys: List<Sur
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) = with(holder.surveyView) {
         surveys[position].let { survey ->
-            Log.d(TAG, survey.toString())
             rating = survey.rating
             reward = survey.value
-            loi = "${survey.loi} minutes"
+            loi = "${survey.loi.toInt()} minutes"
         }
     }
 
     override fun getItemCount(): Int = surveys.size
 
-    class ViewHolder(val surveyView: SurveyView) : RecyclerView.ViewHolder(surveyView) {
-
-    }
+    class ViewHolder(val surveyView: SurveyView) : RecyclerView.ViewHolder(surveyView)
 }

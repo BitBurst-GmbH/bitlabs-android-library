@@ -42,7 +42,10 @@ public class MainActivity extends AppCompatActivity {
         RelativeLayout surveyLayout = findViewById(R.id.rl_survey_widgets);
 
         findViewById(R.id.btn_get_surveys).setOnClickListener(view -> bitLabs.getSurveys(
-                surveys -> surveyLayout.addView(bitLabs.getSurveyWidgets(this, surveys)),
+                surveys -> {
+                    surveyLayout.removeAllViews();
+                    surveyLayout.addView(bitLabs.getSurveyWidgets(this, surveys));
+                },
                 exception -> Log.e(TAG, "GetSurveysErr: " + exception.getMessage(), exception.getCause()))
         );
 

@@ -10,7 +10,10 @@ import ai.bitlabs.sdk.views.SurveysAdapter
 import ai.bitlabs.sdk.views.WebActivity
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.util.Log
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager.*
 import androidx.recyclerview.widget.RecyclerView
@@ -24,8 +27,9 @@ import com.google.android.gms.ads.identifier.AdvertisingIdClient
  */
 object BitLabs {
     private var uid: String = ""
-    private var token: String = ""
     private var adId: String = ""
+    private var token: String = ""
+    private var widgetColor: Int = 0
 
     /** These will be added as query parameters to the OfferWall Link */
     var tags: MutableMap<String, Any> = mutableMapOf()
@@ -64,6 +68,14 @@ object BitLabs {
         this.uid = uid
         bitLabsRepo = BitLabsRepository(token, uid)
         determineAdvertisingInfo(context)
+
+        getWidgetColor()
+    }
+
+    private fun getWidgetColor() {
+        bitLabsRepo?.getAppSettings(
+            { widgetColor = Color.parseColor(it.surveyIconColor) },
+            { Log.e(TAG, "$it") })
     }
 
     /**
@@ -122,7 +134,7 @@ object BitLabs {
     fun getSurveyWidgets(context: Context, surveys: List<Survey>): RecyclerView =
         RecyclerView(context).apply {
             layoutManager = LinearLayoutManager(context, HORIZONTAL, false)
-            adapter = SurveysAdapter(context, surveys)
+            adapter = SurveysAdapter(context, surveys, widgetColor)
         }
 
     internal fun leaveSurvey(networkId: String, surveyId: String, reason: String) =

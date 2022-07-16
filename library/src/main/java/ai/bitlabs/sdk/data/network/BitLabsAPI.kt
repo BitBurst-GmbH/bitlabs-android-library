@@ -23,4 +23,7 @@ internal interface BitLabsAPI {
 
     @GET("client/actions?platform=MOBILE&os=ANDROID")
     fun getActions(@Query("sdk") sdk: String): Call<BitLabsResponse<GetActionsResponse>>
+
+    @GET("client/settings/v2")
+    fun getAppSettings(): Call<BitLabsResponse<GetAppSettingsResponse>>
 }

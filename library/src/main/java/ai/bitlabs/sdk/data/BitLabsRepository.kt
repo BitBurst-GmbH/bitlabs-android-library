@@ -105,4 +105,32 @@ internal class BitLabsRepository(token: String, uid: String) {
             onExceptionListener.onException(Exception(t))
         }
     })
+
+    internal fun getAppSettings(
+        onResponseListener: OnResponseListener<Visual>,
+        onExceptionListener: OnExceptionListener
+    ) = bitLabsAPI.getAppSettings()
+        .enqueue(object : Callback<BitLabsResponse<GetAppSettingsResponse>> {
+            override fun onResponse(
+                call: Call<BitLabsResponse<GetAppSettingsResponse>>,
+                response: Response<BitLabsResponse<GetAppSettingsResponse>>
+            ) {
+                if (response.isSuccessful) {
+                    response.body()?.data?.visual?.let { onResponseListener.onResponse(it) }
+                    return
+                }
+
+                response.errorBody()?.body<GetActionsResponse>()?.error?.details?.run {
+                    onExceptionListener.onException(Exception("$http - $msg"))
+                }
+            }
+
+            override fun onFailure(
+                call: Call<BitLabsResponse<GetAppSettingsResponse>>,
+                t: Throwable
+            ) {
+                onExceptionListener.onException(Exception(t))
+            }
+
+        })
 }

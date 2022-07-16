@@ -1,5 +1,6 @@
 package ai.bitlabs.sdk.views
 
+import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.data.model.Survey
 import android.content.Context
 import android.view.ViewGroup
@@ -21,6 +22,14 @@ class SurveysAdapter(
             rating = survey.rating
             loi = "${survey.loi.toInt()} minutes"
         }
+
+        setOnClickListener { view ->
+            view.alpha = 0.75F;
+            view.animate()
+                .setDuration(500)
+                .alpha(1F)
+                .start()
+            BitLabs.launchOfferWall(context) }
     }
 
     override fun getItemCount(): Int = surveys.size

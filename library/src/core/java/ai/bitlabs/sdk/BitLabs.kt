@@ -131,11 +131,10 @@ object BitLabs {
         }
     }
 
-    fun getSurveyWidgets(context: Context, surveys: List<Survey>): RecyclerView =
-        RecyclerView(context).apply {
-            layoutManager = LinearLayoutManager(context, HORIZONTAL, false)
-            adapter = SurveysAdapter(context, surveys, widgetColor)
-        }
+    fun getSurveyWidgets(context: Context, surveys: List<Survey>) = RecyclerView(context).apply {
+        layoutManager = LinearLayoutManager(context, HORIZONTAL, false)
+        adapter = SurveysAdapter(context, surveys, widgetColor)
+    }
 
     internal fun leaveSurvey(networkId: String, surveyId: String, reason: String) =
         bitLabsRepo?.leaveSurvey(networkId, surveyId, reason)

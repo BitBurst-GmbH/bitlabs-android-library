@@ -131,6 +131,5 @@ internal class BitLabsRepository(token: String, uid: String) {
             ) {
                 onExceptionListener.onException(Exception(t))
             }
-
         })
 }

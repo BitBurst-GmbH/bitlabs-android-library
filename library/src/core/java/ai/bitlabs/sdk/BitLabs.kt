@@ -72,12 +72,6 @@ object BitLabs {
         getWidgetColor()
     }
 
-    private fun getWidgetColor() {
-        bitLabsRepo?.getAppSettings(
-            { widgetColor = Color.parseColor(it.surveyIconColor) },
-            { Log.e(TAG, "$it") })
-    }
-
     /**
      * Determines whether the user can perform an action in the OfferWall
      * (either opening a survey or answering qualifications) and then executes your implementation
@@ -131,6 +125,9 @@ object BitLabs {
         }
     }
 
+    /**
+     * Returns a RecyclerView populating the [surveys].
+     */
     fun getSurveyWidgets(context: Context, surveys: List<Survey>) = RecyclerView(context).apply {
         layoutManager = LinearLayoutManager(context, HORIZONTAL, false)
         adapter = SurveysAdapter(context, surveys, widgetColor)
@@ -138,6 +135,13 @@ object BitLabs {
 
     internal fun leaveSurvey(networkId: String, surveyId: String, reason: String) =
         bitLabsRepo?.leaveSurvey(networkId, surveyId, reason)
+
+    /**
+     * Gets the color from the BitLabs API.
+     */
+    private fun getWidgetColor() = bitLabsRepo?.getAppSettings(
+        { widgetColor = Color.parseColor(it.surveyIconColor) },
+        { Log.e(TAG, "$it") })
 
     private fun determineAdvertisingInfo(context: Context) = Thread {
         try {
@@ -153,7 +157,10 @@ object BitLabs {
      * [bitLabsRepo] is initialised and executes the [block] accordingly.
      */
     private inline fun ifInitialised(block: () -> Unit) {
-        val isInitialised = token.isNotBlank().and(uid.isNotBlank()).and(bitLabsRepo != null)
+        val isInitialised = token
+            .isNotBlank()
+            .and(uid.isNotBlank())
+            .and(bitLabsRepo != null)
 
         if (isInitialised) block()
         else Log.e(TAG, "You should initialise BitLabs first! Call BitLabs::init()")

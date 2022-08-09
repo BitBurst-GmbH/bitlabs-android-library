@@ -29,7 +29,8 @@ class SurveysAdapter(
                 .setDuration(500)
                 .alpha(1F)
                 .start()
-            BitLabs.launchOfferWall(context) }
+            BitLabs.launchOfferWall(context)
+        }
     }
 
     override fun getItemCount(): Int = surveys.size

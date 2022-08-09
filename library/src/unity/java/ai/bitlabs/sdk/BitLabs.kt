@@ -30,23 +30,6 @@ object BitLabs {
     private var bitLabsRepo: BitLabsRepository? = null
     internal var onRewardListener: OnRewardListener? = null
 
-
-    /**
-     * This is the essential function. Without it, the library will not function properly.
-     * So make sure you call it before using the library's functions
-     * @param token Your App Token, found in your [BitLabs Dashboard](https://dashboard.bitlabs.ai/).
-     * @param uid The id of the current user, this id is for you to keep track of which user got what.
-     */
-    @Deprecated(
-        "This will be removed in the next major release(v3)",
-        replaceWith = ReplaceWith("init(context, token, uid)")
-    )
-    fun init(token: String, uid: String) {
-        this.token = token
-        this.uid = uid
-        bitLabsRepo = BitLabsRepository(token, uid)
-    }
-
     /**
      * Initialises the connection with BitLabs API using your app [token] and [uid]
      * and gets the user [Advertising Id][AdvertisingIdClient.Info] using the activity [context].
@@ -71,11 +54,11 @@ object BitLabs {
      */
     fun checkSurveys(gameObject: String) = ifInitialised {
         bitLabsRepo?.checkSurveys({ hasSurveys ->
-            UnityPlayer.UnitySendMessage(gameObject, "checkSurveysCallback", hasSurveys.toString())
+            UnityPlayer.UnitySendMessage(gameObject, "CheckSurveysCallback", hasSurveys.toString())
         }, { exception ->
             UnityPlayer.UnitySendMessage(
                 gameObject,
-                "checkSurveysException",
+                "CheckSurveysException",
                 exception.message.toString()
             )
         })
@@ -95,13 +78,13 @@ object BitLabs {
         bitLabsRepo?.getSurveys("UNITY", { surveys ->
             UnityPlayer.UnitySendMessage(
                 gameObject,
-                "getSurveysCallback",
+                "GetSurveysCallback",
                 GsonBuilder().create().toJson(surveys)
             )
         }, { exception ->
             UnityPlayer.UnitySendMessage(
                 gameObject,
-                "getSurveysException",
+                "GetSurveysException",
                 exception.message.toString()
             )
         })

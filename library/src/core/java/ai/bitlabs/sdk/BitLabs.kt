@@ -11,9 +11,7 @@ import ai.bitlabs.sdk.views.WebActivity
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
-import android.graphics.drawable.GradientDrawable
 import android.util.Log
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager.*
 import androidx.recyclerview.widget.RecyclerView
@@ -36,23 +34,6 @@ object BitLabs {
 
     private var bitLabsRepo: BitLabsRepository? = null
     internal var onRewardListener: OnRewardListener? = null
-
-
-    /**
-     * This is the essential function. Without it, the library will not function properly.
-     * So make sure you call it before using the library's functions
-     * @param[token] Your App Token, found in your [BitLabs Dashboard](https://dashboard.bitlabs.ai/).
-     * @param[uid] The id of the current user, this id is for you to keep track of which user got what.
-     */
-    @Deprecated(
-        "This will be removed in the next major release(v3)",
-        replaceWith = ReplaceWith("init(context, token, uid)")
-    )
-    fun init(token: String, uid: String) {
-        this.token = token
-        this.uid = uid
-        bitLabsRepo = BitLabsRepository(token, uid)
-    }
 
     /**
      * Initialises the connection with BitLabs API using your app [token] and [uid]

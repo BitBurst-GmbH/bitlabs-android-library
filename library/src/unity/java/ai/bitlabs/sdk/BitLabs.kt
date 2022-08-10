@@ -5,6 +5,7 @@ import ai.bitlabs.sdk.data.model.WebActivityParams
 import ai.bitlabs.sdk.util.BUNDLE_KEY_PARAMS
 import ai.bitlabs.sdk.util.OnRewardListener
 import ai.bitlabs.sdk.util.TAG
+import ai.bitlabs.sdk.views.WebActivity
 import android.content.Context
 import android.content.Intent
 import android.util.Log
@@ -20,31 +21,14 @@ import com.unity3d.player.UnityPlayer
  */
 object BitLabs {
     private var uid: String = ""
-    private var token: String = ""
     private var adId: String = ""
+    private var token: String = ""
 
     /** These will be added as query parameters to the OfferWall Link */
     var tags: MutableMap<String, Any> = mutableMapOf()
 
     private var bitLabsRepo: BitLabsRepository? = null
     internal var onRewardListener: OnRewardListener? = null
-
-
-    /**
-     * This is the essential function. Without it, the library will not function properly.
-     * So make sure you call it before using the library's functions
-     * @param token Your App Token, found in your [BitLabs Dashboard](https://dashboard.bitlabs.ai/).
-     * @param uid The id of the current user, this id is for you to keep track of which user got what.
-     */
-    @Deprecated(
-        "This will be removed in the next major release(v3)",
-        replaceWith = ReplaceWith("init(context, token, uid)")
-    )
-    fun init(token: String, uid: String) {
-        this.token = token
-        this.uid = uid
-        bitLabsRepo = BitLabsRepository(token, uid)
-    }
 
     /**
      * Initialises the connection with BitLabs API using your app [token] and [uid]
@@ -69,9 +53,15 @@ object BitLabs {
      * If you want to perform background checks if surveys are available, this is the best option.
      */
     fun checkSurveys(gameObject: String) = ifInitialised {
-        bitLabsRepo?.checkSurveys { hasSurveys ->
-            UnityPlayer.UnitySendMessage(gameObject, "checkSurveysCallback", hasSurveys.toString())
-        }
+        bitLabsRepo?.checkSurveys({ hasSurveys ->
+            UnityPlayer.UnitySendMessage(gameObject, "CheckSurveysCallback", hasSurveys.toString())
+        }, { exception ->
+            UnityPlayer.UnitySendMessage(
+                gameObject,
+                "CheckSurveysException",
+                exception.message.toString()
+            )
+        })
     }
 
     /**
@@ -85,13 +75,19 @@ object BitLabs {
      * then there has been an internal error which is most probably logged with 'BitLabs' as a tag.
      */
     fun getSurveys(gameObject: String) = ifInitialised {
-        bitLabsRepo?.getSurveys("UNITY") { surveys ->
+        bitLabsRepo?.getSurveys("UNITY", { surveys ->
             UnityPlayer.UnitySendMessage(
                 gameObject,
-                "getSurveysCallback",
+                "GetSurveysCallback",
                 GsonBuilder().create().toJson(surveys)
             )
-        }
+        }, { exception ->
+            UnityPlayer.UnitySendMessage(
+                gameObject,
+                "GetSurveysException",
+                exception.message.toString()
+            )
+        })
     }
 
     /** Registers an [OnRewardListener] callback to be invoked when the OfferWall is exited by the user. */

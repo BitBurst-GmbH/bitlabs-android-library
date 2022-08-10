@@ -3,13 +3,18 @@ package ai.bitlabs.sdk
 import ai.bitlabs.sdk.data.BitLabsRepository
 import ai.bitlabs.sdk.data.model.Survey
 import ai.bitlabs.sdk.data.model.WebActivityParams
+import ai.bitlabs.sdk.util.*
 import ai.bitlabs.sdk.util.BUNDLE_KEY_PARAMS
-import ai.bitlabs.sdk.util.OnResponseListener
-import ai.bitlabs.sdk.util.OnRewardListener
 import ai.bitlabs.sdk.util.TAG
+import ai.bitlabs.sdk.views.SurveysAdapter
+import ai.bitlabs.sdk.views.WebActivity
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.util.Log
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager.*
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.ads.identifier.AdvertisingIdClient
 
 /**
@@ -20,31 +25,15 @@ import com.google.android.gms.ads.identifier.AdvertisingIdClient
  */
 object BitLabs {
     private var uid: String = ""
-    private var token: String = ""
     private var adId: String = ""
+    private var token: String = ""
+    private var widgetColor: Int = 0
 
     /** These will be added as query parameters to the OfferWall Link */
     var tags: MutableMap<String, Any> = mutableMapOf()
 
     private var bitLabsRepo: BitLabsRepository? = null
     internal var onRewardListener: OnRewardListener? = null
-
-
-    /**
-     * This is the essential function. Without it, the library will not function properly.
-     * So make sure you call it before using the library's functions
-     * @param[token] Your App Token, found in your [BitLabs Dashboard](https://dashboard.bitlabs.ai/).
-     * @param[uid] The id of the current user, this id is for you to keep track of which user got what.
-     */
-    @Deprecated(
-        "This will be removed in the next major release(v3)",
-        replaceWith = ReplaceWith("init(context, token, uid)")
-    )
-    fun init(token: String, uid: String) {
-        this.token = token
-        this.uid = uid
-        bitLabsRepo = BitLabsRepository(token, uid)
-    }
 
     /**
      * Initialises the connection with BitLabs API using your app [token] and [uid]
@@ -60,6 +49,8 @@ object BitLabs {
         this.uid = uid
         bitLabsRepo = BitLabsRepository(token, uid)
         determineAdvertisingInfo(context)
+
+        getWidgetColor()
     }
 
     /**
@@ -73,9 +64,10 @@ object BitLabs {
      * parameter is `true` if an action can be performed and `false` otherwise. If it's `null`,
      * then there has been an internal error which is most probably logged with 'BitLabs' as a tag.
      */
-    fun checkSurveys(onResponseListener: OnResponseListener<Boolean>) = ifInitialised {
-        bitLabsRepo?.checkSurveys(onResponseListener)
-    }
+    fun checkSurveys(
+        onResponseListener: OnResponseListener<Boolean>,
+        onExceptionListener: OnExceptionListener
+    ) = ifInitialised { bitLabsRepo?.checkSurveys(onResponseListener, onExceptionListener) }
 
     /**
      * Fetches a list of surveys the user can open.
@@ -84,9 +76,10 @@ object BitLabs {
      * Its parameter is the list of surveys. If it's `null`, then there has been an internal error
      * which is most probably logged with 'BitLabs' as a tag.
      */
-    fun getSurveys(onResponseListener: OnResponseListener<List<Survey>>) = ifInitialised {
-        bitLabsRepo?.getSurveys("NATIVE", onResponseListener)
-    }
+    fun getSurveys(
+        onResponseListener: OnResponseListener<List<Survey>>,
+        onExceptionListener: OnExceptionListener
+    ) = ifInitialised { bitLabsRepo?.getSurveys("NATIVE", onResponseListener, onExceptionListener) }
 
 
     /** Registers an [OnRewardListener] callback to be invoked when the OfferWall is exited by the user. */
@@ -113,8 +106,23 @@ object BitLabs {
         }
     }
 
+    /**
+     * Returns a RecyclerView populating the [surveys].
+     */
+    fun getSurveyWidgets(context: Context, surveys: List<Survey>) = RecyclerView(context).apply {
+        layoutManager = LinearLayoutManager(context, HORIZONTAL, false)
+        adapter = SurveysAdapter(context, surveys, widgetColor)
+    }
+
     internal fun leaveSurvey(networkId: String, surveyId: String, reason: String) =
         bitLabsRepo?.leaveSurvey(networkId, surveyId, reason)
+
+    /**
+     * Gets the color from the BitLabs API.
+     */
+    private fun getWidgetColor() = bitLabsRepo?.getAppSettings(
+        { widgetColor = Color.parseColor(it.surveyIconColor) },
+        { Log.e(TAG, "$it") })
 
     private fun determineAdvertisingInfo(context: Context) = Thread {
         try {
@@ -130,7 +138,10 @@ object BitLabs {
      * [bitLabsRepo] is initialised and executes the [block] accordingly.
      */
     private inline fun ifInitialised(block: () -> Unit) {
-        val isInitialised = token.isNotBlank().and(uid.isNotBlank()).and(bitLabsRepo != null)
+        val isInitialised = token
+            .isNotBlank()
+            .and(uid.isNotBlank())
+            .and(bitLabsRepo != null)
 
         if (isInitialised) block()
         else Log.e(TAG, "You should initialise BitLabs first! Call BitLabs::init()")

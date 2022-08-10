@@ -1,5 +1,8 @@
-package ai.bitlabs.sdk
+package ai.bitlabs.sdk.views
 
+import ai.bitlabs.sdk.BitLabs
+import ai.bitlabs.sdk.R
+import ai.bitlabs.sdk.util.setup
 import ai.bitlabs.sdk.util.BUNDLE_KEY_PARAMS
 import ai.bitlabs.sdk.util.TAG
 import android.net.Uri

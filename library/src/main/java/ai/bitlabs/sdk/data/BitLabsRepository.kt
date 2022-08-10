@@ -3,7 +3,7 @@ package ai.bitlabs.sdk.data
 import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.data.model.*
 import ai.bitlabs.sdk.data.network.BitLabsAPI
-import ai.bitlabs.sdk.util.OnResponseListener
+import ai.bitlabs.sdk.util.*
 import ai.bitlabs.sdk.util.TAG
 import ai.bitlabs.sdk.util.body
 import ai.bitlabs.sdk.util.randomSurvey
@@ -33,30 +33,32 @@ internal class BitLabsRepository(token: String, uid: String) {
         .build()
         .create(BitLabsAPI::class.java)
 
-    internal fun checkSurveys(onResponseListener: OnResponseListener<Boolean>) =
-        bitLabsAPI.checkSurveys().enqueue(object : Callback<BitLabsResponse<CheckSurveysResponse>> {
-            override fun onResponse(
-                call: Call<BitLabsResponse<CheckSurveysResponse>>,
-                response: Response<BitLabsResponse<CheckSurveysResponse>>
-            ) {
-                if (response.isSuccessful) {
-                    onResponseListener.onResponse(response.body()?.data?.hasSurveys)
-                } else {
-                    response.errorBody()?.body<CheckSurveysResponse>()?.error?.details?.run {
-                        Log.e(TAG, "CheckSurvey $http - $msg")
-                    }
-                    onResponseListener.onResponse(null)
-                }
+    internal fun checkSurveys(
+        onResponseListener: OnResponseListener<Boolean>,
+        onExceptionListener: OnExceptionListener
+    ) = bitLabsAPI.checkSurveys().enqueue(object : Callback<BitLabsResponse<CheckSurveysResponse>> {
+        override fun onResponse(
+            call: Call<BitLabsResponse<CheckSurveysResponse>>,
+            response: Response<BitLabsResponse<CheckSurveysResponse>>
+        ) {
+            if (response.isSuccessful) {
+                response.body()?.data?.run { onResponseListener.onResponse(hasSurveys) }
+                return
             }
 
-            override fun onFailure(
-                call: Call<BitLabsResponse<CheckSurveysResponse>>,
-                t: Throwable
-            ) {
-                Log.e(TAG, "CheckSurvey Failure - ${t.message ?: "Unknown Error"}")
-                onResponseListener.onResponse(null)
+            response.errorBody()?.body<CheckSurveysResponse>()?.error?.details?.run {
+                onExceptionListener.onException(Exception("$http - $msg"))
             }
-        })
+
+        }
+
+        override fun onFailure(
+            call: Call<BitLabsResponse<CheckSurveysResponse>>,
+            t: Throwable
+        ) {
+            onExceptionListener.onException(Exception(t))
+        }
+    })
 
     internal fun leaveSurvey(networkId: String, surveyId: String, reason: String) =
         bitLabsAPI.leaveSurvey(networkId, surveyId, LeaveReason(reason))
@@ -77,28 +79,57 @@ internal class BitLabsRepository(token: String, uid: String) {
                 }
             })
 
-    internal fun getSurveys(sdk: String, onResponseListener: OnResponseListener<List<Survey>>) =
-        bitLabsAPI.getActions(sdk).enqueue(object : Callback<BitLabsResponse<GetActionsResponse>> {
-            override fun onResponse(
-                call: Call<BitLabsResponse<GetActionsResponse>>,
-                response: Response<BitLabsResponse<GetActionsResponse>>
-            ) {
-                if (response.isSuccessful && response.body() != null) {
-                    val surveys = response.body()?.data?.surveys?.ifEmpty {
-                        (1..3).map { randomSurvey(it) }
-                    }
+    internal fun getSurveys(
+        sdk: String,
+        onResponseListener: OnResponseListener<List<Survey>>,
+        onExceptionListener: OnExceptionListener
+    ) = bitLabsAPI.getActions(sdk).enqueue(object : Callback<BitLabsResponse<GetActionsResponse>> {
+        override fun onResponse(
+            call: Call<BitLabsResponse<GetActionsResponse>>,
+            response: Response<BitLabsResponse<GetActionsResponse>>
+        ) {
+            if (response.isSuccessful) {
+                response.body()?.data?.surveys?.run {
+                    val surveys = this.ifEmpty { (1..3).map { randomSurvey(it) } }
                     onResponseListener.onResponse(surveys)
-                } else {
-                    response.errorBody()?.body<GetActionsResponse>()?.error?.details?.run {
-                        Log.e(TAG, "GetSurveys $http - $msg")
-                    }
-                    onResponseListener.onResponse(null)
+                }
+                return
+            }
+
+            response.errorBody()?.body<GetActionsResponse>()?.error?.details?.run {
+                onExceptionListener.onException(Exception("$http - $msg"))
+            }
+        }
+
+        override fun onFailure(call: Call<BitLabsResponse<GetActionsResponse>>, t: Throwable) {
+            onExceptionListener.onException(Exception(t))
+        }
+    })
+
+    internal fun getAppSettings(
+        onResponseListener: OnResponseListener<Visual>,
+        onExceptionListener: OnExceptionListener
+    ) = bitLabsAPI.getAppSettings()
+        .enqueue(object : Callback<BitLabsResponse<GetAppSettingsResponse>> {
+            override fun onResponse(
+                call: Call<BitLabsResponse<GetAppSettingsResponse>>,
+                response: Response<BitLabsResponse<GetAppSettingsResponse>>
+            ) {
+                if (response.isSuccessful) {
+                    response.body()?.data?.visual?.let { onResponseListener.onResponse(it) }
+                    return
+                }
+
+                response.errorBody()?.body<GetActionsResponse>()?.error?.details?.run {
+                    onExceptionListener.onException(Exception("$http - $msg"))
                 }
             }
 
-            override fun onFailure(call: Call<BitLabsResponse<GetActionsResponse>>, t: Throwable) {
-                Log.e(TAG, "GetSurveys Failure - ${t.message ?: "Unknown Error"}")
-                onResponseListener.onResponse(null)
+            override fun onFailure(
+                call: Call<BitLabsResponse<GetAppSettingsResponse>>,
+                t: Throwable
+            ) {
+                onExceptionListener.onException(Exception(t))
             }
         })
 }

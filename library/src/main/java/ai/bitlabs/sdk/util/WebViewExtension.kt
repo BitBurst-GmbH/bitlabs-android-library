@@ -1,4 +1,4 @@
-package ai.bitlabs.sdk
+package ai.bitlabs.sdk.util
 
 import android.annotation.SuppressLint
 import android.content.Context

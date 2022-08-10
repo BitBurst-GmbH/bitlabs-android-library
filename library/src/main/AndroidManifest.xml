@@ -8,7 +8,7 @@
     <application android:usesCleartextTraffic="true">
 
         <activity
-            android:name="ai.bitlabs.sdk.WebActivity"
+            android:name="ai.bitlabs.sdk.views.WebActivity"
             android:configChanges="orientation|screenSize"
             android:exported="false"
             android:screenOrientation="sensor"

@@ -21,7 +21,7 @@ Then add the dependency in the same file:
 dependencies {
     // other dependencies
     
-    implementation 'com.github.BitBurst-GmbH.bitlabs-android-library:core:2.1.3'
+    implementation 'com.github.BitBurst-GmbH.bitlabs-android-library:core:3.0.0'
 
     // other dependencies
 }
@@ -29,4 +29,4 @@ dependencies {
 
 ### Usage
 
-Refer to the full guide here: [Android SDK v2](https://developer.bitlabs.ai/docs/android-sdk-v2#initialising-the-sdk)
+Refer to the full guide here: [Android SDK v3](https://developer.bitlabs.ai/docs/android-sdk-v3#initialising-the-sdk)

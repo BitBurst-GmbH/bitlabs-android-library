@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import ai.bitlabs.sdk.BitLabs;
-import ai.bitlabs.sdk.data.model.Survey;
 
 public class MainActivity extends AppCompatActivity {
     private final String TAG = "Example";

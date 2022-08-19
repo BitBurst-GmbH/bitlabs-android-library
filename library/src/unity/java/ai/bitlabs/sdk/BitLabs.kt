@@ -8,6 +8,7 @@ import ai.bitlabs.sdk.util.TAG
 import ai.bitlabs.sdk.views.WebActivity
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.util.Log
 import com.google.android.gms.ads.identifier.AdvertisingIdClient
 import com.google.gson.GsonBuilder
@@ -23,6 +24,7 @@ object BitLabs {
     private var uid: String = ""
     private var adId: String = ""
     private var token: String = ""
+    private var widgetColor: String = ""
 
     /** These will be added as query parameters to the OfferWall Link */
     var tags: MutableMap<String, Any> = mutableMapOf()
@@ -44,7 +46,16 @@ object BitLabs {
         this.uid = uid
         bitLabsRepo = BitLabsRepository(token, uid)
         determineAdvertisingInfo(context)
+
+        getWidgetColor()
     }
+
+    /**
+     * Gets the color from the BitLabs API.
+     */
+    private fun getWidgetColor() = bitLabsRepo?.getAppSettings(
+        { widgetColor = it.surveyIconColor },
+        { Log.e(TAG, "$it") })
 
     /** Determines whether the user can perform an action in the OfferWall
      * (either opening a survey or answering qualifications) and then executes your implementation
@@ -101,6 +112,8 @@ object BitLabs {
     fun addTag(key: String, value: Any) {
         tags[key] = value
     }
+
+    fun getColor() = widgetColor;
 
     /**
      * Launches the OfferWall from the [context] of the Activity you pass.

@@ -76,16 +76,16 @@ internal class WebActivity : AppCompatActivity() {
 
     /** A function to configure all UI elements and the logic behind them, if any. */
     private fun bindUI() {
-        toolbar = findViewById(R.id.toolbar)
+        toolbar = findViewById(R.id.toolbar_bitlabs)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
 
-        closeButton = findViewById(R.id.close)
+        closeButton = findViewById(R.id.iv_close_bitlabs)
         closeButton?.setOnClickListener { finish() }
         toggleToolbar(true)
 
-        webView = findViewById(R.id.web)
+        webView = findViewById(R.id.wv_bitlabs)
         webView?.scrollBarStyle = WebView.SCROLLBARS_OUTSIDE_OVERLAY
 
         webView?.setup(this) { isPageOfferWall, url ->

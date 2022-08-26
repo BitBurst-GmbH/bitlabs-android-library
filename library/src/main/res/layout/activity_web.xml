@@ -7,7 +7,7 @@
     tools:context=".views.WebActivity">
 
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
+        android:id="@+id/toolbar_bitlabs"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@android:color/white"
@@ -16,7 +16,7 @@
         app:title="@string/web_toolbar_header" />
 
     <ImageView
-        android:id="@+id/close"
+        android:id="@+id/iv_close_bitlabs"
         android:layout_width="32dp"
         android:layout_height="32dp"
         android:layout_alignParentTop="true"
@@ -28,8 +28,8 @@
         android:visibility="visible" />
 
     <WebView
-        android:id="@+id/web"
+        android:id="@+id/wv_bitlabs"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/toolbar" />
+        android:layout_below="@id/toolbar_bitlabs" />
 </RelativeLayout>

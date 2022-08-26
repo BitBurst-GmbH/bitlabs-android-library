@@ -12,7 +12,7 @@
             android:configChanges="orientation|screenSize"
             android:exported="false"
             android:screenOrientation="sensor"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBarBitLabs">
             <meta-data
                 android:name="android.webkit.WebView.EnableSafeBrowsing"
                 android:value="true" />

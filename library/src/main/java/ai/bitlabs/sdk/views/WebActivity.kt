@@ -2,6 +2,7 @@ package ai.bitlabs.sdk.views
 
 import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.R
+import ai.bitlabs.sdk.util.BUNDLE_KEY_COLOR
 import ai.bitlabs.sdk.util.setup
 import ai.bitlabs.sdk.util.BUNDLE_KEY_PARAMS
 import ai.bitlabs.sdk.util.TAG
@@ -27,8 +28,9 @@ internal class WebActivity : AppCompatActivity() {
 
     private lateinit var url: String
 
-    private var networkId: String? = null
+    private var color: Int = 0
     private var surveyId: String? = null
+    private var networkId: String? = null
 
     private var reward: Float = 0.0F
 
@@ -36,11 +38,13 @@ internal class WebActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_web)
 
-        url = intent.extras?.getString(BUNDLE_KEY_PARAMS) ?: run {
+        url = intent.getStringExtra(BUNDLE_KEY_PARAMS) ?: run {
             Log.e(TAG, "WebActivity - No bundle data found!")
             finish()
             return
         }
+
+        color = intent.getIntExtra(BUNDLE_KEY_COLOR, 0)
 
         bindUI()
 
@@ -77,6 +81,7 @@ internal class WebActivity : AppCompatActivity() {
     /** A function to configure all UI elements and the logic behind them, if any. */
     private fun bindUI() {
         toolbar = findViewById(R.id.toolbar_bitlabs)
+        toolbar?.setBackgroundColor(color);
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)

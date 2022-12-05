@@ -102,6 +102,7 @@ object BitLabs {
         with(Intent(context, WebActivity::class.java)) {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
             putExtra(BUNDLE_KEY_PARAMS, WebActivityParams(token, uid, "NATIVE", adId, tags).url)
+            putExtra(BUNDLE_KEY_COLOR, widgetColor);
             context.startActivity(this)
         }
     }

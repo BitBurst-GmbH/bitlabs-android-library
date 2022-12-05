@@ -9,6 +9,8 @@ internal const val TAG = "BitLabs"
 
 internal const val BUNDLE_KEY_PARAMS = "bundle-key-params"
 
+internal const val BUNDLE_KEY_COLOR = "bundle-key-color"
+
 internal fun randomSurvey(i: Int) = with(Random(i)) {
     Survey(
         networkId = nextInt(),

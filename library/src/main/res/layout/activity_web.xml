@@ -17,14 +17,14 @@
 
     <ImageView
         android:id="@+id/iv_close_bitlabs"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:layout_margin="16dp"
         android:clickable="true"
         android:focusable="true"
-        android:src="@drawable/ic_close_button"
+        android:src="@drawable/ic_sign_out_regular"
         android:visibility="visible" />
 
     <WebView

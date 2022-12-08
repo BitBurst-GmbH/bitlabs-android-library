@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        bitLabs.init(this, "YOUR_APP_TOKEN", "USER_ID");
+        bitLabs.init(this, "YOU_APP_TOKEN", "USER_ID");
 
         // optionally add custom tags to your users
         Map<String, Object> tags = new HashMap<>();

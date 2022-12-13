@@ -10,7 +10,7 @@ repositories {
 }
 
 group 'ai.bitlabs'
-version '3.0.2'
+version '3.0.3'
 
 android {
     compileSdkVersion 31
@@ -18,7 +18,7 @@ android {
     defaultConfig {
         minSdkVersion 19
         targetSdkVersion 31
-        versionCode 31
+        versionCode 32
         versionName version
     }
 

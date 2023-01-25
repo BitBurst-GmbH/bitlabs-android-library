@@ -3,6 +3,8 @@ package ai.bitlabs.sdk.util
 import ai.bitlabs.sdk.data.model.Category
 import ai.bitlabs.sdk.data.model.Details
 import ai.bitlabs.sdk.data.model.Survey
+import android.graphics.Color
+import java.lang.Integer.parseInt
 import kotlin.random.Random
 
 internal const val TAG = "BitLabs"
@@ -10,6 +12,9 @@ internal const val TAG = "BitLabs"
 internal const val BUNDLE_KEY_PARAMS = "bundle-key-params"
 
 internal const val BUNDLE_KEY_COLOR = "bundle-key-color"
+
+internal fun getLuminance(color: Int) =
+    0.2126 * Color.red(color) + 0.7152 * Color.green(color) + 0.0722 * Color.blue(color)
 
 internal fun randomSurvey(i: Int) = with(Random(i)) {
     Survey(

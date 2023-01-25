@@ -10,7 +10,9 @@
         android:id="@+id/toolbar_bitlabs"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/white"
+        app:titleTextColor="@android:color/white"
+        app:navigationIcon="@drawable/ic_circle_chevron_left_regular"
+        android:background="@color/colorPrimary"
         android:minHeight="?attr/actionBarSize"
         android:visibility="gone"
         app:title="@string/web_toolbar_header" />

@@ -28,6 +28,7 @@ object BitLabs {
     private var adId: String = ""
     private var token: String = ""
     private var widgetColor: Int = 0
+    private var headerColor: Int = 0
 
     /** These will be added as query parameters to the OfferWall Link */
     var tags: MutableMap<String, Any> = mutableMapOf()
@@ -102,7 +103,7 @@ object BitLabs {
         with(Intent(context, WebActivity::class.java)) {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
             putExtra(BUNDLE_KEY_PARAMS, WebActivityParams(token, uid, "NATIVE", adId, tags).url)
-            putExtra(BUNDLE_KEY_COLOR, widgetColor);
+            putExtra(BUNDLE_KEY_COLOR, headerColor);
             context.startActivity(this)
         }
     }
@@ -122,7 +123,10 @@ object BitLabs {
      * Gets the color from the BitLabs API.
      */
     private fun getWidgetColor() = bitLabsRepo?.getAppSettings(
-        { widgetColor = Color.parseColor(it.surveyIconColor) },
+        {
+            widgetColor = Color.parseColor(it.surveyIconColor)
+            headerColor = Color.parseColor(it.navigationColor)
+        },
         { Log.e(TAG, "$it") })
 
     private fun determineAdvertisingInfo(context: Context) = Thread {

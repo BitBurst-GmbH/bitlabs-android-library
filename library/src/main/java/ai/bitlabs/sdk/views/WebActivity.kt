@@ -2,10 +2,12 @@ package ai.bitlabs.sdk.views
 
 import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.R
+import ai.bitlabs.sdk.util.*
 import ai.bitlabs.sdk.util.BUNDLE_KEY_COLOR
-import ai.bitlabs.sdk.util.setup
 import ai.bitlabs.sdk.util.BUNDLE_KEY_PARAMS
 import ai.bitlabs.sdk.util.TAG
+import ai.bitlabs.sdk.util.getLuminance
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -16,6 +18,7 @@ import android.widget.ImageView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.graphics.drawable.DrawableCompat
 
 /**
  * The [Activity][AppCompatActivity] that will provide a [WebView] to launch the OfferWall.
@@ -80,14 +83,29 @@ internal class WebActivity : AppCompatActivity() {
 
     /** A function to configure all UI elements and the logic behind them, if any. */
     private fun bindUI() {
+        val isColorBright = getLuminance(color) > 0.729*255
+
         toolbar = findViewById(R.id.toolbar_bitlabs)
         toolbar?.setBackgroundColor(color);
+        toolbar?.setTitleTextColor(if (isColorBright) Color.BLACK else Color.WHITE)
+        toolbar?.navigationIcon?.let {
+            DrawableCompat.setTint(
+                it,
+                if (isColorBright) Color.BLACK else Color.WHITE
+            )
+        }
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
 
         closeButton = findViewById(R.id.iv_close_bitlabs)
         closeButton?.setOnClickListener { finish() }
+        closeButton?.run {
+            DrawableCompat.setTint(
+                drawable,
+                if (isColorBright) Color.BLACK else Color.WHITE
+            )
+        }
         toggleToolbar(true)
 
         webView = findViewById(R.id.wv_bitlabs)

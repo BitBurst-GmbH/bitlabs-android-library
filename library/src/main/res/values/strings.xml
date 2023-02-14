@@ -10,4 +10,7 @@
     <string name="leave_reason_other">Other reasons</string>
     <string name="leave_dialog_continue">Continue the survey</string>
 
+    <string name="simple_earn_reward" translatable="false">EARN %s</string>
+    <string name="compact_earn_reward" translatable="false">EARN\n%s</string>
+
 </resources>

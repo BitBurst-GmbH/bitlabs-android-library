@@ -2,6 +2,7 @@ package ai.bitlabs.sdk.views
 
 import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.data.model.Survey
+import ai.bitlabs.sdk.data.model.WidgetType
 import androidx.recyclerview.widget.RecyclerView
 
 class SurveysAdapter(
@@ -10,7 +11,7 @@ class SurveysAdapter(
     private val widgetColor: Int
 ) : RecyclerView.Adapter<SurveysAdapter.ViewHolder>() {
     override fun onCreateViewHolder(parent: android.view.ViewGroup, viewType: Int) =
-        ViewHolder(ai.bitlabs.sdk.views.SurveyView(context))
+        ViewHolder(ai.bitlabs.sdk.views.SurveyView(context, WidgetType.compact))
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) = with(holder.surveyView) {
         surveys[position].let { survey ->

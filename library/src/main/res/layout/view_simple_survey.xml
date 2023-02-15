@@ -10,6 +10,7 @@
     android:padding="30dp">
 
     <ImageView
+        android:id="@+id/iv_play"
         android:layout_width="52dp"
         android:layout_height="52dp"
         android:layout_gravity="center"

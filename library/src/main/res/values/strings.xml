@@ -12,5 +12,7 @@
 
     <string name="simple_earn_reward" translatable="false">EARN %s</string>
     <string name="compact_earn_reward" translatable="false">EARN\n%s</string>
+    <string name="simple_loi" translatable="false">Now in %d minutes!</string>
+    <string name="compact_loi" translatable="false">%d minutes</string>
 
 </resources>

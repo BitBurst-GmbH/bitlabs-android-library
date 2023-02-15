@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="SurveyView">
-        <attr name="loi" format="string" />
+        <attr name="loi" format="integer" />
         <attr name="color" format="color" />
         <attr name="reward" format="string" />
         <attr name="rating" format="integer" />

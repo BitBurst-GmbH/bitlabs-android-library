@@ -8,10 +8,11 @@ import androidx.recyclerview.widget.RecyclerView
 class SurveysAdapter(
     private val context: android.content.Context,
     private val surveys: List<Survey>,
+    private val type: WidgetType,
     private val widgetColor: Int
 ) : RecyclerView.Adapter<SurveysAdapter.ViewHolder>() {
     override fun onCreateViewHolder(parent: android.view.ViewGroup, viewType: Int) =
-        ViewHolder(SurveyView(context, WidgetType.SIMPLE))
+        ViewHolder(SurveyView(context, type))
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) = with(holder.surveyView) {
         surveys[position].let { survey ->

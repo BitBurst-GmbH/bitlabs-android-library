@@ -41,13 +41,15 @@ class SurveyView(context: Context, private val type: WidgetType = WidgetType.SIM
             val usedColor = when (type) {
                 WidgetType.COMPACT -> value
                 WidgetType.SIMPLE -> Color.WHITE
-                else -> Color.WHITE
+                WidgetType.FULLWIDTH -> Color.WHITE
             }
 
             (findViewById<android.widget.ImageView>(R.id.iv_play)
                 ?.drawable
                 ?.mutate())
                 ?.apply { DrawableCompat.setTint(this, usedColor) }
+
+            findViewById<android.widget.TextView>(R.id.tv_earn_now)?.setTextColor(value)
 
             rewardTV?.setTextColor(usedColor)
         }
@@ -61,7 +63,7 @@ class SurveyView(context: Context, private val type: WidgetType = WidgetType.SIM
         val layout = when (type) {
             WidgetType.COMPACT -> R.layout.view_compact_survey
             WidgetType.SIMPLE -> R.layout.view_simple_survey
-            else -> R.layout.view_simple_survey
+            WidgetType.FULLWIDTH -> R.layout.view_fullwidth_survey
         }
 
         android.view.LayoutInflater.from(context).inflate(layout, this, true)
@@ -97,12 +99,12 @@ class SurveyView(context: Context, private val type: WidgetType = WidgetType.SIM
     private fun getLoiString(value: Int) = when (type) {
         WidgetType.SIMPLE -> resources.getString(R.string.simple_loi, value)
         WidgetType.COMPACT -> resources.getString(R.string.compact_loi, value)
-        else -> resources.getString(R.string.simple_loi, value)
+        WidgetType.FULLWIDTH -> resources.getString(R.string.compact_loi, value)
     }
 
     private fun getEarnRewardString(value: String) = when (type) {
         WidgetType.COMPACT -> resources.getString(R.string.compact_earn_reward, value)
         WidgetType.SIMPLE -> resources.getString(R.string.simple_earn_reward, value)
-        else -> resources.getString(R.string.simple_earn_reward, value)
+        WidgetType.FULLWIDTH -> value
     }
 }

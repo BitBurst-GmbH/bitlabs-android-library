@@ -3,6 +3,7 @@ package ai.bitlabs.sdk
 import ai.bitlabs.sdk.data.BitLabsRepository
 import ai.bitlabs.sdk.data.model.Survey
 import ai.bitlabs.sdk.data.model.WebActivityParams
+import ai.bitlabs.sdk.data.model.WidgetType
 import ai.bitlabs.sdk.util.*
 import ai.bitlabs.sdk.util.BUNDLE_KEY_PARAMS
 import ai.bitlabs.sdk.util.TAG
@@ -111,10 +112,11 @@ object BitLabs {
     /**
      * Returns a RecyclerView populating the [surveys].
      */
-    fun getSurveyWidgets(context: Context, surveys: List<Survey>) = RecyclerView(context).apply {
-        layoutManager = LinearLayoutManager(context, HORIZONTAL, false)
-        adapter = SurveysAdapter(context, surveys, widgetColor)
-    }
+    fun getSurveyWidgets(context: Context, surveys: List<Survey>, type: WidgetType) =
+        RecyclerView(context).apply {
+            layoutManager = LinearLayoutManager(context, HORIZONTAL, false)
+            adapter = SurveysAdapter(context, surveys, type, widgetColor)
+        }
 
     internal fun leaveSurvey(networkId: String, surveyId: String, reason: String) =
         bitLabsRepo?.leaveSurvey(networkId, surveyId, reason)

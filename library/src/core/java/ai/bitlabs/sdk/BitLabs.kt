@@ -30,6 +30,7 @@ object BitLabs {
     private var token: String = ""
     private var widgetColor: Int = 0
     private var headerColor: Int = 0
+    private var currencyIcon: String = ""
 
     /** These will be added as query parameters to the OfferWall Link */
     var tags: MutableMap<String, Any> = mutableMapOf()
@@ -52,7 +53,7 @@ object BitLabs {
         bitLabsRepo = BitLabsRepository(token, uid)
         determineAdvertisingInfo(context)
 
-        getWidgetColor()
+        getAppSettings()
     }
 
     /**
@@ -128,12 +129,18 @@ object BitLabs {
         bitLabsRepo?.leaveSurvey(networkId, surveyId, reason)
 
     /**
-     * Gets the color from the BitLabs API.
+     * Gets the required settings from the BitLabs API.
      */
-    private fun getWidgetColor() = bitLabsRepo?.getAppSettings(
+    private fun getAppSettings() = bitLabsRepo?.getVisuals(
         {
-            widgetColor = Color.parseColor(it.surveyIconColor)
-            headerColor = Color.parseColor(it.navigationColor)
+            it.visual.run {
+                widgetColor = Color.parseColor(surveyIconColor)
+                headerColor = Color.parseColor(navigationColor)
+            }
+
+            it.currency.symbol.run {
+                currencyIcon = content.takeIf { isImage } ?: ""
+            }
         },
         { Log.e(TAG, "$it") })
 

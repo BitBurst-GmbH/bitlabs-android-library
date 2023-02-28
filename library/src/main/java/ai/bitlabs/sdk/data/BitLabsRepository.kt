@@ -2,6 +2,7 @@ package ai.bitlabs.sdk.data
 
 import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.data.model.*
+import ai.bitlabs.sdk.data.model.Currency
 import ai.bitlabs.sdk.data.network.BitLabsAPI
 import ai.bitlabs.sdk.util.*
 import ai.bitlabs.sdk.util.TAG
@@ -14,6 +15,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.*
 
 /** This class is the point of communication between the data and [BitLabs] */
 internal class BitLabsRepository(token: String, uid: String) {
@@ -106,8 +108,8 @@ internal class BitLabsRepository(token: String, uid: String) {
         }
     })
 
-    internal fun getAppSettings(
-        onResponseListener: OnResponseListener<Visual>,
+    internal fun getVisuals(
+        onResponseListener: OnResponseListener<GetAppSettingsResponse>,
         onExceptionListener: OnExceptionListener
     ) = bitLabsAPI.getAppSettings()
         .enqueue(object : Callback<BitLabsResponse<GetAppSettingsResponse>> {
@@ -116,7 +118,7 @@ internal class BitLabsRepository(token: String, uid: String) {
                 response: Response<BitLabsResponse<GetAppSettingsResponse>>
             ) {
                 if (response.isSuccessful) {
-                    response.body()?.data?.visual?.let { onResponseListener.onResponse(it) }
+                    response.body()?.data?.let { onResponseListener.onResponse(it) }
                     return
                 }
 

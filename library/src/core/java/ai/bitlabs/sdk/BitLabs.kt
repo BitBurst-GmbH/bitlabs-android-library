@@ -118,6 +118,12 @@ object BitLabs {
             adapter = SurveysAdapter(context, surveys, type, widgetColor)
         }
 
+    fun getLeaderboard() = bitLabsRepo?.getLeaderboard({ leaderboard ->
+        Log.d(TAG, "Leaderboard: $leaderboard")
+    }, {
+        Log.e(TAG, "$it")
+    })
+
     internal fun leaveSurvey(networkId: String, surveyId: String, reason: String) =
         bitLabsRepo?.leaveSurvey(networkId, surveyId, reason)
 

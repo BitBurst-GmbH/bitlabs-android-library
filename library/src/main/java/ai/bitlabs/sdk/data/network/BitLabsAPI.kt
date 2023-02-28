@@ -26,4 +26,7 @@ internal interface BitLabsAPI {
 
     @GET("client/settings/v2")
     fun getAppSettings(): Call<BitLabsResponse<GetAppSettingsResponse>>
+
+    @GET("client/leaderboard")
+    fun getLeaderboard(): Call<BitLabsResponse<GetLeaderboardResponse>>
 }

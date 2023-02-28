@@ -132,4 +132,31 @@ internal class BitLabsRepository(token: String, uid: String) {
                 onExceptionListener.onException(Exception(t))
             }
         })
+
+    internal fun getLeaderboard(
+        onResponseListener: OnResponseListener<GetLeaderboardResponse>,
+        onExceptionListener: OnExceptionListener
+    ) = bitLabsAPI.getLeaderboard()
+        .enqueue(object : Callback<BitLabsResponse<GetLeaderboardResponse>> {
+            override fun onResponse(
+                call: Call<BitLabsResponse<GetLeaderboardResponse>>,
+                response: Response<BitLabsResponse<GetLeaderboardResponse>>
+            ) {
+                if (response.isSuccessful) {
+                    response.body()?.data?.let { onResponseListener.onResponse(it) }
+                    return
+                }
+
+                response.errorBody()?.body<GetLeaderboardResponse>()?.error?.details?.run {
+                    onExceptionListener.onException(Exception("$http - $msg"))
+                }
+            }
+
+            override fun onFailure(
+                call: Call<BitLabsResponse<GetLeaderboardResponse>>,
+                t: Throwable
+            ) {
+                onExceptionListener.onException(Exception(t))
+            }
+        })
 }

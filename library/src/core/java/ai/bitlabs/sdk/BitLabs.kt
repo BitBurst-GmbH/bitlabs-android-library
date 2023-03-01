@@ -1,12 +1,14 @@
 package ai.bitlabs.sdk
 
 import ai.bitlabs.sdk.data.BitLabsRepository
+import ai.bitlabs.sdk.data.model.GetLeaderboardResponse
 import ai.bitlabs.sdk.data.model.Survey
 import ai.bitlabs.sdk.data.model.WebActivityParams
 import ai.bitlabs.sdk.data.model.WidgetType
 import ai.bitlabs.sdk.util.*
 import ai.bitlabs.sdk.util.BUNDLE_KEY_PARAMS
 import ai.bitlabs.sdk.util.TAG
+import ai.bitlabs.sdk.views.LeaderboardFragment
 import ai.bitlabs.sdk.views.SurveysAdapter
 import ai.bitlabs.sdk.views.WebActivity
 import android.content.Context
@@ -119,11 +121,10 @@ object BitLabs {
             adapter = SurveysAdapter(context, surveys, type, widgetColor)
         }
 
-    fun getLeaderboard() = bitLabsRepo?.getLeaderboard({ leaderboard ->
-        Log.d(TAG, "Leaderboard: $leaderboard")
-    }, {
-        Log.e(TAG, "$it")
-    })
+    fun getLeaderboard(onResponseListener: OnResponseListener<LeaderboardFragment>) =
+        bitLabsRepo?.getLeaderboard({
+            onResponseListener.onResponse(LeaderboardFragment(it.rewards, currencyIcon))
+        }, { Log.e(TAG, "$it") })
 
     internal fun leaveSurvey(networkId: String, surveyId: String, reason: String) =
         bitLabsRepo?.leaveSurvey(networkId, surveyId, reason)

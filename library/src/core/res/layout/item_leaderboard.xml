@@ -47,8 +47,7 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:contentDescription="TODO"
-            android:padding="2dp"
-            app:tint="@color/colorPrimary" />
+            android:padding="2dp" />
 
         <Space
             android:layout_width="0dp"
@@ -60,8 +59,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
-            android:drawableEnd="@drawable/ic_circle_chevron_left_regular"
-            android:drawableTint="@color/colorPrimary"
             android:gravity="center"
             android:textColor="@android:color/black"
             android:textSize="16sp"

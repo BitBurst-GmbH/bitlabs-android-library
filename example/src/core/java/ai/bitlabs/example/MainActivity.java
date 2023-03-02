@@ -11,7 +11,6 @@ import java.util.Map;
 
 import ai.bitlabs.sdk.BitLabs;
 import ai.bitlabs.sdk.data.model.WidgetType;
-import ai.bitlabs.sdk.views.LeaderboardFragment;
 
 public class MainActivity extends AppCompatActivity {
     private final String TAG = "Example";
@@ -52,10 +51,9 @@ public class MainActivity extends AppCompatActivity {
 
         findViewById(R.id.btn_launch_offerwall).setOnClickListener(view -> bitLabs.launchOfferWall(this));
 
-        bitLabs.getLeaderboard(leaderboardFragment -> {
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.fragment_container_view_tag, leaderboardFragment)
-                    .commit();
-        });
+        bitLabs.getLeaderboard(leaderboardFragment -> getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.fragment_container_view_tag, leaderboardFragment)
+                .commit());
     }
 }

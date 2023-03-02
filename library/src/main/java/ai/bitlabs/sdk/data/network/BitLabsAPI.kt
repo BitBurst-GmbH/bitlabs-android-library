@@ -4,6 +4,7 @@ import ai.bitlabs.sdk.data.model.*
 import ai.bitlabs.sdk.data.model.BitLabsResponse
 import ai.bitlabs.sdk.data.model.CheckSurveysResponse
 import ai.bitlabs.sdk.data.model.GetActionsResponse
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.*
 
@@ -29,4 +30,7 @@ internal interface BitLabsAPI {
 
     @GET("client/leaderboard")
     fun getLeaderboard(): Call<BitLabsResponse<GetLeaderboardResponse>>
+
+    @GET
+    fun getCurrencyIcon(@Url url: String): Call<ResponseBody>
 }

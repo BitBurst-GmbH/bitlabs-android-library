@@ -1,7 +1,6 @@
 package ai.bitlabs.sdk
 
 import ai.bitlabs.sdk.data.BitLabsRepository
-import ai.bitlabs.sdk.data.model.GetLeaderboardResponse
 import ai.bitlabs.sdk.data.model.Survey
 import ai.bitlabs.sdk.data.model.WebActivityParams
 import ai.bitlabs.sdk.data.model.WidgetType
@@ -13,7 +12,11 @@ import ai.bitlabs.sdk.views.SurveysAdapter
 import ai.bitlabs.sdk.views.WebActivity
 import android.content.Context
 import android.content.Intent
+import android.content.res.Resources
+import android.graphics.Bitmap
 import android.graphics.Color
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.util.Log
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager.*
@@ -32,7 +35,7 @@ object BitLabs {
     private var token: String = ""
     private var widgetColor: Int = 0
     private var headerColor: Int = 0
-    private var currencyIcon: String = ""
+    private var currencyIconUrl: String = ""
 
     /** These will be added as query parameters to the OfferWall Link */
     var tags: MutableMap<String, Any> = mutableMapOf()
@@ -123,11 +126,17 @@ object BitLabs {
 
     fun getLeaderboard(onResponseListener: OnResponseListener<LeaderboardFragment>) =
         bitLabsRepo?.getLeaderboard({
-            onResponseListener.onResponse(LeaderboardFragment(it.rewards, currencyIcon))
+            onResponseListener.onResponse(LeaderboardFragment(it.rewards, currencyIconUrl))
         }, { Log.e(TAG, "$it") })
 
     internal fun leaveSurvey(networkId: String, surveyId: String, reason: String) =
         bitLabsRepo?.leaveSurvey(networkId, surveyId, reason)
+
+    internal fun getCurrencyIcon(
+        url: String,
+        resources: Resources,
+        onResponseListener: OnResponseListener<Drawable>
+    ) = bitLabsRepo?.getCurrencyIcon(url, resources, onResponseListener)
 
     /**
      * Gets the required settings from the BitLabs API.
@@ -140,7 +149,7 @@ object BitLabs {
             }
 
             it.currency.symbol.run {
-                currencyIcon = content.takeIf { isImage } ?: ""
+                currencyIconUrl = content.takeIf { isImage } ?: ""
             }
         },
         { Log.e(TAG, "$it") })

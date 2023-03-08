@@ -20,14 +20,10 @@
             android:id="@+id/bl_tv_leaderboard_rank"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:minEms="3"
             android:textColor="@android:color/black"
             android:textSize="18sp"
             tools:text="1" />
-
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
 
         <TextView
             android:id="@+id/bl_tv_leaderboard_name"
@@ -36,6 +32,16 @@
             android:textColor="@android:color/black"
             android:textSize="18sp"
             tools:text="anonymous" />
+
+        <TextView
+            android:id="@+id/bl_tv_leaderboard_you"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            tools:text=" (You)" />
 
         <Space
             android:layout_width="0dp"

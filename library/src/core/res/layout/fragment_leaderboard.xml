@@ -9,10 +9,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingHorizontal="4dp"
+        android:text="Leaderboard"
         android:textColor="@android:color/black"
         android:textSize="20sp"
-        android:textStyle="bold"
-        android:text="Leaderboard" />
+        android:textStyle="bold" />
 
     <TextView
         android:layout_width="match_parent"
@@ -27,13 +27,12 @@
         android:padding="4dp">
 
 
-
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/bl_rv_leaderboard"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:listitem="@layout/item_leaderboard"
-        android:paddingHorizontal="4dp" />
+        android:paddingHorizontal="4dp"
+        tools:listitem="@layout/item_leaderboard" />
 </LinearLayout>

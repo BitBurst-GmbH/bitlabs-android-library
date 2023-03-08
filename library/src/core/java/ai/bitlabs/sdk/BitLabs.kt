@@ -121,9 +121,15 @@ object BitLabs {
             adapter = SurveysAdapter(context, surveys, type, widgetColors)
         }
 
-    fun getLeaderboard(onResponseListener: OnResponseListener<LeaderboardFragment>) =
+    fun getLeaderboard(onResponseListener: OnResponseListener<LeaderboardFragment?>) =
         bitLabsRepo?.getLeaderboard({
-            onResponseListener.onResponse(LeaderboardFragment(it.rewards, currencyIconUrl))
+            onResponseListener.onResponse(it.topUsers?.run {
+                LeaderboardFragment(
+                    this,
+                    it.ownUser,
+                    currencyIconUrl
+                )
+            })
         }, { Log.e(TAG, "$it") })
 
     internal fun leaveSurvey(networkId: String, surveyId: String, reason: String) =
@@ -163,10 +169,7 @@ object BitLabs {
      * [bitLabsRepo] is initialised and executes the [block] accordingly.
      */
     private inline fun ifInitialised(block: () -> Unit) {
-        val isInitialised = token
-            .isNotBlank()
-            .and(uid.isNotBlank())
-            .and(bitLabsRepo != null)
+        val isInitialised = token.isNotBlank().and(uid.isNotBlank()).and(bitLabsRepo != null)
 
         if (isInitialised) block()
         else Log.e(TAG, "You should initialise BitLabs first! Call BitLabs::init()")

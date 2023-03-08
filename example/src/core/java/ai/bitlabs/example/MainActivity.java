@@ -51,9 +51,13 @@ public class MainActivity extends AppCompatActivity {
 
         findViewById(R.id.btn_launch_offerwall).setOnClickListener(view -> bitLabs.launchOfferWall(this));
 
-        bitLabs.getLeaderboard(leaderboardFragment -> getSupportFragmentManager()
-                .beginTransaction()
-                .add(R.id.fragment_container_view_tag, leaderboardFragment)
-                .commit());
+        bitLabs.getLeaderboard(leaderboardFragment -> {
+            if (leaderboardFragment == null) return;
+
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .add(R.id.fragment_container_view_tag, leaderboardFragment)
+                    .commit();
+        });
     }
 }

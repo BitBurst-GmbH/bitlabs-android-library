@@ -13,9 +13,6 @@ import ai.bitlabs.sdk.views.WebActivity
 import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
-import android.graphics.Bitmap
-import android.graphics.Color
-import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.util.Log
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -33,9 +30,9 @@ object BitLabs {
     private var uid: String = ""
     private var adId: String = ""
     private var token: String = ""
-    private var widgetColor: Int = 0
-    private var headerColor: Int = 0
     private var currencyIconUrl: String = ""
+    private var headerColor = intArrayOf(0, 0)
+    private var widgetColors = intArrayOf(0, 0)
 
     /** These will be added as query parameters to the OfferWall Link */
     var tags: MutableMap<String, Any> = mutableMapOf()
@@ -110,7 +107,7 @@ object BitLabs {
         with(Intent(context, WebActivity::class.java)) {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
             putExtra(BUNDLE_KEY_PARAMS, WebActivityParams(token, uid, "NATIVE", adId, tags).url)
-            putExtra(BUNDLE_KEY_COLOR, headerColor);
+            putExtra(BUNDLE_KEY_COLOR, headerColor)
             context.startActivity(this)
         }
     }
@@ -121,7 +118,7 @@ object BitLabs {
     fun getSurveyWidgets(context: Context, surveys: List<Survey>, type: WidgetType) =
         RecyclerView(context).apply {
             layoutManager = LinearLayoutManager(context, HORIZONTAL, false)
-            adapter = SurveysAdapter(context, surveys, type, widgetColor)
+            adapter = SurveysAdapter(context, surveys, type, widgetColors)
         }
 
     fun getLeaderboard(onResponseListener: OnResponseListener<LeaderboardFragment>) =
@@ -135,7 +132,7 @@ object BitLabs {
     internal fun getCurrencyIcon(
         url: String,
         resources: Resources,
-        onResponseListener: OnResponseListener<Drawable>
+        onResponseListener: OnResponseListener<Drawable?>
     ) = bitLabsRepo?.getCurrencyIcon(url, resources, onResponseListener)
 
     /**
@@ -144,13 +141,11 @@ object BitLabs {
     private fun getAppSettings() = bitLabsRepo?.getVisuals(
         {
             it.visual.run {
-                widgetColor = Color.parseColor(surveyIconColor)
-                headerColor = Color.parseColor(navigationColor)
+                widgetColors = extractColors(surveyIconColor)
+                headerColor = extractColors(navigationColor)
             }
 
-            it.currency.symbol.run {
-                currencyIconUrl = content.takeIf { isImage } ?: ""
-            }
+            it.currency.symbol.run { currencyIconUrl = content.takeIf { isImage } ?: "" }
         },
         { Log.e(TAG, "$it") })
 

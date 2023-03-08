@@ -4,6 +4,7 @@ import ai.bitlabs.sdk.R
 import ai.bitlabs.sdk.data.model.WidgetType
 import android.content.Context
 import android.graphics.Color
+import androidx.core.content.res.*
 import androidx.core.content.withStyledAttributes
 import androidx.core.graphics.drawable.DrawableCompat
 
@@ -26,20 +27,20 @@ class SurveyView(context: Context, private val type: WidgetType = WidgetType.SIM
             field = value
             loiTV?.text = getLoiString(value)
         }
-    var color = androidx.core.content.res.ResourcesCompat.getColor(
-        resources,
-        R.color.colorPrimaryDark,
-        null
+    var colors = intArrayOf(
+        ResourcesCompat.getColor(resources, R.color.colorPrimaryDark, null),
+        ResourcesCompat.getColor(resources, R.color.colorPrimaryDark, null)
     )
         set(value) {
             field = value
             (findViewById<android.view.ViewGroup>(R.id.bl_widget_container)
                 .background
                 .mutate() as android.graphics.drawable.GradientDrawable)
-                .setColor(value)
+                .colors = value
+
 
             val usedColor = when (type) {
-                WidgetType.COMPACT -> value
+                WidgetType.COMPACT -> value.first()
                 WidgetType.SIMPLE -> Color.WHITE
                 WidgetType.FULLWIDTH -> Color.WHITE
             }
@@ -49,7 +50,7 @@ class SurveyView(context: Context, private val type: WidgetType = WidgetType.SIM
                 ?.mutate())
                 ?.apply { DrawableCompat.setTint(this, usedColor) }
 
-            findViewById<android.widget.TextView>(R.id.tv_earn_now)?.setTextColor(value)
+            findViewById<android.widget.TextView>(R.id.tv_earn_now)?.setTextColor(value.first())
 
             rewardTV?.setTextColor(usedColor)
         }
@@ -76,15 +77,15 @@ class SurveyView(context: Context, private val type: WidgetType = WidgetType.SIM
         bindUI()
     }
 
-    constructor(
-        context: Context,
-        attrs: android.util.AttributeSet
-    ) : this(context) {
+    constructor(context: Context, attrs: android.util.AttributeSet) : this(context) {
         context.withStyledAttributes(attrs, R.styleable.SurveyView) {
             loi = getInt(R.styleable.SurveyView_loi, loi)
             rating = getInt(R.styleable.SurveyView_rating, rating)
-            color = getColor(R.styleable.SurveyView_color, color)
             reward = getString(R.styleable.SurveyView_reward) ?: reward
+            colors = intArrayOf(
+                getColor(R.styleable.SurveyView_startColor, colors.first()),
+                getColor(R.styleable.SurveyView_endColor, colors.last())
+            )
         }
     }
 

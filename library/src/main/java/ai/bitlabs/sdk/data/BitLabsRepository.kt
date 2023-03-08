@@ -4,19 +4,15 @@ import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.data.model.*
 import ai.bitlabs.sdk.data.network.BitLabsAPI
 import ai.bitlabs.sdk.util.*
-import android.annotation.SuppressLint
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Canvas
-import android.graphics.ImageDecoder
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
-import android.graphics.drawable.VectorDrawable
 import android.util.Log
 import com.caverock.androidsvg.SVG
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
-import org.xmlpull.v1.XmlPullParserFactory
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -171,17 +167,16 @@ internal class BitLabsRepository(token: String, uid: String) {
     internal fun getCurrencyIcon(
         url: String,
         resources: Resources,
-        onResponseListener: OnResponseListener<Drawable>
+        onResponseListener: OnResponseListener<Drawable?>
     ) = bitLabsAPI.getCurrencyIcon(url)
         .enqueue(object : Callback<ResponseBody> {
-            @SuppressLint("NewApi")
             override fun onResponse(
                 call: Call<ResponseBody>,
                 response: Response<ResponseBody>
             ) {
                 if (response.isSuccessful) {
                     response.body()?.let {
-                        val drawable = if (it.contentType()?.subtype() == "svg+xml") {
+                        val drawable = if (it.contentType()?.subtype() == "svg+xml")
                             with(SVG.getFromString(it.string())) {
                                 val bitmap = Bitmap.createBitmap(
                                     documentWidth.toInt(),
@@ -196,9 +191,8 @@ internal class BitLabsRepository(token: String, uid: String) {
 
                                 BitmapDrawable(resources, bitmap)
                             }
-                        } else {
+                        else
                             BitmapDrawable(resources, it.byteStream())
-                        }
 
                         onResponseListener.onResponse(drawable)
                     }
@@ -209,6 +203,7 @@ internal class BitLabsRepository(token: String, uid: String) {
                     TAG, "getCurrencyIcon Failure - " +
                             (response.errorBody()?.string() ?: "Unknown Error")
                 )
+                onResponseListener.onResponse(null)
             }
 
             override fun onFailure(call: Call<ResponseBody>, t: Throwable) {

@@ -9,14 +9,14 @@ class SurveysAdapter(
     private val context: android.content.Context,
     private val surveys: List<Survey>,
     private val type: WidgetType,
-    private val widgetColor: Int
+    private val widgetColors: IntArray
 ) : RecyclerView.Adapter<SurveysAdapter.ViewHolder>() {
     override fun onCreateViewHolder(parent: android.view.ViewGroup, viewType: Int) =
         ViewHolder(SurveyView(context, type))
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) = with(holder.surveyView) {
         surveys[position].let { survey ->
-            color = widgetColor
+            colors = widgetColors
             reward = survey.value
             rating = survey.rating
             loi = survey.loi.toInt()

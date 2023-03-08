@@ -3,11 +3,8 @@ package ai.bitlabs.sdk.views
 import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.R
 import ai.bitlabs.sdk.util.*
-import ai.bitlabs.sdk.util.BUNDLE_KEY_COLOR
-import ai.bitlabs.sdk.util.BUNDLE_KEY_PARAMS
-import ai.bitlabs.sdk.util.TAG
-import ai.bitlabs.sdk.util.getLuminance
 import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -31,9 +28,9 @@ internal class WebActivity : AppCompatActivity() {
 
     private lateinit var url: String
 
-    private var color: Int = 0
     private var surveyId: String? = null
     private var networkId: String? = null
+    private var colors = intArrayOf(0, 0)
 
     private var reward: Float = 0.0F
 
@@ -47,7 +44,7 @@ internal class WebActivity : AppCompatActivity() {
             return
         }
 
-        color = intent.getIntExtra(BUNDLE_KEY_COLOR, 0)
+        colors = intent.getIntArrayExtra(BUNDLE_KEY_COLOR) ?: colors
 
         bindUI()
 
@@ -83,16 +80,18 @@ internal class WebActivity : AppCompatActivity() {
 
     /** A function to configure all UI elements and the logic behind them, if any. */
     private fun bindUI() {
-        val isColorBright = getLuminance(color) > 0.729*255
+        val isColorBright =
+            getLuminance(colors.first()) > 0.729 * 255 || getLuminance(colors.last()) > 0.729 * 255
 
         toolbar = findViewById(R.id.toolbar_bitlabs)
-        toolbar?.setBackgroundColor(color);
+        (toolbar?.background?.mutate() as GradientDrawable).let {
+            it.colors = colors
+            it.cornerRadius = 0F
+        }
+
         toolbar?.setTitleTextColor(if (isColorBright) Color.BLACK else Color.WHITE)
         toolbar?.navigationIcon?.let {
-            DrawableCompat.setTint(
-                it,
-                if (isColorBright) Color.BLACK else Color.WHITE
-            )
+            DrawableCompat.setTint(it, if (isColorBright) Color.BLACK else Color.WHITE)
         }
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -101,10 +100,7 @@ internal class WebActivity : AppCompatActivity() {
         closeButton = findViewById(R.id.iv_close_bitlabs)
         closeButton?.setOnClickListener { finish() }
         closeButton?.run {
-            DrawableCompat.setTint(
-                drawable,
-                if (isColorBright) Color.BLACK else Color.WHITE
-            )
+            DrawableCompat.setTint(drawable, if (isColorBright) Color.BLACK else Color.WHITE)
         }
         toggleToolbar(true)
 

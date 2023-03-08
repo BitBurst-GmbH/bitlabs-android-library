@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 class LeaderboardAdapter(
     private val context: Context,
     private val rewards: List<Reward>,
-    private val currencyIcon: Drawable
+    private val currencyIcon: Drawable?
 ) : RecyclerView.Adapter<LeaderboardAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
@@ -26,7 +26,7 @@ class LeaderboardAdapter(
         holder.rank?.text = reward.rank.toString()
         holder.name?.text = "anonymous"
         holder.reward?.text = reward.rewardRaw.toString()
-        with(currencyIcon) {
+        currencyIcon?.apply {
             setBounds(0, 0, intrinsicWidth * 2, intrinsicHeight * 2)
             holder.reward?.setCompoundDrawables(null, null, this, null)
         }

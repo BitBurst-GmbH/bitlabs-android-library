@@ -2,7 +2,8 @@
 <resources>
     <declare-styleable name="SurveyView">
         <attr name="loi" format="integer" />
-        <attr name="color" format="color" />
+        <attr name="startColor" format="color" />
+        <attr name="endColor" format="color" />
         <attr name="reward" format="string" />
         <attr name="rating" format="integer" />
     </declare-styleable>

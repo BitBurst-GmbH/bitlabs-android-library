@@ -5,9 +5,9 @@
     android:id="@+id/bl_widget_container"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:minWidth="400dp"
     android:layout_marginHorizontal="4dp"
-    android:background="@drawable/background_card_blue"
+    android:background="@drawable/background_card_gradient"
+    android:minWidth="400dp"
     android:padding="8dp">
 
     <LinearLayout

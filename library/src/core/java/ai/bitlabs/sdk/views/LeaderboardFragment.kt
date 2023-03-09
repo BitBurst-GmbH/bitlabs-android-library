@@ -8,7 +8,8 @@ import androidx.fragment.app.Fragment
 class LeaderboardFragment(
     private val topUsers: List<ai.bitlabs.sdk.data.model.TopUser>,
     private val ownUser: OwnUser?,
-    private val currencyIconUrl: String
+    private val currencyIconUrl: String,
+    private val color: IntArray,
 ) : Fragment(R.layout.fragment_leaderboard) {
     override fun onViewCreated(view: android.view.View, savedInstanceState: android.os.Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -21,7 +22,8 @@ class LeaderboardFragment(
         )
 
         BitLabs.getCurrencyIcon(currencyIconUrl, resources) { drawable ->
-            leaderboard.adapter = LeaderboardAdapter(requireContext(), topUsers, ownUser, drawable)
+            leaderboard.adapter =
+                LeaderboardAdapter(requireContext(), topUsers, ownUser, drawable, color.first())
         }
 
     }

@@ -127,7 +127,8 @@ object BitLabs {
                 LeaderboardFragment(
                     this,
                     it.ownUser,
-                    currencyIconUrl
+                    currencyIconUrl,
+                    widgetColors
                 )
             })
         }, { Log.e(TAG, "$it") })

@@ -48,12 +48,20 @@
             android:layout_height="match_parent"
             android:layout_weight="1" />
 
-        <ImageView
-            android:id="@+id/bl_iv_leaderboard_top_avatar"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:contentDescription="TODO"
-            android:padding="2dp" />
+        <TextView
+            android:id="@+id/bl_iv_leaderboard_top_trophy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:background="@drawable/ic_trophy_solid"
+            android:gravity="center_horizontal"
+            android:maxWidth="24dp"
+            android:visibility="gone"
+            android:maxEms="1"
+            android:textColor="@android:color/white"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            tools:text="1" />
 
         <Space
             android:layout_width="0dp"

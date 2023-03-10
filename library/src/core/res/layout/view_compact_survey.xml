@@ -38,11 +38,11 @@
                 android:id="@+id/rating_bar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:indeterminateDrawable="@drawable/star_ratingbar"
+                android:indeterminateDrawable="@drawable/layer_list_star"
                 android:maxHeight="25dp"
                 android:minHeight="0dp"
                 android:numStars="5"
-                android:progressDrawable="@drawable/star_ratingbar"
+                android:progressDrawable="@drawable/layer_list_star"
                 tools:rating="3" />
 
             <TextView

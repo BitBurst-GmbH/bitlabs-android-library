@@ -126,6 +126,7 @@ object BitLabs {
             onResponseListener.onResponse(it.topUsers?.run {
                 LeaderboardFragment(
                     this,
+                    it.rewards,
                     it.ownUser,
                     currencyIconUrl,
                     widgetColors

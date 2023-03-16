@@ -1,5 +1,6 @@
 package ai.bitlabs.sdk.views
 
+import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.R
 import ai.bitlabs.sdk.data.model.OwnUser
 import ai.bitlabs.sdk.data.model.TopUser
@@ -27,6 +28,8 @@ class LeaderboardAdapter(
         )
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.itemView.setOnClickListener { BitLabs.launchOfferWall(context) }
+
         val user = topUsers[position]
 
         holder.name?.text = user.name

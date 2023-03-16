@@ -23,6 +23,8 @@ class LeaderboardFragment(
         leaderboard.layoutManager =
             LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
 
+        view.setOnClickListener { BitLabs.launchOfferWall(requireContext()) }
+
         view.findViewById<TextView>(R.id.bl_tv_own_user_rank).text =
             if (ownUser == null) "Participate in a survey to join the leaderboard."
             else getString(R.string.leaderboard_own_user_rank, ownUser.rank)

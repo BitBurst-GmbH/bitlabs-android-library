@@ -124,13 +124,7 @@ object BitLabs {
     fun getLeaderboard(onResponseListener: OnResponseListener<LeaderboardFragment?>) =
         bitLabsRepo?.getLeaderboard({
             onResponseListener.onResponse(it.topUsers?.run {
-                LeaderboardFragment(
-                    this,
-                    it.rewards,
-                    it.ownUser,
-                    currencyIconUrl,
-                    widgetColors
-                )
+                LeaderboardFragment(this, it.ownUser, currencyIconUrl, widgetColors)
             })
         }, { Log.e(TAG, "$it") })
 

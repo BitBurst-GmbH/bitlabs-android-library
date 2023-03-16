@@ -7,7 +7,6 @@ import ai.bitlabs.sdk.util.getLuminance
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.Drawable
-import android.graphics.drawable.VectorDrawable
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.graphics.drawable.DrawableCompat

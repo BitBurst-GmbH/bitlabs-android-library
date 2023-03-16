@@ -15,4 +15,9 @@
     <string name="simple_loi" translatable="false">Now in %d minutes!</string>
     <string name="compact_loi" translatable="false">%d minutes</string>
 
+    <string name="leaderboard_title" translatable="false">Leaderboard</string>
+    <string name="leaderboard_own_user_rank" translatable="false">
+        You are currently ranked %d on our leaderboard.
+    </string>
+
 </resources>

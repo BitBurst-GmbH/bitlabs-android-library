@@ -22,13 +22,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        bitLabs.init(this, "7afbdd12-1a97-4496-bcbe-1d0a7376427e", "USER_ID");
+        bitLabs.init(this, "46d31e1e-315a-4b52-b0de-eca6062163af", "USER_ID");
 
         // optionally add custom tags to your users
         Map<String, Object> tags = new HashMap<>();
         tags.put("my_tag", "new_user");
         bitLabs.setTags(tags);
-
         bitLabs.addTag("is_premium", true);
 
         // Get client-side callbacks to reward the user (We highly recommend using server-to-server callbacks!)

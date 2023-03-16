@@ -9,56 +9,19 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingHorizontal="4dp"
-        android:text="Leaderboard"
+        android:text="@string/leaderboard_title"
         android:textColor="@android:color/black"
         android:textSize="20sp"
         android:textStyle="bold" />
 
     <TextView
+        android:id="@+id/bl_tv_own_user_rank"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
         android:paddingHorizontal="4dp"
-        android:text="You are currently ranked 6 on our leaderboard." />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="12dp">
-
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
-
-        <include
-            android:id="@+id/bl_ll_top_reward_1"
-            layout="@layout/view_top_reward" />
-
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
-
-        <include
-            android:id="@+id/bl_ll_top_reward_2"
-            layout="@layout/view_top_reward" />
-
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
-
-        <include
-            android:id="@+id/bl_ll_top_reward_3"
-            layout="@layout/view_top_reward" />
-
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
-
-    </LinearLayout>
+        android:text="@string/leaderboard_own_user_rank"
+        tools:text="You are currently ranked %d on our leaderboard." />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/bl_rv_leaderboard"

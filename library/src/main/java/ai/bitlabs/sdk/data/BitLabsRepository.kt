@@ -110,7 +110,7 @@ internal class BitLabsRepository(token: String, uid: String) {
         }
     })
 
-    internal fun getVisuals(
+    internal fun getAppSettings(
         onResponseListener: OnResponseListener<GetAppSettingsResponse>,
         onExceptionListener: OnExceptionListener
     ) = bitLabsAPI.getAppSettings()

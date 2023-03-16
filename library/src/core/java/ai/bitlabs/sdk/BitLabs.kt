@@ -27,15 +27,15 @@ import com.google.android.gms.ads.identifier.AdvertisingIdClient
  * main process(app lifecycle).
  */
 object BitLabs {
-    private var uid: String = ""
-    private var adId: String = ""
-    private var token: String = ""
-    private var currencyIconUrl: String = ""
+    private var uid = ""
+    private var adId = ""
+    private var token = ""
+    private var currencyIconUrl = ""
     private var headerColor = intArrayOf(0, 0)
     private var widgetColors = intArrayOf(0, 0)
 
     /** These will be added as query parameters to the OfferWall Link */
-    var tags: MutableMap<String, Any> = mutableMapOf()
+    var tags = mutableMapOf<String, Any>()
 
     private var bitLabsRepo: BitLabsRepository? = null
     internal var onRewardListener: OnRewardListener? = null
@@ -140,7 +140,7 @@ object BitLabs {
     /**
      * Gets the required settings from the BitLabs API.
      */
-    private fun getAppSettings() = bitLabsRepo?.getVisuals(
+    private fun getAppSettings() = bitLabsRepo?.getAppSettings(
         {
             it.visual.run {
                 widgetColors = extractColors(surveyIconColor)

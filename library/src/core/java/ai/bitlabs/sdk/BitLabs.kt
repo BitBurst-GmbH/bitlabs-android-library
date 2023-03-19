@@ -115,7 +115,8 @@ object BitLabs {
     /**
      * Returns a RecyclerView populating the [surveys].
      */
-    fun getSurveyWidgets(context: Context, surveys: List<Survey>, type: WidgetType) =
+    @JvmOverloads
+    fun getSurveyWidgets(context: Context, surveys: List<Survey>, type: WidgetType = WidgetType.COMPACT) =
         RecyclerView(context).apply {
             layoutManager = LinearLayoutManager(context, HORIZONTAL, false)
             adapter = SurveysAdapter(context, surveys, type, widgetColors)

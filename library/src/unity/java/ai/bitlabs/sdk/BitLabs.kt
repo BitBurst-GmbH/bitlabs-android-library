@@ -5,10 +5,10 @@ import ai.bitlabs.sdk.data.model.WebActivityParams
 import ai.bitlabs.sdk.util.BUNDLE_KEY_PARAMS
 import ai.bitlabs.sdk.util.OnRewardListener
 import ai.bitlabs.sdk.util.TAG
+import ai.bitlabs.sdk.util.extractColors
 import ai.bitlabs.sdk.views.WebActivity
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.util.Log
 import com.google.android.gms.ads.identifier.AdvertisingIdClient
 import com.google.gson.GsonBuilder
@@ -21,13 +21,15 @@ import com.unity3d.player.UnityPlayer
  * main process(app lifecycle).
  */
 object BitLabs {
-    private var uid: String = ""
-    private var adId: String = ""
-    private var token: String = ""
-    private var widgetColor: String = ""
+    private var uid = ""
+    private var adId = ""
+    private var token = ""
+    private var currencyIconUrl = ""
+    private var widgetColor = intArrayOf(0, 0)
+    private var headerColor = intArrayOf(0, 0)
 
     /** These will be added as query parameters to the OfferWall Link */
-    var tags: MutableMap<String, Any> = mutableMapOf()
+    var tags = mutableMapOf<String, Any>()
 
     private var bitLabsRepo: BitLabsRepository? = null
     internal var onRewardListener: OnRewardListener? = null
@@ -47,15 +49,20 @@ object BitLabs {
         bitLabsRepo = BitLabsRepository(token, uid)
         determineAdvertisingInfo(context)
 
-        getWidgetColor()
+        getAppSettings()
     }
 
     /**
-     * Gets the color from the BitLabs API.
+     * Gets the app settings from the BitLabs API.
      */
-    private fun getWidgetColor() = bitLabsRepo?.getAppSettings(
-        { widgetColor = it.surveyIconColor },
-        { Log.e(TAG, "$it") })
+    private fun getAppSettings() = bitLabsRepo?.getAppSettings({
+        it.visual.run {
+            widgetColor = extractColors(surveyIconColor)
+            headerColor = extractColors(navigationColor)
+        }
+
+        it.currency.symbol.run { currencyIconUrl = content.takeIf { isImage } ?: "" }
+    }, { Log.e(TAG, "$it") })
 
     /** Determines whether the user can perform an action in the OfferWall
      * (either opening a survey or answering qualifications) and then executes your implementation
@@ -66,12 +73,8 @@ object BitLabs {
     fun checkSurveys(gameObject: String) = ifInitialised {
         bitLabsRepo?.checkSurveys({ hasSurveys ->
             UnityPlayer.UnitySendMessage(gameObject, "CheckSurveysCallback", hasSurveys.toString())
-        }, { exception ->
-            UnityPlayer.UnitySendMessage(
-                gameObject,
-                "CheckSurveysException",
-                exception.message.toString()
-            )
+        }, { e ->
+            UnityPlayer.UnitySendMessage(gameObject, "CheckSurveysException", e.message.toString())
         })
     }
 
@@ -83,7 +86,7 @@ object BitLabs {
      * ######
      * The getSurveysCallback() is executed when a response is received.
      * Its parameter is the String in format of JSON list of surveys in . If it's `null`,
-     * then there has been an internal error which is most probably logged with 'BitLabs' as a tag.
+     * then there has been an internal error which is mostly logged with 'BitLabs' as a tag.
      */
     fun getSurveys(gameObject: String) = ifInitialised {
         bitLabsRepo?.getSurveys("UNITY", { surveys ->
@@ -101,10 +104,33 @@ object BitLabs {
         })
     }
 
+    /**
+     * Fetches the leaderboard.
+     * ######
+     * The getLeaderBoardCallback() is executed when a response is received.
+     * Its parameter is the String in format of JSON list of surveys in . If it's `null`,
+     * then there has been an internal error which is mostly logged with 'BitLabs' as a tag.
+     */
+    fun getLeaderboard(gameObject: String) = ifInitialised {
+        bitLabsRepo?.getLeaderboard({ leaderBoard ->
+            UnityPlayer.UnitySendMessage(
+                gameObject,
+                "GetLeaderBoardCallback",
+                GsonBuilder().create().toJson(leaderBoard)
+            )
+        }, { exception ->
+            UnityPlayer.UnitySendMessage(
+                gameObject,
+                "GetLeaderBoardException",
+                exception.message.toString()
+            )
+        })
+    }
+
     /** Registers an [OnRewardListener] callback to be invoked when the OfferWall is exited by the user. */
     fun setOnRewardListener(gameObject: String) {
         onRewardListener = OnRewardListener { payout ->
-            UnityPlayer.UnitySendMessage(gameObject, "rewardCallback", payout.toString())
+            UnityPlayer.UnitySendMessage(gameObject, "RewardCallback", payout.toString())
         }
     }
 

@@ -1,5 +1,8 @@
 apply plugin: 'com.android.application'
 
+def properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
 android {
     compileSdkVersion 31
 
@@ -9,6 +12,7 @@ android {
         targetSdkVersion 31
         versionCode 32
         versionName '3.0.3'
+        buildConfigField 'String', 'APP_TOKEN', properties['appToken']
     }
 
     flavorDimensions "sdk"

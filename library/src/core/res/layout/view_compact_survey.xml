@@ -2,11 +2,11 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/fl_widget_container"
+    android:id="@+id/bl_widget_container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="4dp"
-    android:background="@drawable/background_card_blue"
+    android:background="@drawable/background_card_gradient"
     android:minWidth="300dp"
     android:padding="10dp">
 
@@ -38,11 +38,11 @@
                 android:id="@+id/rating_bar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:indeterminateDrawable="@drawable/star_ratingbar"
+                android:indeterminateDrawable="@drawable/layer_list_star"
                 android:maxHeight="25dp"
                 android:minHeight="0dp"
                 android:numStars="5"
-                android:progressDrawable="@drawable/star_ratingbar"
+                android:progressDrawable="@drawable/layer_list_star"
                 tools:rating="3" />
 
             <TextView
@@ -66,35 +66,23 @@
         android:maxWidth="100dp">
 
         <ImageView
+            android:id="@+id/iv_play"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginStart="8dp"
             android:contentDescription="Start"
             android:scaleType="centerInside"
-            android:src="@drawable/ic_circle_play_light" />
+            android:src="@drawable/ic_circle_play_light"
+            app:tint="@color/colorPrimaryDark" />
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/tv_reward"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/tv_earn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="EARN"
-                android:textColor="@color/colorPrimaryDark"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/tv_reward"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/colorPrimaryDark"
-                android:textStyle="bold"
-                tools:text="0.05" />
-        </LinearLayout>
+            android:textColor="@color/colorPrimaryDark"
+            android:textStyle="bold"
+            tools:text="EARN\n0.05" />
     </LinearLayout>
 </FrameLayout>

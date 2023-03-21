@@ -3,14 +3,17 @@ package ai.bitlabs.sdk
 import ai.bitlabs.sdk.data.BitLabsRepository
 import ai.bitlabs.sdk.data.model.Survey
 import ai.bitlabs.sdk.data.model.WebActivityParams
+import ai.bitlabs.sdk.data.model.WidgetType
 import ai.bitlabs.sdk.util.*
 import ai.bitlabs.sdk.util.BUNDLE_KEY_PARAMS
 import ai.bitlabs.sdk.util.TAG
+import ai.bitlabs.sdk.views.LeaderboardFragment
 import ai.bitlabs.sdk.views.SurveysAdapter
 import ai.bitlabs.sdk.views.WebActivity
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
+import android.content.res.Resources
+import android.graphics.drawable.Drawable
 import android.util.Log
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager.*
@@ -24,14 +27,15 @@ import com.google.android.gms.ads.identifier.AdvertisingIdClient
  * main process(app lifecycle).
  */
 object BitLabs {
-    private var uid: String = ""
-    private var adId: String = ""
-    private var token: String = ""
-    private var widgetColor: Int = 0
-    private var headerColor: Int = 0
+    private var uid = ""
+    private var adId = ""
+    private var token = ""
+    private var currencyIconUrl = ""
+    private var headerColor = intArrayOf(0, 0)
+    private var widgetColors = intArrayOf(0, 0)
 
     /** These will be added as query parameters to the OfferWall Link */
-    var tags: MutableMap<String, Any> = mutableMapOf()
+    var tags = mutableMapOf<String, Any>()
 
     private var bitLabsRepo: BitLabsRepository? = null
     internal var onRewardListener: OnRewardListener? = null
@@ -51,7 +55,7 @@ object BitLabs {
         bitLabsRepo = BitLabsRepository(token, uid)
         determineAdvertisingInfo(context)
 
-        getWidgetColor()
+        getAppSettings()
     }
 
     /**
@@ -103,7 +107,7 @@ object BitLabs {
         with(Intent(context, WebActivity::class.java)) {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
             putExtra(BUNDLE_KEY_PARAMS, WebActivityParams(token, uid, "NATIVE", adId, tags).url)
-            putExtra(BUNDLE_KEY_COLOR, headerColor);
+            putExtra(BUNDLE_KEY_COLOR, headerColor)
             context.startActivity(this)
         }
     }
@@ -111,21 +115,40 @@ object BitLabs {
     /**
      * Returns a RecyclerView populating the [surveys].
      */
-    fun getSurveyWidgets(context: Context, surveys: List<Survey>) = RecyclerView(context).apply {
-        layoutManager = LinearLayoutManager(context, HORIZONTAL, false)
-        adapter = SurveysAdapter(context, surveys, widgetColor)
-    }
+    @JvmOverloads
+    fun getSurveyWidgets(context: Context, surveys: List<Survey>, type: WidgetType = WidgetType.COMPACT) =
+        RecyclerView(context).apply {
+            layoutManager = LinearLayoutManager(context, HORIZONTAL, false)
+            adapter = SurveysAdapter(context, surveys, type, widgetColors)
+        }
+
+    fun getLeaderboard(onResponseListener: OnResponseListener<LeaderboardFragment?>) =
+        bitLabsRepo?.getLeaderboard({
+            onResponseListener.onResponse(it.topUsers?.run {
+                LeaderboardFragment(this, it.ownUser, currencyIconUrl, widgetColors)
+            })
+        }, { Log.e(TAG, "$it") })
 
     internal fun leaveSurvey(networkId: String, surveyId: String, reason: String) =
         bitLabsRepo?.leaveSurvey(networkId, surveyId, reason)
 
+    internal fun getCurrencyIcon(
+        url: String,
+        resources: Resources,
+        onResponseListener: OnResponseListener<Drawable?>
+    ) = bitLabsRepo?.getCurrencyIcon(url, resources, onResponseListener)
+
     /**
-     * Gets the color from the BitLabs API.
+     * Gets the required settings from the BitLabs API.
      */
-    private fun getWidgetColor() = bitLabsRepo?.getAppSettings(
+    private fun getAppSettings() = bitLabsRepo?.getAppSettings(
         {
-            widgetColor = Color.parseColor(it.surveyIconColor)
-            headerColor = Color.parseColor(it.navigationColor)
+            it.visual.run {
+                widgetColors = extractColors(surveyIconColor)
+                headerColor = extractColors(navigationColor)
+            }
+
+            it.currency.symbol.run { currencyIconUrl = content.takeIf { isImage } ?: "" }
         },
         { Log.e(TAG, "$it") })
 
@@ -143,10 +166,7 @@ object BitLabs {
      * [bitLabsRepo] is initialised and executes the [block] accordingly.
      */
     private inline fun ifInitialised(block: () -> Unit) {
-        val isInitialised = token
-            .isNotBlank()
-            .and(uid.isNotBlank())
-            .and(bitLabsRepo != null)
+        val isInitialised = token.isNotBlank().and(uid.isNotBlank()).and(bitLabsRepo != null)
 
         if (isInitialised) block()
         else Log.e(TAG, "You should initialise BitLabs first! Call BitLabs::init()")

@@ -10,12 +10,12 @@
         android:id="@+id/toolbar_bitlabs"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:titleTextColor="@android:color/white"
-        app:navigationIcon="@drawable/ic_circle_chevron_left_regular"
-        android:background="@color/colorPrimary"
+        android:background="@drawable/background_card_gradient"
         android:minHeight="?attr/actionBarSize"
-        android:visibility="gone"
-        app:title="@string/web_toolbar_header" />
+        android:visibility="visible"
+        app:navigationIcon="@drawable/ic_circle_chevron_left_regular"
+        app:title="@string/web_toolbar_header"
+        app:titleTextColor="@android:color/white" />
 
     <ImageView
         android:id="@+id/iv_close_bitlabs"

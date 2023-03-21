@@ -4,11 +4,15 @@ import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.data.model.*
 import ai.bitlabs.sdk.data.network.BitLabsAPI
 import ai.bitlabs.sdk.util.*
-import ai.bitlabs.sdk.util.TAG
-import ai.bitlabs.sdk.util.body
-import ai.bitlabs.sdk.util.randomSurvey
+import android.content.res.Resources
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.util.Log
+import com.caverock.androidsvg.SVG
 import okhttp3.OkHttpClient
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -107,7 +111,7 @@ internal class BitLabsRepository(token: String, uid: String) {
     })
 
     internal fun getAppSettings(
-        onResponseListener: OnResponseListener<Visual>,
+        onResponseListener: OnResponseListener<GetAppSettingsResponse>,
         onExceptionListener: OnExceptionListener
     ) = bitLabsAPI.getAppSettings()
         .enqueue(object : Callback<BitLabsResponse<GetAppSettingsResponse>> {
@@ -116,7 +120,7 @@ internal class BitLabsRepository(token: String, uid: String) {
                 response: Response<BitLabsResponse<GetAppSettingsResponse>>
             ) {
                 if (response.isSuccessful) {
-                    response.body()?.data?.visual?.let { onResponseListener.onResponse(it) }
+                    response.body()?.data?.let { onResponseListener.onResponse(it) }
                     return
                 }
 
@@ -130,6 +134,80 @@ internal class BitLabsRepository(token: String, uid: String) {
                 t: Throwable
             ) {
                 onExceptionListener.onException(Exception(t))
+            }
+        })
+
+    internal fun getLeaderboard(
+        onResponseListener: OnResponseListener<GetLeaderboardResponse>,
+        onExceptionListener: OnExceptionListener
+    ) = bitLabsAPI.getLeaderboard()
+        .enqueue(object : Callback<BitLabsResponse<GetLeaderboardResponse>> {
+            override fun onResponse(
+                call: Call<BitLabsResponse<GetLeaderboardResponse>>,
+                response: Response<BitLabsResponse<GetLeaderboardResponse>>
+            ) {
+                if (response.isSuccessful) {
+                    response.body()?.data?.let { onResponseListener.onResponse(it) }
+                    return
+                }
+
+                response.errorBody()?.body<GetLeaderboardResponse>()?.error?.details?.run {
+                    onExceptionListener.onException(Exception("$http - $msg"))
+                }
+            }
+
+            override fun onFailure(
+                call: Call<BitLabsResponse<GetLeaderboardResponse>>,
+                t: Throwable
+            ) {
+                onExceptionListener.onException(Exception(t))
+            }
+        })
+
+    internal fun getCurrencyIcon(
+        url: String,
+        resources: Resources,
+        onResponseListener: OnResponseListener<Drawable?>
+    ) = bitLabsAPI.getCurrencyIcon(url)
+        .enqueue(object : Callback<ResponseBody> {
+            override fun onResponse(
+                call: Call<ResponseBody>,
+                response: Response<ResponseBody>
+            ) {
+                if (response.isSuccessful) {
+                    response.body()?.let {
+                        val drawable = if (it.contentType()?.subtype() == "svg+xml")
+                            with(SVG.getFromString(it.string())) {
+                                val bitmap = Bitmap.createBitmap(
+                                    documentWidth.toInt(),
+                                    documentHeight.toInt(),
+                                    Bitmap.Config.ARGB_8888
+                                )
+
+                                val canvas = Canvas(bitmap)
+                                canvas.drawRGB(255, 255, 255)
+
+                                renderToCanvas(canvas)
+
+                                BitmapDrawable(resources, bitmap)
+                            }
+                        else
+                            BitmapDrawable(resources, it.byteStream())
+
+                        onResponseListener.onResponse(drawable)
+                    }
+                    return
+                }
+
+                Log.e(
+                    TAG, "getCurrencyIcon Failure - " +
+                            (response.errorBody()?.string() ?: "Unknown Error")
+                )
+                onResponseListener.onResponse(null)
+            }
+
+            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                Log.e(TAG, "getCurrencyIcon Failure - ${t.message ?: "Unknown Error"}")
             }
         })
 }

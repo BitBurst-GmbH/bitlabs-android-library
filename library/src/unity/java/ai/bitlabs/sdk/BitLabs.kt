@@ -130,7 +130,7 @@ object BitLabs {
     /** Registers an [OnRewardListener] callback to be invoked when the OfferWall is exited by the user. */
     fun setOnRewardListener(gameObject: String) {
         onRewardListener = OnRewardListener { payout ->
-            UnityPlayer.UnitySendMessage(gameObject, "rewardCallback", payout.toString())
+            UnityPlayer.UnitySendMessage(gameObject, "RewardCallback", payout.toString())
         }
     }
 

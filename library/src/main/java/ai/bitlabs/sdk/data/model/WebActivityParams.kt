@@ -24,7 +24,6 @@ internal data class WebActivityParams(
         .parse("https://web.bitlabs.ai").buildUpon()
         .appendQueryParameter("token", token)
         .appendQueryParameter("uid", uid)
-        .appendQueryParameter("username", "lolo")
         .appendQueryParameter("os", "ANDROID")
         .appendQueryParameter("sdk", sdk)
         .apply { if (maid.isNotEmpty()) appendQueryParameter("maid", maid) }

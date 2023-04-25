@@ -115,16 +115,10 @@ object BitLabs {
         bitLabsRepo?.getLeaderboard({ leaderBoard ->
             UnityPlayer.UnitySendMessage(
                 gameObject,
-                "GetLeaderBoardCallback",
+                "GetLeaderboardCallback",
                 GsonBuilder().create().toJson(leaderBoard)
             )
-        }, { exception ->
-            UnityPlayer.UnitySendMessage(
-                gameObject,
-                "GetLeaderBoardException",
-                exception.message.toString()
-            )
-        })
+        }, { Log.e(TAG, "$it") })
     }
 
     /** Registers an [OnRewardListener] callback to be invoked when the OfferWall is exited by the user. */

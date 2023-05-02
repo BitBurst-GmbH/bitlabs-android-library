@@ -4,6 +4,9 @@ import ai.bitlabs.sdk.data.model.Category
 import ai.bitlabs.sdk.data.model.Details
 import ai.bitlabs.sdk.data.model.Survey
 import android.graphics.Color
+import android.util.Log
+import com.google.gson.*
+import java.util.*
 import kotlin.random.Random
 
 internal const val TAG = "BitLabs"
@@ -41,3 +44,10 @@ internal fun randomSurvey(i: Int) = with(Random(i)) {
         missingQuestions = 0
     )
 }
+
+internal fun String.snakeToCamelCase() = split("_")
+    .joinToString("") { it.replaceFirstChar { c -> c.uppercase() } }
+    .replaceFirstChar { c -> c.lowercase() }
+
+internal fun String.convertKeysToCamelCase() = Regex("\"([a-z]+(?:_[a-z]+)+)\":")
+    .replace(this) { match -> match.groupValues[1].snakeToCamelCase().let { "\"$it\":" } }

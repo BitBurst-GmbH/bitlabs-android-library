@@ -2,8 +2,8 @@ package ai.bitlabs.sdk
 
 import ai.bitlabs.sdk.data.BitLabsRepository
 import ai.bitlabs.sdk.data.model.WebActivityParams
+import ai.bitlabs.sdk.util.*
 import ai.bitlabs.sdk.util.BUNDLE_KEY_PARAMS
-import ai.bitlabs.sdk.util.OnRewardListener
 import ai.bitlabs.sdk.util.TAG
 import ai.bitlabs.sdk.util.extractColors
 import ai.bitlabs.sdk.views.WebActivity
@@ -93,7 +93,7 @@ object BitLabs {
             UnityPlayer.UnitySendMessage(
                 gameObject,
                 "GetSurveysCallback",
-                GsonBuilder().create().toJson(surveys)
+                GsonBuilder().create().toJson(surveys).convertKeysToCamelCase()
             )
         }, { exception ->
             UnityPlayer.UnitySendMessage(
@@ -116,7 +116,7 @@ object BitLabs {
             UnityPlayer.UnitySendMessage(
                 gameObject,
                 "GetLeaderboardCallback",
-                GsonBuilder().create().toJson(leaderBoard)
+                GsonBuilder().create().toJson(leaderBoard).convertKeysToCamelCase()
             )
         }, { Log.e(TAG, "$it") })
     }

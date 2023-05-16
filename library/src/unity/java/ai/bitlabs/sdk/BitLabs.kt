@@ -133,8 +133,9 @@ object BitLabs {
         tags[key] = value
     }
 
-    fun getColor() = widgetColor;
+    fun getColor() = widgetColor
 
+    fun getCurrencyIconUrl() = currencyIconUrl
     /**
      * Launches the OfferWall from the [context] of the Activity you pass.
      * ######

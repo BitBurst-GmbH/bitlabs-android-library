@@ -4,11 +4,11 @@ import ai.bitlabs.sdk.R
 import ai.bitlabs.sdk.data.model.WidgetType
 import android.content.Context
 import android.graphics.Color
-import androidx.core.content.res.*
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.content.withStyledAttributes
 import androidx.core.graphics.drawable.DrawableCompat
 
-class SurveyView(context: Context, private val type: WidgetType = WidgetType.SIMPLE) :
+class SurveyView(context: Context, private val type: WidgetType = WidgetType.COMPACT) :
     android.widget.LinearLayout(context) {
 
     var rating = 3
@@ -20,6 +20,7 @@ class SurveyView(context: Context, private val type: WidgetType = WidgetType.SIM
     var reward = "0.5"
         set(value) {
             field = value
+            oldRewardTV?.text = value
             rewardTV?.text = getEarnRewardString(value)
         }
     var loi = 1
@@ -36,6 +37,9 @@ class SurveyView(context: Context, private val type: WidgetType = WidgetType.SIM
             (findViewById<android.view.ViewGroup>(R.id.bl_widget_container)
                 .background
                 .mutate() as android.graphics.drawable.GradientDrawable)
+                .colors = value
+
+            (bonusPercentageTV?.background?.mutate() as android.graphics.drawable.GradientDrawable)
                 .colors = value
 
 
@@ -59,6 +63,8 @@ class SurveyView(context: Context, private val type: WidgetType = WidgetType.SIM
     private var ratingTV: android.widget.TextView? = null
     private var rewardTV: android.widget.TextView? = null
     private var ratingBar: android.widget.RatingBar? = null
+    private var oldRewardTV: android.widget.TextView? = null
+    private var bonusPercentageTV: android.widget.TextView? = null
 
     init {
         val layout = when (type) {
@@ -73,6 +79,8 @@ class SurveyView(context: Context, private val type: WidgetType = WidgetType.SIM
         ratingTV = findViewById(R.id.tv_rating)
         rewardTV = findViewById(R.id.tv_reward)
         ratingBar = findViewById(R.id.rating_bar)
+        oldRewardTV = findViewById(R.id.tv_old_reward)
+        bonusPercentageTV = findViewById(R.id.tv_bonus_percentage)
 
         bindUI()
     }
@@ -90,9 +98,13 @@ class SurveyView(context: Context, private val type: WidgetType = WidgetType.SIM
     }
 
     private fun bindUI() {
+        oldRewardTV?.text = reward
+        oldRewardTV?.paintFlags = (oldRewardTV?.paintFlags
+            ?: android.graphics.Paint.STRIKE_THRU_TEXT_FLAG) or android.graphics.Paint.STRIKE_THRU_TEXT_FLAG
+
         loiTV?.text = getLoiString(loi)
-        rewardTV?.text = getEarnRewardString(reward)
         ratingTV?.text = rating.toString()
+        rewardTV?.text = getEarnRewardString(reward)
 
         ratingBar?.rating = rating.toFloat()
     }

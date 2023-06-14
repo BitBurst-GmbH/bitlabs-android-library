@@ -2,8 +2,7 @@ package ai.bitlabs.sdk.views
 
 import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.R
-import ai.bitlabs.sdk.data.model.OwnUser
-import ai.bitlabs.sdk.data.model.TopUser
+import ai.bitlabs.sdk.data.model.User
 import ai.bitlabs.sdk.util.getLuminance
 import android.content.Context
 import android.graphics.Color
@@ -15,8 +14,8 @@ import androidx.recyclerview.widget.RecyclerView
 
 class LeaderboardAdapter(
     private val context: Context,
-    private val topUsers: List<TopUser>,
-    private val ownUser: OwnUser?,
+    private val topUsers: List<User>,
+    private val ownUser: User?,
     private val currencyIcon: Drawable?,
     private val color: Int,
 ) : RecyclerView.Adapter<LeaderboardAdapter.ViewHolder>() {

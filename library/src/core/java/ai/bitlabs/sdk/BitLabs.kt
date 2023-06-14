@@ -30,6 +30,7 @@ object BitLabs {
     private var uid = ""
     private var adId = ""
     private var token = ""
+    private var bonusPercentage = 0
     private var currencyIconUrl = ""
     private var headerColor = intArrayOf(0, 0)
     private var widgetColors = intArrayOf(0, 0)

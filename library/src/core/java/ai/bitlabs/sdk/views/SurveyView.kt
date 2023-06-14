@@ -8,7 +8,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.content.withStyledAttributes
 import androidx.core.graphics.drawable.DrawableCompat
 
-class SurveyView(context: Context, private val type: WidgetType = WidgetType.COMPACT) :
+class SurveyView(context: Context, private val type: WidgetType = WidgetType.SIMPLE) :
     android.widget.LinearLayout(context) {
 
     var rating = 3
@@ -40,8 +40,19 @@ class SurveyView(context: Context, private val type: WidgetType = WidgetType.COM
                 .colors = value
 
             (bonusPercentageTV?.background?.mutate() as android.graphics.drawable.GradientDrawable)
-                .colors = value
+                .colors = when (type) {
+                WidgetType.COMPACT -> value
+                WidgetType.SIMPLE -> intArrayOf(value.first(), Color.WHITE)
+                WidgetType.FULLWIDTH -> intArrayOf(Color.WHITE, Color.WHITE)
+            }
 
+            bonusPercentageTV?.setTextColor(
+                when (type) {
+                    WidgetType.COMPACT -> Color.WHITE
+                    WidgetType.SIMPLE -> value.first()
+                    WidgetType.FULLWIDTH -> value.first()
+                }
+            )
 
             val usedColor = when (type) {
                 WidgetType.COMPACT -> value.first()
@@ -55,6 +66,8 @@ class SurveyView(context: Context, private val type: WidgetType = WidgetType.COM
                 ?.apply { DrawableCompat.setTint(this, usedColor) }
 
             findViewById<android.widget.TextView>(R.id.tv_earn_now)?.setTextColor(value.first())
+
+            oldRewardTV?.setTextColor(usedColor)
 
             rewardTV?.setTextColor(usedColor)
         }

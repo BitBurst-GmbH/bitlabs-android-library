@@ -56,13 +56,43 @@
             tools:drawableStart="@drawable/ic_clock_regular"
             tools:text="1 minute" />
 
-        <TextView
-            android:id="@+id/tv_reward"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#ffffff"
-            android:textSize="12sp"
-            tools:text="0.50" />
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_old_reward"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="2dp"
+                android:text="0.03"
+                android:textColor="@android:color/white"
+                android:textSize="8sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_reward"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:textColor="#ffffff"
+                android:textSize="12sp"
+                tools:text="0.50" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_bonus_percentage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:background="@drawable/background_card_gradient"
+            android:backgroundTint="@android:color/white"
+            android:paddingHorizontal="4dp"
+            android:paddingVertical="2dp"
+            android:text="+20%"
+            android:textSize="8sp"
+            android:textStyle="bold" />
     </LinearLayout>
 
     <TextView

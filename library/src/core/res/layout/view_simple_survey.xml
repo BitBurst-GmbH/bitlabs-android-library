@@ -25,6 +25,36 @@
         android:layout_margin="8dp"
         android:orientation="vertical">
 
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginHorizontal="2dp"
+            android:maxWidth="100dp">
+
+            <TextView
+                android:id="@+id/tv_old_reward"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="2dp"
+                android:text="0.03"
+                android:textColor="@android:color/white"
+                android:textSize="10sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_bonus_percentage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/background_card_gradient"
+                android:backgroundTint="@android:color/white"
+                android:paddingHorizontal="4dp"
+                android:paddingVertical="2dp"
+                android:text="+20%"
+                android:textSize="8sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
         <TextView
             android:id="@+id/tv_reward"
             android:layout_width="wrap_content"

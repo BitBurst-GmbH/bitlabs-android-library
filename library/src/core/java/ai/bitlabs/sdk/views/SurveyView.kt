@@ -42,7 +42,7 @@ class SurveyView(context: Context, private val type: WidgetType = WidgetType.SIM
             (bonusPercentageTV?.background?.mutate() as android.graphics.drawable.GradientDrawable)
                 .colors = when (type) {
                 WidgetType.COMPACT -> value
-                WidgetType.SIMPLE -> intArrayOf(value.first(), Color.WHITE)
+                WidgetType.SIMPLE -> intArrayOf(Color.WHITE, Color.WHITE)
                 WidgetType.FULLWIDTH -> intArrayOf(Color.WHITE, Color.WHITE)
             }
 

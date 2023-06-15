@@ -5,8 +5,6 @@ import ai.bitlabs.sdk.data.model.Survey
 import ai.bitlabs.sdk.data.model.WebActivityParams
 import ai.bitlabs.sdk.data.model.WidgetType
 import ai.bitlabs.sdk.util.*
-import ai.bitlabs.sdk.util.BUNDLE_KEY_PARAMS
-import ai.bitlabs.sdk.util.TAG
 import ai.bitlabs.sdk.views.LeaderboardFragment
 import ai.bitlabs.sdk.views.SurveysAdapter
 import ai.bitlabs.sdk.views.WebActivity
@@ -16,7 +14,7 @@ import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.util.Log
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager.*
+import androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.ads.identifier.AdvertisingIdClient
 
@@ -117,10 +115,17 @@ object BitLabs {
      * Returns a RecyclerView populating the [surveys].
      */
     @JvmOverloads
-    fun getSurveyWidgets(context: Context, surveys: List<Survey>, type: WidgetType = WidgetType.COMPACT) =
+    fun getSurveyWidgets(
+        context: Context,
+        surveys: List<Survey>,
+        type: WidgetType = WidgetType.COMPACT
+    ) =
         RecyclerView(context).apply {
             layoutManager = LinearLayoutManager(context, HORIZONTAL, false)
-            adapter = SurveysAdapter(context, surveys, type, widgetColors)
+            getCurrencyIcon(currencyIconUrl, context.resources) {
+//                it?.setBounds(0, 0, it.intrinsicWidth * 2, it.intrinsicHeight * 2)
+                adapter = SurveysAdapter(context, surveys, type, it, widgetColors)
+            }
         }
 
     fun getLeaderboard(onResponseListener: OnResponseListener<LeaderboardFragment?>) =

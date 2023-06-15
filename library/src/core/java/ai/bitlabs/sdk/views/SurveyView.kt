@@ -2,8 +2,10 @@ package ai.bitlabs.sdk.views
 
 import ai.bitlabs.sdk.R
 import ai.bitlabs.sdk.data.model.WidgetType
+import ai.bitlabs.sdk.util.toPx
 import android.content.Context
 import android.graphics.Color
+import android.graphics.drawable.Drawable
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.content.withStyledAttributes
 import androidx.core.graphics.drawable.DrawableCompat
@@ -22,6 +24,21 @@ class SurveyView(context: Context, private val type: WidgetType = WidgetType.SIM
             field = value
             oldRewardTV?.text = value
             rewardTV?.text = getEarnRewardString(value)
+        }
+    var currency: Drawable? = null
+        set(value) {
+            field = value
+            value?.constantState?.newDrawable()?.mutate()?.apply {
+                val size = (if (type == WidgetType.SIMPLE) 16 else 11).toPx().toInt()
+                setBounds(0, 0, size, size)
+                rewardTV?.setCompoundDrawables(null, null, this, null)
+            }
+
+            value?.constantState?.newDrawable()?.mutate()?.apply {
+                val size = (if (type == WidgetType.SIMPLE) 12 else 9).toPx().toInt()
+                setBounds(0, 0, size, size)
+                oldRewardTV?.setCompoundDrawables(null, null, this, null)
+            }
         }
     var loi = 1
         set(value) {
@@ -129,7 +146,7 @@ class SurveyView(context: Context, private val type: WidgetType = WidgetType.SIM
     }
 
     private fun getEarnRewardString(value: String) = when (type) {
-        WidgetType.COMPACT -> resources.getString(R.string.compact_earn_reward, value)
+        WidgetType.COMPACT -> value
         WidgetType.SIMPLE -> resources.getString(R.string.simple_earn_reward, value)
         WidgetType.FULLWIDTH -> value
     }

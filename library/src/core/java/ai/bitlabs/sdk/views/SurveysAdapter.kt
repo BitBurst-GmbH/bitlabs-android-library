@@ -3,12 +3,14 @@ package ai.bitlabs.sdk.views
 import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.data.model.Survey
 import ai.bitlabs.sdk.data.model.WidgetType
+import android.graphics.drawable.Drawable
 import androidx.recyclerview.widget.RecyclerView
 
 class SurveysAdapter(
     private val context: android.content.Context,
     private val surveys: List<Survey>,
     private val type: WidgetType,
+    private val currencyIcon: Drawable?,
     private val widgetColors: IntArray
 ) : RecyclerView.Adapter<SurveysAdapter.ViewHolder>() {
     override fun onCreateViewHolder(parent: android.view.ViewGroup, viewType: Int) =
@@ -20,6 +22,7 @@ class SurveysAdapter(
             reward = survey.value
             rating = survey.rating
             loi = survey.loi.toInt()
+            currency = currencyIcon
         }
 
         setOnClickListener { view ->

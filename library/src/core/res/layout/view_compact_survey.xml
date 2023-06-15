@@ -83,14 +83,29 @@
                 android:src="@drawable/ic_circle_play_light"
                 app:tint="@color/colorPrimaryDark" />
 
-            <TextView
-                android:id="@+id/tv_reward"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
-                android:textColor="@color/colorPrimaryDark"
-                android:textStyle="bold"
-                tools:text="EARN\n0.05" />
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_earn_now"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="EARN"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tv_reward"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="2dp"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textStyle="bold"
+                    tools:text="0.05" />
+            </LinearLayout>
         </LinearLayout>
 
         <LinearLayout
@@ -105,10 +120,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="2dp"
-                android:text="0.03"
+                android:drawablePadding="2dp"
                 android:textColor="@android:color/black"
                 android:textSize="10sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                tools:text="0.03" />
 
             <TextView
                 android:id="@+id/tv_bonus_percentage"

@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.btn_get_surveys).setOnClickListener(view -> bitLabs.getSurveys(
                 surveys -> {
                     surveyLayout.removeAllViews();
-                    surveyLayout.addView(bitLabs.getSurveyWidgets(this, surveys));
+                    surveyLayout.addView(bitLabs.getSurveyWidgets(this, surveys, WidgetType.FULLWIDTH));
                 },
                 exception -> Log.e(TAG, "GetSurveysErr: " + exception.getMessage(), exception.getCause()))
         );

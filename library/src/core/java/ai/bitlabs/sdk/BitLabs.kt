@@ -69,6 +69,7 @@ object BitLabs {
      * parameter is `true` if an action can be performed and `false` otherwise. If it's `null`,
      * then there has been an internal error which is most probably logged with 'BitLabs' as a tag.
      */
+    @Deprecated("This will be removed soon.")
     fun checkSurveys(
         onResponseListener: OnResponseListener<Boolean>,
         onExceptionListener: OnExceptionListener

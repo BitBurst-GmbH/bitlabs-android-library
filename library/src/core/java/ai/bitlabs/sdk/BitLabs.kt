@@ -5,8 +5,6 @@ import ai.bitlabs.sdk.data.model.Survey
 import ai.bitlabs.sdk.data.model.WebActivityParams
 import ai.bitlabs.sdk.data.model.WidgetType
 import ai.bitlabs.sdk.util.*
-import ai.bitlabs.sdk.util.BUNDLE_KEY_PARAMS
-import ai.bitlabs.sdk.util.TAG
 import ai.bitlabs.sdk.views.LeaderboardFragment
 import ai.bitlabs.sdk.views.SurveysAdapter
 import ai.bitlabs.sdk.views.WebActivity
@@ -16,7 +14,7 @@ import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.util.Log
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager.*
+import androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.ads.identifier.AdvertisingIdClient
 
@@ -69,11 +67,14 @@ object BitLabs {
      * parameter is `true` if an action can be performed and `false` otherwise. If it's `null`,
      * then there has been an internal error which is most probably logged with 'BitLabs' as a tag.
      */
-    @Deprecated("This will be removed soon.")
     fun checkSurveys(
         onResponseListener: OnResponseListener<Boolean>,
         onExceptionListener: OnExceptionListener
-    ) = ifInitialised { bitLabsRepo?.checkSurveys(onResponseListener, onExceptionListener) }
+    ) = ifInitialised {
+        bitLabsRepo?.getSurveys("NATIVE", { surveys ->
+            onResponseListener.onResponse(surveys.isNotEmpty())
+        }, onExceptionListener)
+    }
 
     /**
      * Fetches a list of surveys the user can open.
@@ -117,7 +118,11 @@ object BitLabs {
      * Returns a RecyclerView populating the [surveys].
      */
     @JvmOverloads
-    fun getSurveyWidgets(context: Context, surveys: List<Survey>, type: WidgetType = WidgetType.COMPACT) =
+    fun getSurveyWidgets(
+        context: Context,
+        surveys: List<Survey>,
+        type: WidgetType = WidgetType.COMPACT
+    ) =
         RecyclerView(context).apply {
             layoutManager = LinearLayoutManager(context, HORIZONTAL, false)
             adapter = SurveysAdapter(context, surveys, type, widgetColors)

@@ -37,34 +37,6 @@ internal class BitLabsRepository(token: String, uid: String) {
         .build()
         .create(BitLabsAPI::class.java)
 
-    @Deprecated("This belongs to v1 of the API and will be removed soon in favor of v2")
-    internal fun checkSurveys(
-        onResponseListener: OnResponseListener<Boolean>,
-        onExceptionListener: OnExceptionListener
-    ) = bitLabsAPI.checkSurveys().enqueue(object : Callback<BitLabsResponse<CheckSurveysResponse>> {
-        override fun onResponse(
-            call: Call<BitLabsResponse<CheckSurveysResponse>>,
-            response: Response<BitLabsResponse<CheckSurveysResponse>>
-        ) {
-            if (response.isSuccessful) {
-                response.body()?.data?.run { onResponseListener.onResponse(hasSurveys) }
-                return
-            }
-
-            response.errorBody()?.body<CheckSurveysResponse>()?.error?.details?.run {
-                onExceptionListener.onException(Exception("$http - $msg"))
-            }
-
-        }
-
-        override fun onFailure(
-            call: Call<BitLabsResponse<CheckSurveysResponse>>,
-            t: Throwable
-        ) {
-            onExceptionListener.onException(Exception(t))
-        }
-    })
-
     internal fun leaveSurvey(networkId: String, surveyId: String, reason: String) =
         bitLabsAPI.leaveSurvey(networkId, surveyId, LeaveReason(reason))
             .enqueue(object : Callback<BitLabsResponse<Unit>> {

@@ -9,9 +9,6 @@ import retrofit2.http.*
  * Responsible for communication with the BitLabs API
  */
 internal interface BitLabsAPI {
-    @Deprecated("This belongs to v1 of the API and will be removed soon in favor of v2")
-    @GET("v1/client/check?platform=MOBILE")
-    fun checkSurveys(): Call<BitLabsResponse<CheckSurveysResponse>>
 
     @POST("v1/client/networks/{networkId}/surveys/{surveyId}/leave")
     fun leaveSurvey(

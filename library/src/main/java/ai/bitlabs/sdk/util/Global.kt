@@ -1,12 +1,8 @@
 package ai.bitlabs.sdk.util
 
 import ai.bitlabs.sdk.data.model.Category
-import ai.bitlabs.sdk.data.model.Details
 import ai.bitlabs.sdk.data.model.Survey
 import android.graphics.Color
-import android.util.Log
-import com.google.gson.*
-import java.util.*
 import kotlin.random.Random
 
 internal const val TAG = "BitLabs"
@@ -32,16 +28,17 @@ internal fun extractColors(color: String) =
 
 internal fun randomSurvey(i: Int) = with(Random(i)) {
     Survey(
-        networkId = nextInt(),
-        id = i,
+        id = i.toString(),
         cpi = "0.5",
-        value = "0.5",
-        loi = nextDouble(30.0),
-        remaining = 3,
-        details = Details(Category("Survey-$i", "")),
+        value = "500",
+        loi = nextDouble(10.0),
+        category = Category("Survey-$i", "", "", ""),
         rating = nextInt(6),
-        link = "",
-        missingQuestions = 0
+        country = "US",
+        language = "en",
+        tags = listOf("recontact", "pii"),
+        type = "survey",
+        clickUrl = "",
     )
 }
 

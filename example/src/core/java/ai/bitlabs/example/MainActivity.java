@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import ai.bitlabs.sdk.BitLabs;
-import ai.bitlabs.sdk.data.model.WidgetType;
 
 public class MainActivity extends AppCompatActivity {
     private final String TAG = "Example";
@@ -22,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        bitLabs.init(this, BuildConfig.APP_TOKEN, "USER_ID");
+        bitLabs.init(this, BuildConfig.APP_TOKEN, "omaRaad");
 
         // optionally add custom tags to your users
         Map<String, Object> tags = new HashMap<>();

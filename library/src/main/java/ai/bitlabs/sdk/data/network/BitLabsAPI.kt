@@ -15,13 +15,6 @@ internal interface BitLabsAPI {
         @Body click: UpdateClickBody
     ): Call<BitLabsResponse<Unit>>
 
-//    @POST("v1/client/networks/{networkId}/surveys/{surveyId}/leave")
-//    fun leaveSurvey(
-//        @Path("networkId") networkId: String,
-//        @Path("surveyId") surveyId: String,
-//        @Body leaveReason: LeaveReason
-//    ): Call<BitLabsResponse<Unit>>
-
     @GET("v2/client/surveys?platform=MOBILE&os=ANDROID")
     fun getSurveys(@Query("sdk") sdk: String): Call<BitLabsResponse<GetSurveysResponse>>
 

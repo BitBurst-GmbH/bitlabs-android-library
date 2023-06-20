@@ -67,8 +67,7 @@ internal class WebActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == android.R.id.home)
-            showLeaveSurveyAlertDialog()
+        if (item.itemId == android.R.id.home) showLeaveSurveyAlertDialog()
         return super.onOptionsItemSelected(item)
     }
 
@@ -83,7 +82,7 @@ internal class WebActivity : AppCompatActivity() {
             getLuminance(colors.first()) > 0.729 * 255 || getLuminance(colors.last()) > 0.729 * 255
 
         toolbar = findViewById(R.id.toolbar_bitlabs)
-        (toolbar?.background?.mutate() as GradientDrawable).let {
+        (toolbar?.background?.mutate() as? GradientDrawable)?.let {
             it.colors = colors
             it.cornerRadius = 0F
         }

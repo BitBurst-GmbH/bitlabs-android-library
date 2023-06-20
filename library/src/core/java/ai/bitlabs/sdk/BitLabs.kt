@@ -135,8 +135,8 @@ object BitLabs {
             })
         }, { Log.e(TAG, "$it") })
 
-    internal fun leaveSurvey(networkId: String, surveyId: String, reason: String) =
-        bitLabsRepo?.leaveSurvey(networkId, surveyId, reason)
+    internal fun leaveSurvey(clickId: String, reason: String) =
+        bitLabsRepo?.leaveSurvey(clickId, reason)
 
     internal fun getCurrencyIcon(
         url: String,

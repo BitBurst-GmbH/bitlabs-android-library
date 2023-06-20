@@ -9,13 +9,18 @@ import retrofit2.http.*
  * Responsible for communication with the BitLabs API
  */
 internal interface BitLabsAPI {
-
-    @POST("v1/client/networks/{networkId}/surveys/{surveyId}/leave")
-    fun leaveSurvey(
-        @Path("networkId") networkId: String,
-        @Path("surveyId") surveyId: String,
-        @Body leaveReason: LeaveReason
+    @POST("/v2/client/clicks/{clickId}")
+    fun updateClick(
+        @Path("clickId") clickId: String,
+        @Body click: UpdateClickBody
     ): Call<BitLabsResponse<Unit>>
+
+//    @POST("v1/client/networks/{networkId}/surveys/{surveyId}/leave")
+//    fun leaveSurvey(
+//        @Path("networkId") networkId: String,
+//        @Path("surveyId") surveyId: String,
+//        @Body leaveReason: LeaveReason
+//    ): Call<BitLabsResponse<Unit>>
 
     @GET("v2/client/surveys?platform=MOBILE&os=ANDROID")
     fun getSurveys(@Query("sdk") sdk: String): Call<BitLabsResponse<GetSurveysResponse>>

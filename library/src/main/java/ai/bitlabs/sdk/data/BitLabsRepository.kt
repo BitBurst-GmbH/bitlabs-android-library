@@ -37,8 +37,8 @@ internal class BitLabsRepository(token: String, uid: String) {
         .build()
         .create(BitLabsAPI::class.java)
 
-    internal fun leaveSurvey(networkId: String, surveyId: String, reason: String) =
-        bitLabsAPI.leaveSurvey(networkId, surveyId, LeaveReason(reason))
+    internal fun leaveSurvey(clickId: String, reason: String) =
+        bitLabsAPI.updateClick(clickId, UpdateClickBody(LeaveReason(reason)))
             .enqueue(object : Callback<BitLabsResponse<Unit>> {
                 override fun onResponse(
                     call: Call<BitLabsResponse<Unit>>,

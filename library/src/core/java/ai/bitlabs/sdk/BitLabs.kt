@@ -86,8 +86,13 @@ object BitLabs {
     fun getSurveys(
         onResponseListener: OnResponseListener<List<Survey>>,
         onExceptionListener: OnExceptionListener
-    ) = ifInitialised { bitLabsRepo?.getSurveys("NATIVE", onResponseListener, onExceptionListener) }
-
+    ) = ifInitialised {
+        bitLabsRepo?.getSurveys(
+            "NATIVE",
+            { onResponseListener.onResponse(it.ifEmpty { (1..3).map { i -> randomSurvey(i) } }) },
+            onExceptionListener
+        )
+    }
 
     /** Registers an [OnRewardListener] callback to be invoked when the OfferWall is exited by the user. */
     fun setOnRewardListener(onRewardListener: OnRewardListener) {

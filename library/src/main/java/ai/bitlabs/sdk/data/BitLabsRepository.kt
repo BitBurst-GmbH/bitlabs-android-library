@@ -3,7 +3,10 @@ package ai.bitlabs.sdk.data
 import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.data.model.*
 import ai.bitlabs.sdk.data.network.BitLabsAPI
-import ai.bitlabs.sdk.util.*
+import ai.bitlabs.sdk.util.OnExceptionListener
+import ai.bitlabs.sdk.util.OnResponseListener
+import ai.bitlabs.sdk.util.TAG
+import ai.bitlabs.sdk.util.body
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -66,10 +69,7 @@ internal class BitLabsRepository(token: String, uid: String) {
             response: Response<BitLabsResponse<GetSurveysResponse>>
         ) {
             if (response.isSuccessful) {
-                response.body()?.data?.surveys?.run {
-                    val surveys = this.ifEmpty { (1..3).map { randomSurvey(it) } }
-                    onResponseListener.onResponse(surveys)
-                }
+                response.body()?.data?.surveys?.run { onResponseListener.onResponse(this) }
                 return
             }
 

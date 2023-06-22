@@ -3,7 +3,10 @@ package ai.bitlabs.sdk.data
 import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.data.model.*
 import ai.bitlabs.sdk.data.network.BitLabsAPI
-import ai.bitlabs.sdk.util.*
+import ai.bitlabs.sdk.util.OnExceptionListener
+import ai.bitlabs.sdk.util.OnResponseListener
+import ai.bitlabs.sdk.util.TAG
+import ai.bitlabs.sdk.util.body
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -22,7 +25,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 /** This class is the point of communication between the data and [BitLabs] */
 internal class BitLabsRepository(token: String, uid: String) {
     private val bitLabsAPI = Retrofit.Builder()
-        .baseUrl("https://api.bitlabs.ai/v1/")
+        .baseUrl("https://api.bitlabs.ai/")
         .client(OkHttpClient.Builder().addInterceptor { chain ->
             chain.run {
                 proceed(
@@ -37,35 +40,8 @@ internal class BitLabsRepository(token: String, uid: String) {
         .build()
         .create(BitLabsAPI::class.java)
 
-    internal fun checkSurveys(
-        onResponseListener: OnResponseListener<Boolean>,
-        onExceptionListener: OnExceptionListener
-    ) = bitLabsAPI.checkSurveys().enqueue(object : Callback<BitLabsResponse<CheckSurveysResponse>> {
-        override fun onResponse(
-            call: Call<BitLabsResponse<CheckSurveysResponse>>,
-            response: Response<BitLabsResponse<CheckSurveysResponse>>
-        ) {
-            if (response.isSuccessful) {
-                response.body()?.data?.run { onResponseListener.onResponse(hasSurveys) }
-                return
-            }
-
-            response.errorBody()?.body<CheckSurveysResponse>()?.error?.details?.run {
-                onExceptionListener.onException(Exception("$http - $msg"))
-            }
-
-        }
-
-        override fun onFailure(
-            call: Call<BitLabsResponse<CheckSurveysResponse>>,
-            t: Throwable
-        ) {
-            onExceptionListener.onException(Exception(t))
-        }
-    })
-
-    internal fun leaveSurvey(networkId: String, surveyId: String, reason: String) =
-        bitLabsAPI.leaveSurvey(networkId, surveyId, LeaveReason(reason))
+    internal fun leaveSurvey(clickId: String, reason: String) =
+        bitLabsAPI.updateClick(clickId, UpdateClickBody(LeaveReason(reason)))
             .enqueue(object : Callback<BitLabsResponse<Unit>> {
                 override fun onResponse(
                     call: Call<BitLabsResponse<Unit>>,
@@ -87,25 +63,22 @@ internal class BitLabsRepository(token: String, uid: String) {
         sdk: String,
         onResponseListener: OnResponseListener<List<Survey>>,
         onExceptionListener: OnExceptionListener
-    ) = bitLabsAPI.getActions(sdk).enqueue(object : Callback<BitLabsResponse<GetActionsResponse>> {
+    ) = bitLabsAPI.getSurveys(sdk).enqueue(object : Callback<BitLabsResponse<GetSurveysResponse>> {
         override fun onResponse(
-            call: Call<BitLabsResponse<GetActionsResponse>>,
-            response: Response<BitLabsResponse<GetActionsResponse>>
+            call: Call<BitLabsResponse<GetSurveysResponse>>,
+            response: Response<BitLabsResponse<GetSurveysResponse>>
         ) {
             if (response.isSuccessful) {
-                response.body()?.data?.surveys?.run {
-                    val surveys = this.ifEmpty { (1..3).map { randomSurvey(it) } }
-                    onResponseListener.onResponse(surveys)
-                }
+                response.body()?.data?.surveys?.run { onResponseListener.onResponse(this) }
                 return
             }
 
-            response.errorBody()?.body<GetActionsResponse>()?.error?.details?.run {
+            response.errorBody()?.body<GetSurveysResponse>()?.error?.details?.run {
                 onExceptionListener.onException(Exception("$http - $msg"))
             }
         }
 
-        override fun onFailure(call: Call<BitLabsResponse<GetActionsResponse>>, t: Throwable) {
+        override fun onFailure(call: Call<BitLabsResponse<GetSurveysResponse>>, t: Throwable) {
             onExceptionListener.onException(Exception(t))
         }
     })
@@ -124,7 +97,7 @@ internal class BitLabsRepository(token: String, uid: String) {
                     return
                 }
 
-                response.errorBody()?.body<GetActionsResponse>()?.error?.details?.run {
+                response.errorBody()?.body<GetSurveysResponse>()?.error?.details?.run {
                     onExceptionListener.onException(Exception("$http - $msg"))
                 }
             }

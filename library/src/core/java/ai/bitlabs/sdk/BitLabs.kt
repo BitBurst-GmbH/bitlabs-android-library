@@ -72,7 +72,11 @@ object BitLabs {
     fun checkSurveys(
         onResponseListener: OnResponseListener<Boolean>,
         onExceptionListener: OnExceptionListener
-    ) = ifInitialised { bitLabsRepo?.checkSurveys(onResponseListener, onExceptionListener) }
+    ) = ifInitialised {
+        bitLabsRepo?.getSurveys("NATIVE", { surveys ->
+            onResponseListener.onResponse(surveys.isNotEmpty())
+        }, onExceptionListener)
+    }
 
     /**
      * Fetches a list of surveys the user can open.
@@ -84,7 +88,13 @@ object BitLabs {
     fun getSurveys(
         onResponseListener: OnResponseListener<List<Survey>>,
         onExceptionListener: OnExceptionListener
-    ) = ifInitialised { bitLabsRepo?.getSurveys("NATIVE", onResponseListener, onExceptionListener) }
+    ) = ifInitialised {
+        bitLabsRepo?.getSurveys(
+            "NATIVE",
+            { onResponseListener.onResponse(it.ifEmpty { (1..3).map { i -> randomSurvey(i) } }) },
+            onExceptionListener
+        )
+    }
 
     /** Registers an [OnRewardListener] callback to be invoked when the OfferWall is exited by the user. */
     fun setOnRewardListener(onRewardListener: OnRewardListener) {
@@ -141,8 +151,8 @@ object BitLabs {
             })
         }, { Log.e(TAG, "$it") })
 
-    internal fun leaveSurvey(networkId: String, surveyId: String, reason: String) =
-        bitLabsRepo?.leaveSurvey(networkId, surveyId, reason)
+    internal fun leaveSurvey(clickId: String, reason: String) =
+        bitLabsRepo?.leaveSurvey(clickId, reason)
 
     internal fun getCurrencyIcon(
         url: String,

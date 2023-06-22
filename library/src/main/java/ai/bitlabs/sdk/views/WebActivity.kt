@@ -28,8 +28,7 @@ internal class WebActivity : AppCompatActivity() {
 
     private lateinit var url: String
 
-    private var surveyId: String? = null
-    private var networkId: String? = null
+    private var clickId: String? = null
     private var colors = intArrayOf(0, 0)
 
     private var reward: Float = 0.0F
@@ -68,8 +67,7 @@ internal class WebActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == android.R.id.home)
-            showLeaveSurveyAlertDialog()
+        if (item.itemId == android.R.id.home) showLeaveSurveyAlertDialog()
         return super.onOptionsItemSelected(item)
     }
 
@@ -84,7 +82,7 @@ internal class WebActivity : AppCompatActivity() {
             getLuminance(colors.first()) > 0.729 * 255 || getLuminance(colors.last()) > 0.729 * 255
 
         toolbar = findViewById(R.id.toolbar_bitlabs)
-        (toolbar?.background?.mutate() as GradientDrawable).let {
+        (toolbar?.background?.mutate() as? GradientDrawable)?.let {
             it.colors = colors
             it.cornerRadius = 0F
         }
@@ -108,15 +106,15 @@ internal class WebActivity : AppCompatActivity() {
         webView?.scrollBarStyle = WebView.SCROLLBARS_OUTSIDE_OVERLAY
 
         webView?.setup(this) { isPageOfferWall, url ->
+            Log.i(TAG, "bindUI: $url")
             if (isPageOfferWall) {
-                if (url.contains("survey/complete") || url.contains("survey/screenout"))
+                if (url.contains("/survey-complete")
+                    || url.contains("/survey-screenout")
+                    || url.contains("/start-bonus")
+                )
                     Uri.parse(url).getQueryParameter("val")?.let { reward += it.toFloat() }
             } else {
-                Regex("/networks/(\\d+)/surveys/(\\d+)").find(url)?.let { match ->
-                    val (networkId, surveyId) = match.destructured
-                    this.networkId = networkId
-                    this.surveyId = surveyId
-                }
+                Uri.parse(url).getQueryParameter("clk")?.let { clickId = it }
             }
             toggleToolbar(isPageOfferWall)
         }
@@ -157,7 +155,6 @@ internal class WebActivity : AppCompatActivity() {
         toggleToolbar(true)
         webView?.loadUrl(url)
 
-        if (networkId != null && surveyId != null)
-            BitLabs.leaveSurvey(networkId!!, surveyId!!, reason)
+        if (clickId != null) BitLabs.leaveSurvey(clickId!!, reason)
     }
 }

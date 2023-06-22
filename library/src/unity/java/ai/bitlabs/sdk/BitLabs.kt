@@ -3,9 +3,6 @@ package ai.bitlabs.sdk
 import ai.bitlabs.sdk.data.BitLabsRepository
 import ai.bitlabs.sdk.data.model.WebActivityParams
 import ai.bitlabs.sdk.util.*
-import ai.bitlabs.sdk.util.BUNDLE_KEY_PARAMS
-import ai.bitlabs.sdk.util.TAG
-import ai.bitlabs.sdk.util.extractColors
 import ai.bitlabs.sdk.views.WebActivity
 import android.content.Context
 import android.content.Intent
@@ -71,8 +68,12 @@ object BitLabs {
      * If you want to perform background checks if surveys are available, this is the best option.
      */
     fun checkSurveys(gameObject: String) = ifInitialised {
-        bitLabsRepo?.checkSurveys({ hasSurveys ->
-            UnityPlayer.UnitySendMessage(gameObject, "CheckSurveysCallback", hasSurveys.toString())
+        bitLabsRepo?.getSurveys("UNITY", { surveys ->
+            UnityPlayer.UnitySendMessage(
+                gameObject,
+                "CheckSurveysCallback",
+                surveys.isNotEmpty().toString()
+            )
         }, { e ->
             UnityPlayer.UnitySendMessage(gameObject, "CheckSurveysException", e.message.toString())
         })
@@ -93,7 +94,7 @@ object BitLabs {
             UnityPlayer.UnitySendMessage(
                 gameObject,
                 "GetSurveysCallback",
-                GsonBuilder().create().toJson(surveys).convertKeysToCamelCase()
+                GsonBuilder().create().toJson(surveys.ifEmpty { { (1..3).map { randomSurvey(it) } } }).convertKeysToCamelCase()
             )
         }, { exception ->
             UnityPlayer.UnitySendMessage(
@@ -136,6 +137,7 @@ object BitLabs {
     fun getColor() = widgetColor
 
     fun getCurrencyIconUrl() = currencyIconUrl
+
     /**
      * Launches the OfferWall from the [context] of the Activity you pass.
      * ######
@@ -150,8 +152,8 @@ object BitLabs {
         }
     }
 
-    internal fun leaveSurvey(networkId: String, surveyId: String, reason: String) =
-        bitLabsRepo?.leaveSurvey(networkId, surveyId, reason)
+    internal fun leaveSurvey(clickId: String, reason: String) =
+        bitLabsRepo?.leaveSurvey(clickId, reason)
 
     private fun determineAdvertisingInfo(context: Context) = Thread {
         try {

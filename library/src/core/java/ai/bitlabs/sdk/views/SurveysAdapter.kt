@@ -3,9 +3,9 @@ package ai.bitlabs.sdk.views
 import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.data.model.Survey
 import ai.bitlabs.sdk.data.model.WidgetType
+import ai.bitlabs.sdk.util.rounded
 import android.graphics.drawable.Drawable
 import androidx.recyclerview.widget.RecyclerView
-import kotlin.math.roundToInt
 
 class SurveysAdapter(
     private val context: android.content.Context,
@@ -14,18 +14,16 @@ class SurveysAdapter(
     private val currencyIcon: Drawable?,
     private val widgetColors: IntArray,
     private val bonusPercentage: Int,
-    private val currencyBonusPercentage: Int
 ) : RecyclerView.Adapter<SurveysAdapter.ViewHolder>() {
     override fun onCreateViewHolder(parent: android.view.ViewGroup, viewType: Int) =
         ViewHolder(SurveyView(context, type))
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) = with(holder.surveyView) {
         surveys[position].let { survey ->
-            val rewardWithBonus = survey.value.toDouble() * (1 + currencyBonusPercentage / 100.0)
-            reward = ((rewardWithBonus * 100).roundToInt() / 100.0).toString()
+            reward = survey.value.rounded()
 
             val rewardWithoutBonus = survey.value.toDouble() / (1 + bonusPercentage / 100.0)
-            oldReward = ((rewardWithoutBonus * 100).roundToInt() / 100.0).toString()
+            oldReward = rewardWithoutBonus.toString().rounded()
 
             colors = widgetColors
             rating = survey.rating

@@ -132,15 +132,7 @@ object BitLabs {
     ) = RecyclerView(context).apply {
         layoutManager = LinearLayoutManager(context, HORIZONTAL, false)
         getCurrencyIcon(currencyIconUrl, context.resources) {
-            adapter = SurveysAdapter(
-                context,
-                surveys,
-                type,
-                it,
-                widgetColors,
-                bonusPercentage,
-                currencyBonus
-            )
+            adapter = SurveysAdapter(context, surveys, type, it, widgetColors, bonusPercentage)
         }
     }
 

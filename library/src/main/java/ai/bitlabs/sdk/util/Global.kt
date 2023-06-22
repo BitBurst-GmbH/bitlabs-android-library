@@ -5,7 +5,7 @@ import ai.bitlabs.sdk.data.model.Survey
 import android.content.res.Resources
 import android.graphics.Color
 import android.util.TypedValue
-
+import kotlin.math.roundToInt
 import kotlin.random.Random
 
 internal const val TAG = "BitLabs"
@@ -57,3 +57,5 @@ internal fun Number.toPx() = TypedValue.applyDimension(
     this.toFloat(),
     Resources.getSystem().displayMetrics
 )
+
+internal fun String.rounded() = ((toDouble() * 100).roundToInt() / 100.0).toString()

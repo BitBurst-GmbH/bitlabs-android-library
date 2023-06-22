@@ -28,6 +28,7 @@ object BitLabs {
     private var uid = ""
     private var adId = ""
     private var token = ""
+    private var currencyBonus = 0
     private var bonusPercentage = 0
     private var currencyIconUrl = ""
     private var headerColor = intArrayOf(0, 0)
@@ -85,7 +86,6 @@ object BitLabs {
         onExceptionListener: OnExceptionListener
     ) = ifInitialised { bitLabsRepo?.getSurveys("NATIVE", onResponseListener, onExceptionListener) }
 
-
     /** Registers an [OnRewardListener] callback to be invoked when the OfferWall is exited by the user. */
     fun setOnRewardListener(onRewardListener: OnRewardListener) {
         this.onRewardListener = onRewardListener
@@ -119,14 +119,20 @@ object BitLabs {
         context: Context,
         surveys: List<Survey>,
         type: WidgetType = WidgetType.COMPACT
-    ) =
-        RecyclerView(context).apply {
-            layoutManager = LinearLayoutManager(context, HORIZONTAL, false)
-            getCurrencyIcon(currencyIconUrl, context.resources) {
-//                it?.setBounds(0, 0, it.intrinsicWidth * 2, it.intrinsicHeight * 2)
-                adapter = SurveysAdapter(context, surveys, type, it, widgetColors)
-            }
+    ) = RecyclerView(context).apply {
+        layoutManager = LinearLayoutManager(context, HORIZONTAL, false)
+        getCurrencyIcon(currencyIconUrl, context.resources) {
+            adapter = SurveysAdapter(
+                context,
+                surveys,
+                type,
+                it,
+                widgetColors,
+                bonusPercentage,
+                currencyBonus
+            )
         }
+    }
 
     fun getLeaderboard(onResponseListener: OnResponseListener<LeaderboardFragment?>) =
         bitLabsRepo?.getLeaderboard({
@@ -155,6 +161,9 @@ object BitLabs {
             }
 
             it.currency.symbol.run { currencyIconUrl = content.takeIf { isImage } ?: "" }
+            currencyBonus = it.currency.bonusPercentage
+
+            bonusPercentage += currencyBonus
         },
         { Log.e(TAG, "$it") })
 

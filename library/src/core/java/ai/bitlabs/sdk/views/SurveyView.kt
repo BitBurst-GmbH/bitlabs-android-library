@@ -6,6 +6,7 @@ import ai.bitlabs.sdk.util.toPx
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.Drawable
+import android.view.View
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.content.withStyledAttributes
 import androidx.core.graphics.drawable.DrawableCompat
@@ -22,8 +23,24 @@ class SurveyView(context: Context, private val type: WidgetType = WidgetType.SIM
     var reward = "0.5"
         set(value) {
             field = value
-            oldRewardTV?.text = value
             rewardTV?.text = getEarnRewardString(value)
+        }
+    var oldReward = "0.5"
+        set(value) {
+            field = value
+            oldRewardTV?.text = value
+        }
+    var bonus = 0
+        set(value) {
+            field = value
+            bonusPercentageTV?.text = "+$value%"
+            if (value == 0) {
+                bonusPercentageTV?.visibility = View.GONE
+                oldRewardTV?.visibility = View.GONE
+            } else {
+                bonusPercentageTV?.visibility = View.VISIBLE
+                oldRewardTV?.visibility = View.VISIBLE
+            }
         }
     var currency: Drawable? = null
         set(value) {

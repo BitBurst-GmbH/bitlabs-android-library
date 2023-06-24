@@ -28,9 +28,8 @@ object BitLabs {
     private var uid = ""
     private var adId = ""
     private var token = ""
-    private var currencyBonus = 0
-    private var bonusPercentage = 0
     private var currencyIconUrl = ""
+    private var bonusPercentage = 0.0
     private var headerColor = intArrayOf(0, 0)
     private var widgetColors = intArrayOf(0, 0)
 
@@ -163,9 +162,12 @@ object BitLabs {
             }
 
             it.currency.symbol.run { currencyIconUrl = content.takeIf { isImage } ?: "" }
-            currencyBonus = it.currency.bonusPercentage
+            bonusPercentage = it.currency.bonusPercentage / 100.0
 
-            bonusPercentage += currencyBonus
+
+            it.promotion?.bonusPercentage?.run {
+                bonusPercentage += this / 100.0 + this * bonusPercentage / 100.0
+            }
         },
         { Log.e(TAG, "$it") })
 

@@ -13,7 +13,7 @@ class SurveysAdapter(
     private val type: WidgetType,
     private val currencyIcon: Drawable?,
     private val widgetColors: IntArray,
-    private val bonusPercentage: Int,
+    private val bonusPercentage: Double,
 ) : RecyclerView.Adapter<SurveysAdapter.ViewHolder>() {
     override fun onCreateViewHolder(parent: android.view.ViewGroup, viewType: Int) =
         ViewHolder(SurveyView(context, type))
@@ -22,14 +22,14 @@ class SurveysAdapter(
         surveys[position].let { survey ->
             reward = survey.value.rounded()
 
-            val rewardWithoutBonus = survey.value.toDouble() / (1 + bonusPercentage / 100.0)
+            val rewardWithoutBonus = survey.value.toDouble() / (1 + bonusPercentage)
             oldReward = rewardWithoutBonus.toString().rounded()
 
             colors = widgetColors
             rating = survey.rating
             loi = survey.loi.toInt()
             currency = currencyIcon
-            bonus = bonusPercentage
+            bonus = (bonusPercentage * 100).toInt()
         }
 
         setOnClickListener { view ->

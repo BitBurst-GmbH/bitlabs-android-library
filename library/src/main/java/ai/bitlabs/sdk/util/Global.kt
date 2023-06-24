@@ -2,7 +2,10 @@ package ai.bitlabs.sdk.util
 
 import ai.bitlabs.sdk.data.model.Category
 import ai.bitlabs.sdk.data.model.Survey
+import android.content.res.Resources
 import android.graphics.Color
+import android.util.TypedValue
+import kotlin.math.roundToInt
 import kotlin.random.Random
 
 internal const val TAG = "BitLabs"
@@ -48,3 +51,11 @@ internal fun String.snakeToCamelCase() = split("_")
 
 internal fun String.convertKeysToCamelCase() = Regex("\"([a-z]+(?:_[a-z]+)+)\":")
     .replace(this) { match -> match.groupValues[1].snakeToCamelCase().let { "\"$it\":" } }
+
+internal fun Number.toPx() = TypedValue.applyDimension(
+    TypedValue.COMPLEX_UNIT_DIP,
+    this.toFloat(),
+    Resources.getSystem().displayMetrics
+)
+
+internal fun String.rounded() = ((toDouble() * 100).roundToInt() / 100.0).toString()

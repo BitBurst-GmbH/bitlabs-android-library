@@ -1,5 +1,6 @@
 package ai.bitlabs.sdk.util
 
+import ai.bitlabs.sdk.views.WebActivity
 import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri

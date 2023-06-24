@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import ai.bitlabs.sdk.BitLabs;
+import ai.bitlabs.sdk.data.model.WidgetType;
 
 public class MainActivity extends AppCompatActivity {
     private final String TAG = "Example";
@@ -42,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.btn_get_surveys).setOnClickListener(view -> bitLabs.getSurveys(
                 surveys -> {
                     surveyLayout.removeAllViews();
-                    surveyLayout.addView(bitLabs.getSurveyWidgets(this, surveys));
+                    surveyLayout.addView(bitLabs.getSurveyWidgets(this, surveys, WidgetType.FULLWIDTH));
                 },
                 exception -> Log.e(TAG, "GetSurveysErr: " + exception.getMessage(), exception.getCause()))
         );

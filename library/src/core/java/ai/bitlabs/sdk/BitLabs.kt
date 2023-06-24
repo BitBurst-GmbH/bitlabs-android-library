@@ -29,6 +29,7 @@ object BitLabs {
     private var adId = ""
     private var token = ""
     private var currencyIconUrl = ""
+    private var bonusPercentage = 0.0
     private var headerColor = intArrayOf(0, 0)
     private var widgetColors = intArrayOf(0, 0)
 
@@ -127,11 +128,12 @@ object BitLabs {
         context: Context,
         surveys: List<Survey>,
         type: WidgetType = WidgetType.COMPACT
-    ) =
-        RecyclerView(context).apply {
-            layoutManager = LinearLayoutManager(context, HORIZONTAL, false)
-            adapter = SurveysAdapter(context, surveys, type, widgetColors)
+    ) = RecyclerView(context).apply {
+        layoutManager = LinearLayoutManager(context, HORIZONTAL, false)
+        getCurrencyIcon(currencyIconUrl, context.resources) {
+            adapter = SurveysAdapter(context, surveys, type, it, widgetColors, bonusPercentage)
         }
+    }
 
     fun getLeaderboard(onResponseListener: OnResponseListener<LeaderboardFragment?>) =
         bitLabsRepo?.getLeaderboard({
@@ -160,6 +162,12 @@ object BitLabs {
             }
 
             it.currency.symbol.run { currencyIconUrl = content.takeIf { isImage } ?: "" }
+            bonusPercentage = it.currency.bonusPercentage / 100.0
+
+
+            it.promotion?.bonusPercentage?.run {
+                bonusPercentage += this / 100.0 + this * bonusPercentage / 100.0
+            }
         },
         { Log.e(TAG, "$it") })
 

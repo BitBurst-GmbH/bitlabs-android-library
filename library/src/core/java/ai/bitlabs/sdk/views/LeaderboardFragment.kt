@@ -2,8 +2,7 @@ package ai.bitlabs.sdk.views
 
 import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.R
-import ai.bitlabs.sdk.data.model.OwnUser
-import ai.bitlabs.sdk.data.model.TopUser
+import ai.bitlabs.sdk.data.model.User
 import android.view.View
 import android.widget.TextView
 import androidx.fragment.app.Fragment
@@ -11,8 +10,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 class LeaderboardFragment(
-    private val topUsers: List<TopUser>,
-    private val ownUser: OwnUser?,
+    private val topUsers: List<User>,
+    private val ownUser: User?,
     private val currencyIconUrl: String,
     private val color: IntArray,
 ) : Fragment(R.layout.fragment_leaderboard) {

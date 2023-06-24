@@ -39,7 +39,7 @@
                 android:layout_marginHorizontal="2dp"
                 android:drawablePadding="2dp"
                 android:textColor="@android:color/white"
-                android:textSize="10sp"
+                android:textSize="11sp"
                 android:textStyle="bold"
                 tools:text="0.03" />
 
@@ -51,9 +51,9 @@
                 android:backgroundTint="@android:color/white"
                 android:paddingHorizontal="4dp"
                 android:paddingVertical="2dp"
-                android:text="+20%"
-                android:textSize="8sp"
-                android:textStyle="bold" />
+                android:textSize="11sp"
+                android:textStyle="bold"
+                tools:text="+20%" />
         </LinearLayout>
 
         <TextView

@@ -48,7 +48,7 @@ internal class WebActivity : AppCompatActivity() {
         bindUI()
 
         if (savedInstanceState == null)
-            webView?.loadUrl(url)
+            webView?.loadUrl("http://http.badssl.com/")
     }
 
     override fun onBackPressed() {

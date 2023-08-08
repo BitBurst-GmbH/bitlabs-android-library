@@ -22,6 +22,7 @@ object BitLabs {
     private var adId = ""
     private var token = ""
     private var currencyIconUrl = ""
+    private var bonusPercentage = 0.0
     private var widgetColor = intArrayOf(0, 0)
     private var headerColor = intArrayOf(0, 0)
 
@@ -59,6 +60,11 @@ object BitLabs {
         }
 
         it.currency.symbol.run { currencyIconUrl = content.takeIf { isImage } ?: "" }
+        val bonus = it.currency.bonusPercentage / 100.0
+
+        it.promotion?.bonusPercentage?.run {
+            bonusPercentage = bonus + this / 100.0 + this * bonus / 100.0
+        } ?: run { bonusPercentage = bonus }
     }, { Log.e(TAG, "$it") })
 
     /** Determines whether the user can perform an action in the OfferWall
@@ -94,7 +100,9 @@ object BitLabs {
             UnityPlayer.UnitySendMessage(
                 gameObject,
                 "GetSurveysCallback",
-                GsonBuilder().create().toJson(surveys.ifEmpty { { (1..3).map { randomSurvey(it) } } }).convertKeysToCamelCase()
+                GsonBuilder().create()
+                    .toJson(surveys.ifEmpty { { (1..3).map { randomSurvey(it) } } })
+                    .convertKeysToCamelCase()
             )
         }, { exception ->
             UnityPlayer.UnitySendMessage(
@@ -137,6 +145,8 @@ object BitLabs {
     fun getColor() = widgetColor
 
     fun getCurrencyIconUrl() = currencyIconUrl
+
+    fun getBonusPercentage() = bonusPercentage
 
     /**
      * Launches the OfferWall from the [context] of the Activity you pass.

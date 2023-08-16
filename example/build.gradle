@@ -4,7 +4,8 @@ def properties = new Properties()
 properties.load(project.rootProject.file('local.properties').newDataInputStream())
 
 android {
-    compileSdkVersion 31
+    compileSdk 31
+    ndkVersion '22.0.7026061'
 
     defaultConfig {
         applicationId 'ai.bitlabs.example'
@@ -15,7 +16,7 @@ android {
         buildConfigField 'String', 'APP_TOKEN', properties.getProperty('appToken', '"APP_TOKEN"')
     }
 
-    flavorDimensions "sdk"
+    flavorDimensions = ['sdk']
 
     productFlavors {
         core {}
@@ -26,12 +27,6 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-    ndkVersion '22.0.7026061'
-    buildToolsVersion '30.0.3'
-}
-
-repositories {
-    maven { url 'https://jitpack.io' }
 }
 
 dependencies {

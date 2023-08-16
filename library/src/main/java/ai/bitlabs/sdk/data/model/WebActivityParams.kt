@@ -22,9 +22,9 @@ internal data class WebActivityParams(
     /** Returns a string representation of the URL with all necessary parameters. */
     private fun buildUrl() = Uri
         .parse("https://web.bitlabs.ai").buildUpon()
+        .appendQueryParameter("os", "ANDROID")
         .appendQueryParameter("token", token)
         .appendQueryParameter("uid", uid)
-        .appendQueryParameter("os", "ANDROID")
         .appendQueryParameter("sdk", sdk)
         .apply { if (maid.isNotEmpty()) appendQueryParameter("maid", maid) }
         .apply { tags.forEach { tag -> appendQueryParameter(tag.key, tag.value.toString()) } }

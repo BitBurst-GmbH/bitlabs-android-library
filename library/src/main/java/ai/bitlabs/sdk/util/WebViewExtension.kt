@@ -14,7 +14,7 @@ import androidx.browser.customtabs.CustomTabsIntent
 /** Adds all necessary configurations for the its receiver [WebActivity.webView] */
 @SuppressLint("SetJavaScriptEnabled")
 fun WebView.setup(
-    context: Context, onShouldOverrideUrlLoading: (isPageOfferWall: Boolean, url: String) -> Unit
+    context: Context, onDoUpdateVisitedHistory: (isPageOfferWall: Boolean, url: String) -> Unit
 ) {
     if (Build.VERSION.SDK_INT >= 21) CookieManager.getInstance()
         .setAcceptThirdPartyCookies(this, true)
@@ -50,8 +50,8 @@ fun WebView.setup(
 
     this.webViewClient = object : WebViewClient() {
         override fun doUpdateVisitedHistory(view: WebView?, url: String?, isReload: Boolean) {
-            onShouldOverrideUrlLoading(
-                url?.contains("https://web.bitlabs.ai") ?: true,
+            onDoUpdateVisitedHistory(
+                url?.startsWith("https://web.bitlabs.ai") ?: true,
                 url ?: ""
             )
             super.doUpdateVisitedHistory(view, url, isReload)

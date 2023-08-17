@@ -27,10 +27,9 @@ internal class WebActivity : AppCompatActivity() {
 
     private lateinit var url: String
 
+    private var reward: Float = 0.0F
     private var clickId: String? = null
     private var colors = intArrayOf(0, 0)
-
-    private var reward: Float = 0.0F
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

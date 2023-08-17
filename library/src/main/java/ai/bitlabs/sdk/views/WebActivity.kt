@@ -24,7 +24,6 @@ internal class WebActivity : AppCompatActivity() {
 
     private var webView: WebView? = null
     private var toolbar: Toolbar? = null
-    private var closeButton: ImageView? = null
 
     private lateinit var url: String
 
@@ -95,17 +94,17 @@ internal class WebActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
 
-        closeButton = findViewById(R.id.iv_close_bitlabs)
-        closeButton?.setOnClickListener { finish() }
-        closeButton?.run {
-            DrawableCompat.setTint(drawable, if (isColorBright) Color.BLACK else Color.WHITE)
-        }
         toggleToolbar(true)
 
         webView = findViewById(R.id.wv_bitlabs)
         webView?.scrollBarStyle = WebView.SCROLLBARS_OUTSIDE_OVERLAY
 
         webView?.setup(this) { isPageOfferWall, url ->
+            if (url.contains("/close")) {
+                finish()
+                return@setup
+            }
+
             Log.i(TAG, "bindUI: $url")
             if (isPageOfferWall) {
                 if (url.contains("/survey-complete")
@@ -123,8 +122,6 @@ internal class WebActivity : AppCompatActivity() {
     /** Shows or hides some UI elements according to whether [isPageOfferWall] is `true` or `false`. */
     private fun toggleToolbar(isPageOfferWall: Boolean) {
         toolbar?.visibility = if (isPageOfferWall) View.GONE else View.VISIBLE
-        closeButton?.visibility = if (isPageOfferWall) View.VISIBLE else View.GONE
-        (if (isPageOfferWall) closeButton else toolbar)?.bringToFront()
 
         webView?.isScrollbarFadingEnabled = !isPageOfferWall
         webView?.settings?.run {

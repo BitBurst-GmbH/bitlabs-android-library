@@ -17,18 +17,6 @@
         app:title="@string/web_toolbar_header"
         app:titleTextColor="@android:color/white" />
 
-    <ImageView
-        android:id="@+id/iv_close_bitlabs"
-        android:layout_width="28dp"
-        android:layout_height="28dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:layout_margin="16dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:src="@drawable/ic_sign_out_regular"
-        android:visibility="visible" />
-
     <WebView
         android:id="@+id/wv_bitlabs"
         android:layout_width="match_parent"

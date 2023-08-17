@@ -34,21 +34,14 @@ fun WebView.setup(
             resultMsg.sendToTarget()
 
             newWebView.webViewClient = object : WebViewClient() {
-                @Deprecated("Deprecated in Java")
-                override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
-                    if (url.isNullOrEmpty()) return true
-                    CustomTabsIntent.Builder().build().launchUrl(context, Uri.parse(url))
-                    return false
-                }
-
-                @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-                override fun shouldOverrideUrlLoading(
+                override fun doUpdateVisitedHistory(
                     view: WebView?,
-                    request: WebResourceRequest?
-                ): Boolean {
-                    val url = request?.run { url.toString() } ?: return true
-                    CustomTabsIntent.Builder().build().launchUrl(context, Uri.parse(url))
-                    return false
+                    url: String?,
+                    isReload: Boolean
+                ) {
+                    if (!url.isNullOrEmpty())
+                        CustomTabsIntent.Builder().build().launchUrl(context, Uri.parse(url))
+                    super.doUpdateVisitedHistory(view, url, isReload)
                 }
             }
             return true

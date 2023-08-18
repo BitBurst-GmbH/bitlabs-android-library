@@ -10,8 +10,8 @@ android {
         applicationId 'ai.bitlabs.example'
         minSdkVersion 19
         targetSdkVersion 31
-        versionCode 35
-        versionName '3.1.7'
+        versionCode 37
+        versionName '3.1.9'
         buildConfigField 'String', 'APP_TOKEN', properties.getProperty('appToken', '"APP_TOKEN"')
     }
 

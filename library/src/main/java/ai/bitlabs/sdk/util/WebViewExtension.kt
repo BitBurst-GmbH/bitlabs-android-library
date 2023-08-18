@@ -44,6 +44,7 @@ fun WebView.setup(
                     super.doUpdateVisitedHistory(view, url, isReload)
                 }
             }
+
             return true
         }
     }

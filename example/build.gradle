@@ -1,19 +1,18 @@
 apply plugin: 'com.android.application'
 
-def properties = new Properties()
-properties.load(project.rootProject.file('local.properties').newDataInputStream())
+def keystore = new Properties()
+keystore.load(project.rootProject.file('keystore.properties').newDataInputStream())
 
 android {
-    compileSdk 31
-    ndkVersion '22.0.7026061'
+    compileSdk 33
 
     defaultConfig {
         applicationId 'ai.bitlabs.example'
         minSdkVersion 19
-        targetSdkVersion 31
+        targetSdkVersion 33
         versionCode 35
         versionName '3.1.7'
-        buildConfigField 'String', 'APP_TOKEN', properties.getProperty('appToken', '"APP_TOKEN"')
+        buildConfigField 'String', 'APP_TOKEN', keystore.getProperty('appToken', '"APP_TOKEN"')
     }
 
     flavorDimensions = ['sdk']

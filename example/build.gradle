@@ -1,37 +1,28 @@
 apply plugin: 'com.android.application'
 
-def properties = new Properties()
-properties.load(project.rootProject.file('local.properties').newDataInputStream())
+def keystore = new Properties()
+keystore.load(project.rootProject.file('keystore.properties').newDataInputStream())
 
 android {
-    compileSdkVersion 31
+    namespace 'ai.bitlabs.example'
+
+    compileSdk 31
 
     defaultConfig {
         applicationId 'ai.bitlabs.example'
         minSdkVersion 19
         targetSdkVersion 31
-        versionCode 37
-        versionName '3.1.9'
-        buildConfigField 'String', 'APP_TOKEN', properties.getProperty('appToken', '"APP_TOKEN"')
+        versionCode 38
+        versionName '3.1.10'
+        buildConfigField 'String', 'APP_TOKEN', keystore.getProperty('appToken', '"APP_TOKEN"')
     }
 
-    flavorDimensions "sdk"
+    flavorDimensions = ['sdk']
 
     productFlavors {
         core {}
         unity {}
     }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-    ndkVersion '22.0.7026061'
-    buildToolsVersion '30.0.3'
-}
-
-repositories {
-    maven { url 'https://jitpack.io' }
 }
 
 dependencies {

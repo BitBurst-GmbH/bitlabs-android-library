@@ -4,25 +4,17 @@ plugins {
     id 'maven-publish'
 }
 
-repositories {
-    mavenCentral()
-    google()
-}
-
-group 'ai.bitlabs'
-version '3.1.9'
-
 android {
-    compileSdkVersion 31
+    namespace 'ai.bitlabs.sdk'
+
+    compileSdk 31
 
     defaultConfig {
         minSdkVersion 19
         targetSdkVersion 31
-        versionCode 37
-        versionName version
     }
 
-    flavorDimensions 'sdk'
+    flavorDimensions = ['sdk']
 
     productFlavors {
         core {}
@@ -30,35 +22,30 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8.toString()
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 }
 
 dependencies {
-    implementation 'androidx.recyclerview:recyclerview:1.2.1'
     unityCompileOnly files('libs/classes.jar')
+
     implementation 'androidx.core:core-ktx:1.8.0'
     implementation 'androidx.browser:browser:1.4.0'
     implementation 'androidx.appcompat:appcompat:1.4.2'
+    implementation 'androidx.recyclerview:recyclerview:1.2.1'
 
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
 
     implementation 'com.caverock:androidsvg-aar:1.4'
 
-
     implementation 'com.google.android.gms:play-services-ads-identifier:18.0.1'
 }
 
 afterEvaluate {
     publishing {
-        publications {
-            // Creates two publications with different artifactIds
+        publications { // Creates two publications with different artifactIds
             core(MavenPublication) {
                 from components.coreRelease
                 artifactId = 'core'

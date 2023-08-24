@@ -4,12 +4,14 @@ def keystore = new Properties()
 keystore.load(project.rootProject.file('keystore.properties').newDataInputStream())
 
 android {
-    compileSdk 33
+    namespace 'ai.bitlabs.example'
+
+    compileSdk 31
 
     defaultConfig {
         applicationId 'ai.bitlabs.example'
         minSdkVersion 19
-        targetSdkVersion 33
+        targetSdkVersion 31
         versionCode 37
         versionName '3.1.9'
         buildConfigField 'String', 'APP_TOKEN', keystore.getProperty('appToken', '"APP_TOKEN"')

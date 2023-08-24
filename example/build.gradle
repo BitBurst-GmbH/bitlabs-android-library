@@ -1,12 +1,11 @@
 apply plugin: 'com.android.application'
 
 def keystore = new Properties()
-keystore.load(project.rootProject.file('keystore.properties').newDataInputStream())
+keystore.load(project.rootProject.file('local.properties').newDataInputStream())
 
 android {
     namespace 'ai.bitlabs.example'
 
-    compileSdk 31
     compileSdkVersion 31 // NOTE: For Jitpack Compatibility
 
     defaultConfig {

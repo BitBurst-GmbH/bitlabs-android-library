@@ -7,7 +7,6 @@ plugins {
 android {
     namespace 'ai.bitlabs.sdk'
 
-    compileSdk 31
     compileSdkVersion 31 // NOTE: For Jitpack Compatibility
 
     defaultConfig {
@@ -23,8 +22,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
 }
 
@@ -43,9 +42,6 @@ dependencies {
 
     implementation 'com.google.android.gms:play-services-ads-identifier:18.0.1'
 }
-
-group = 'ai.bitlabs.sdk'
-version = '3.1.11'
 
 afterEvaluate {
     publishing {

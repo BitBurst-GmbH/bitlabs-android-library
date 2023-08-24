@@ -44,6 +44,9 @@ dependencies {
     implementation 'com.google.android.gms:play-services-ads-identifier:18.0.1'
 }
 
+group = 'ai.bitlabs.sdk'
+version = '3.1.11'
+
 afterEvaluate {
     publishing {
         publications { // Creates two publications with different artifactIds

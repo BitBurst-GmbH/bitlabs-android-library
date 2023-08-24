@@ -7,6 +7,7 @@ android {
     namespace 'ai.bitlabs.example'
 
     compileSdk 31
+    compileSdkVersion 31 // NOTE: For Jitpack Compatibility
 
     defaultConfig {
         applicationId 'ai.bitlabs.example'

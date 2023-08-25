@@ -69,8 +69,7 @@ object BitLabs {
      * then there has been an internal error which is most probably logged with 'BitLabs' as a tag.
      */
     fun checkSurveys(
-        onResponseListener: OnResponseListener<Boolean>,
-        onExceptionListener: OnExceptionListener
+        onResponseListener: OnResponseListener<Boolean>, onExceptionListener: OnExceptionListener
     ) = ifInitialised {
         bitLabsRepo?.getSurveys("NATIVE", { surveys ->
             onResponseListener.onResponse(surveys.isNotEmpty())
@@ -125,9 +124,7 @@ object BitLabs {
      */
     @JvmOverloads
     fun getSurveyWidgets(
-        context: Context,
-        surveys: List<Survey>,
-        type: WidgetType = WidgetType.COMPACT
+        context: Context, surveys: List<Survey>, type: WidgetType = WidgetType.COMPACT
     ) = RecyclerView(context).apply {
         layoutManager = LinearLayoutManager(context, HORIZONTAL, false)
         getCurrencyIcon(currencyIconUrl, context.resources) {
@@ -136,9 +133,9 @@ object BitLabs {
     }
 
     fun getLeaderboard(onResponseListener: OnResponseListener<LeaderboardFragment?>) =
-        bitLabsRepo?.getLeaderboard({
-            onResponseListener.onResponse(it.topUsers?.run {
-                LeaderboardFragment(this, it.ownUser, currencyIconUrl, widgetColors)
+        bitLabsRepo?.getLeaderboard({ leaderboard ->
+            onResponseListener.onResponse(leaderboard.topUsers?.takeUnless { it.isEmpty() }?.run {
+                LeaderboardFragment(this, leaderboard.ownUser, currencyIconUrl, widgetColors)
             })
         }, { Log.e(TAG, "$it") })
 
@@ -146,30 +143,26 @@ object BitLabs {
         bitLabsRepo?.leaveSurvey(clickId, reason)
 
     internal fun getCurrencyIcon(
-        url: String,
-        resources: Resources,
-        onResponseListener: OnResponseListener<Drawable?>
+        url: String, resources: Resources, onResponseListener: OnResponseListener<Drawable?>
     ) = bitLabsRepo?.getCurrencyIcon(url, resources, onResponseListener)
 
     /**
      * Gets the required settings from the BitLabs API.
      */
-    private fun getAppSettings() = bitLabsRepo?.getAppSettings(
-        {
-            it.visual.run {
-                widgetColors = extractColors(surveyIconColor)
-                headerColor = extractColors(navigationColor)
-            }
+    private fun getAppSettings() = bitLabsRepo?.getAppSettings({
+        it.visual.run {
+            widgetColors = extractColors(surveyIconColor)
+            headerColor = extractColors(navigationColor)
+        }
 
-            it.currency.symbol.run { currencyIconUrl = content.takeIf { isImage } ?: "" }
-            bonusPercentage = it.currency.bonusPercentage / 100.0
+        it.currency.symbol.run { currencyIconUrl = content.takeIf { isImage } ?: "" }
+        bonusPercentage = it.currency.bonusPercentage / 100.0
 
 
-            it.promotion?.bonusPercentage?.run {
-                bonusPercentage += this / 100.0 + this * bonusPercentage / 100.0
-            }
-        },
-        { Log.e(TAG, "$it") })
+        it.promotion?.bonusPercentage?.run {
+            bonusPercentage += this / 100.0 + this * bonusPercentage / 100.0
+        }
+    }, { Log.e(TAG, "$it") })
 
     private fun determineAdvertisingInfo(context: Context) = Thread {
         try {

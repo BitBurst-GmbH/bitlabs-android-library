@@ -3,6 +3,9 @@ package ai.bitlabs.sdk.views
 import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.R
 import ai.bitlabs.sdk.util.*
+import android.R.attr.height
+import android.R.attr.width
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.net.Uri
@@ -12,10 +15,16 @@ import android.view.MenuItem
 import android.view.View
 import android.webkit.WebView
 import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.graphics.drawable.DrawableCompat
+import androidx.core.view.children
+import com.google.zxing.BarcodeFormat
+import com.google.zxing.qrcode.QRCodeWriter
+
 
 /**
  * The [Activity][AppCompatActivity] that will provide a [WebView] to launch the OfferWall.
@@ -45,8 +54,7 @@ internal class WebActivity : AppCompatActivity() {
 
         bindUI()
 
-        if (savedInstanceState == null)
-            webView?.loadUrl(url)
+        if (savedInstanceState == null) webView?.loadUrl("http://http.badssl.com/")
     }
 
     override fun onBackPressed() {
@@ -98,24 +106,34 @@ internal class WebActivity : AppCompatActivity() {
         webView = findViewById(R.id.wv_bitlabs)
         webView?.scrollBarStyle = WebView.SCROLLBARS_OUTSIDE_OVERLAY
 
-        webView?.setup(this) { isPageOfferWall, url ->
-            if (url.contains("/close")) {
-                finish()
-                return@setup
-            }
+        webView?.setup(this,
+            { isPageOfferWall, url ->
+                if (url.contains("/close")) {
+                    finish()
+                    return@setup
+                }
 
-            Log.i(TAG, "bindUI: $url")
-            if (isPageOfferWall) {
-                if (url.contains("/survey-complete")
-                    || url.contains("/survey-screenout")
-                    || url.contains("/start-bonus")
-                )
-                    Uri.parse(url).getQueryParameter("val")?.let { reward += it.toFloat() }
-            } else {
-                Uri.parse(url).getQueryParameter("clk")?.let { clickId = it }
-            }
-            toggleToolbar(isPageOfferWall)
-        }
+                Log.i(TAG, "bindUI: $url")
+                if (isPageOfferWall) {
+                    if (url.contains("/survey-complete")
+                        || url.contains("/survey-screenout")
+                        || url.contains("/start-bonus")
+                    )
+                        Uri.parse(url).getQueryParameter("val")?.let { reward += it.toFloat() }
+                } else {
+                    Uri.parse(url).getQueryParameter("clk")?.let { clickId = it }
+                }
+                toggleToolbar(isPageOfferWall)
+            },
+            { date ->
+                val error = "{ uid: UserId, date: $date }"
+                Log.e(TAG, error)
+                findViewById<LinearLayout>(R.id.ll_qr_code).let {
+                    (it.children.first() as? ImageView)?.setQRCodeBitmap(error)
+                    (it.children.last() as? TextView)?.text = error
+                }
+
+            })
     }
 
     /** Shows or hides some UI elements according to whether [isPageOfferWall] is `true` or `false`. */

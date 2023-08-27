@@ -18,5 +18,6 @@
     <string name="leaderboard_own_user_rank" translatable="false">
         You are currently ranked %d on our leaderboard.
     </string>
+    <string name="qrcode">QRCode</string>
 
 </resources>

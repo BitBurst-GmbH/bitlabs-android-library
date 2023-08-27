@@ -3,8 +3,12 @@ package ai.bitlabs.sdk.util
 import ai.bitlabs.sdk.data.model.Category
 import ai.bitlabs.sdk.data.model.Survey
 import android.content.res.Resources
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.util.TypedValue
+import android.widget.ImageView
+import com.google.zxing.BarcodeFormat
+import com.google.zxing.qrcode.QRCodeWriter
 import kotlin.math.roundToInt
 import kotlin.random.Random
 
@@ -59,3 +63,12 @@ internal fun Number.toPx() = TypedValue.applyDimension(
 )
 
 internal fun String.rounded() = ((toDouble() * 100).roundToInt() / 100.0).toString()
+
+internal fun ImageView.setQRCodeBitmap(value: String) = Bitmap
+    .createBitmap(512, 512, Bitmap.Config.RGB_565)
+    .apply {
+        val bitMtx = QRCodeWriter().encode(value, BarcodeFormat.QR_CODE, 512, 512)
+        for (x in 0 until 512)
+            for (y in 0 until 512)
+                setPixel(x, y, if (bitMtx.get(x, y)) Color.BLACK else Color.WHITE)
+    }.let { setImageBitmap(it) }

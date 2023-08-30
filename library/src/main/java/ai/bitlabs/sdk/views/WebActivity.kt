@@ -10,6 +10,7 @@ import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.Bundle
+import android.util.Base64
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
@@ -54,12 +55,11 @@ internal class WebActivity : AppCompatActivity() {
 
         bindUI()
 
-        if (savedInstanceState == null) webView?.loadUrl("http://http.badssl.com/")
+        if (savedInstanceState == null) webView?.loadUrl(url)
     }
 
     override fun onBackPressed() {
-        if (toolbar?.visibility == View.VISIBLE)
-            showLeaveSurveyAlertDialog()
+        if (toolbar?.visibility == View.VISIBLE) showLeaveSurveyAlertDialog()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -106,34 +106,32 @@ internal class WebActivity : AppCompatActivity() {
         webView = findViewById(R.id.wv_bitlabs)
         webView?.scrollBarStyle = WebView.SCROLLBARS_OUTSIDE_OVERLAY
 
-        webView?.setup(this,
-            { isPageOfferWall, url ->
-                if (url.contains("/close")) {
-                    finish()
-                    return@setup
-                }
+        webView?.setup(this, { isPageOfferWall, url ->
+            if (url.contains("/close")) {
+                finish()
+                return@setup
+            }
 
-                Log.i(TAG, "bindUI: $url")
-                if (isPageOfferWall) {
-                    if (url.contains("/survey-complete")
-                        || url.contains("/survey-screenout")
-                        || url.contains("/start-bonus")
+            Log.i(TAG, "bindUI: $url")
+            if (isPageOfferWall) {
+                if (url.contains("/survey-complete") || url.contains("/survey-screenout") || url.contains(
+                        "/start-bonus"
                     )
-                        Uri.parse(url).getQueryParameter("val")?.let { reward += it.toFloat() }
-                } else {
-                    Uri.parse(url).getQueryParameter("clk")?.let { clickId = it }
-                }
-                toggleToolbar(isPageOfferWall)
-            },
-            { date ->
-                val error = "{ uid: UserId, date: $date }"
-                Log.e(TAG, error)
-                findViewById<LinearLayout>(R.id.ll_qr_code).let {
-                    (it.children.first() as? ImageView)?.setQRCodeBitmap(error)
-                    (it.children.last() as? TextView)?.text = error
-                }
+                ) Uri.parse(url).getQueryParameter("val")?.let { reward += it.toFloat() }
+            } else {
+                Uri.parse(url).getQueryParameter("clk")?.let { clickId = it }
+            }
+            toggleToolbar(isPageOfferWall)
+        }, { date ->
+            val error = "{ uid: UserId, date: $date }".toByteArray()
+                .let { Base64.encodeToString(it, Base64.DEFAULT) }
 
-            })
+            findViewById<LinearLayout>(R.id.ll_qr_code)?.let {
+                it.visibility = View.VISIBLE
+                (it.children.last() as? TextView)?.text = getString(R.string.error_id, error).trim()
+                (it.children.first() as? ImageView)?.setQRCodeBitmap(error)
+            }
+        })
     }
 
     /** Shows or hides some UI elements according to whether [isPageOfferWall] is `true` or `false`. */
@@ -157,15 +155,14 @@ internal class WebActivity : AppCompatActivity() {
             getString(R.string.leave_reason_too_long),
             getString(R.string.leave_reason_other)
         )
-        AlertDialog.Builder(this)
-            .setTitle(getString(R.string.leave_dialog_title))
+        AlertDialog.Builder(this).setTitle(getString(R.string.leave_dialog_title))
             .setItems(optionsDisplay) { _, which -> leaveSurvey(options[which]) }
-            .setNegativeButton(getString(R.string.leave_dialog_continue)) { _, _ -> }
-            .show()
+            .setNegativeButton(getString(R.string.leave_dialog_continue)) { _, _ -> }.show()
     }
 
     /** Loads the OfferWall page and sends the [reason] to the API */
     private fun leaveSurvey(reason: String) {
+        findViewById<LinearLayout>(R.id.ll_qr_code)?.visibility = View.GONE
         toggleToolbar(true)
         webView?.loadUrl(url)
 

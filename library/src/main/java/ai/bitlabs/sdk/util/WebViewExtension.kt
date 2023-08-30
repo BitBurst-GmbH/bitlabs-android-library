@@ -6,7 +6,6 @@ import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.os.Message
-import android.util.Log
 import android.view.View
 import android.webkit.*
 import androidx.annotation.RequiresApi

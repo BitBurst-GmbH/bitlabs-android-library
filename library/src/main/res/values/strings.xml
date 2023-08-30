@@ -19,4 +19,11 @@
         You are currently ranked %d on our leaderboard.
     </string>
 
+    <string name="error_id" translatable="false">Error ID:\n%1$s</string>
+
+    <!--    CONTENT DESCRIPTION    -->
+    <string name="qrcode" translatable="false">QRCode</string>
+    <string name="start" translatable="false">Start</string>
+    <string name="earn" translatable="false">EARN</string>
+    <string name="earn_now" translatable="false">EARN NOW</string>
 </resources>

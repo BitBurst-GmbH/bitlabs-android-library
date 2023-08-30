@@ -15,7 +15,7 @@
         android:layout_height="52dp"
         android:layout_gravity="center"
         android:layout_marginEnd="8dp"
-        android:contentDescription="Start"
+        android:contentDescription="@string/start"
         android:src="@drawable/ic_circle_play_light"
         app:tint="@android:color/white" />
 

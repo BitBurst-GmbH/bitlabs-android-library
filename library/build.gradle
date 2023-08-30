@@ -25,6 +25,10 @@ android {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_17.toString()
+    }
 }
 
 dependencies {
@@ -38,6 +42,7 @@ dependencies {
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
 
+    implementation 'com.google.zxing:core:3.5.2'
     implementation 'com.caverock:androidsvg-aar:1.4'
 
     implementation 'com.google.android.gms:play-services-ads-identifier:18.0.1'

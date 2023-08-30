@@ -106,7 +106,7 @@
         android:background="@drawable/background_card_white"
         android:paddingHorizontal="20dp"
         android:paddingVertical="4dp"
-        android:text="EARN NOW"
+        android:text="@string/earn_now"
         android:textColor="@color/colorPrimaryDark"
         android:textStyle="bold" />
 </FrameLayout>

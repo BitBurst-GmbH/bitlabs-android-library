@@ -14,7 +14,9 @@ import androidx.browser.customtabs.CustomTabsIntent
 /** Adds all necessary configurations for the its receiver [WebActivity.webView] */
 @SuppressLint("SetJavaScriptEnabled")
 fun WebView.setup(
-    context: Context, onDoUpdateVisitedHistory: (isPageOfferWall: Boolean, url: String) -> Unit
+    context: Context,
+    onDoUpdateVisitedHistory: (isPageOfferWall: Boolean, url: String) -> Unit,
+    onError: (date: String) -> Unit,
 ) {
     if (Build.VERSION.SDK_INT >= 21) CookieManager.getInstance()
         .setAcceptThirdPartyCookies(this, true)
@@ -61,6 +63,16 @@ fun WebView.setup(
         @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
         override fun onPageFinished(view: WebView?, url: String?) {
             CookieManager.getInstance().flush()
+        }
+
+        @RequiresApi(Build.VERSION_CODES.M)
+        override fun onReceivedError(
+            view: WebView?,
+            request: WebResourceRequest?,
+            error: WebResourceError?
+        ) {
+            onError(System.currentTimeMillis().toString())
+            super.onReceivedError(view, request, error)
         }
     }
 

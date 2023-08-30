@@ -78,7 +78,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginStart="8dp"
-                android:contentDescription="Start"
+                android:contentDescription="@string/start"
                 android:scaleType="centerInside"
                 android:src="@drawable/ic_circle_play_light"
                 app:tint="@color/colorPrimaryDark" />
@@ -93,7 +93,7 @@
                     android:id="@+id/tv_earn_now"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="EARN"
+                    android:text="@string/earn"
                     android:textColor="@color/colorPrimaryDark"
                     android:textStyle="bold" />
 
@@ -133,10 +133,10 @@
                 android:background="@drawable/background_card_gradient"
                 android:paddingHorizontal="4dp"
                 android:paddingVertical="2dp"
-                android:text="+20%"
                 android:textColor="@android:color/white"
                 android:textSize="10sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                tools:text="+20%" />
         </LinearLayout>
 
     </FrameLayout>

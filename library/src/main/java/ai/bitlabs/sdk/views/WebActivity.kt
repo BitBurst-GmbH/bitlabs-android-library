@@ -2,10 +2,12 @@ package ai.bitlabs.sdk.views
 
 import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.R
-import ai.bitlabs.sdk.util.*
-import android.R.attr.height
-import android.R.attr.width
-import android.graphics.Bitmap
+import ai.bitlabs.sdk.util.BUNDLE_KEY_COLOR
+import ai.bitlabs.sdk.util.BUNDLE_KEY_PARAMS
+import ai.bitlabs.sdk.util.TAG
+import ai.bitlabs.sdk.util.getLuminance
+import ai.bitlabs.sdk.util.setQRCodeBitmap
+import ai.bitlabs.sdk.util.setup
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.net.Uri
@@ -23,8 +25,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.children
-import com.google.zxing.BarcodeFormat
-import com.google.zxing.qrcode.QRCodeWriter
 
 
 /**

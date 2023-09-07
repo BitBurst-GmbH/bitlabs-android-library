@@ -53,8 +53,8 @@ internal fun String.snakeToCamelCase() = split("_")
     .joinToString("") { it.replaceFirstChar { c -> c.uppercase() } }
     .replaceFirstChar { c -> c.lowercase() }
 
-internal fun String.convertKeysToCamelCase() = Regex("\"([a-z]+(?:_[a-z]+)+)\":")
-    .replace(this) { match -> match.groupValues[1].snakeToCamelCase().let { "\"$it\":" } }
+//internal fun String.convertKeysToCamelCase() = Regex("\"([a-z]+(?:_[a-z]+)+)\":")
+//    .replace(this) { match -> match.groupValues[1].snakeToCamelCase().let { "\"$it\":" } }
 
 internal fun Number.toPx() = TypedValue.applyDimension(
     TypedValue.COMPLEX_UNIT_DIP,
@@ -62,7 +62,11 @@ internal fun Number.toPx() = TypedValue.applyDimension(
     Resources.getSystem().displayMetrics
 )
 
-internal fun String.rounded() = ((toDouble() * 100).roundToInt() / 100.0).toString()
+internal fun String.rounded() = with(((toDouble() * 100).roundToInt() / 100.0)) {
+    if (this % 1.0 == 0.0) String.format("%.0f", this)
+    else this.toString()
+}
+
 
 internal fun ImageView.setQRCodeBitmap(value: String) = Bitmap
     .createBitmap(512, 512, Bitmap.Config.RGB_565)

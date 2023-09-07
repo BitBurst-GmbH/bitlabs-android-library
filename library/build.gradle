@@ -12,6 +12,8 @@ android {
     defaultConfig {
         minSdkVersion 19
         targetSdkVersion 31
+        multiDexEnabled true
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     flavorDimensions = ['sdk']
@@ -46,6 +48,13 @@ dependencies {
     implementation 'com.caverock:androidsvg-aar:1.4'
 
     implementation 'com.google.android.gms:play-services-ads-identifier:18.0.1'
+
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation "com.google.truth:truth:1.1.4"
+
+    androidTestImplementation 'androidx.test:rules:1.4.0'
+    androidTestImplementation 'androidx.test:runner:1.4.0'
+    androidTestImplementation 'com.google.truth:truth:1.1.4'
 }
 
 afterEvaluate {

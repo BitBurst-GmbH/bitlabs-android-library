@@ -31,7 +31,9 @@ internal fun extractColors(color: String) =
             .split(",\\s".toRegex())
             .map { Color.parseColor(it.trim()) }
             .toIntArray()
-    } ?: intArrayOf(Color.parseColor(color), Color.parseColor(color))
+    } ?: Regex("""#([0-9a-fA-F]{6})""").find(color)?.run {
+        intArrayOf(Color.parseColor(groupValues[0]), Color.parseColor(groupValues[0]))
+    } ?: intArrayOf()
 
 internal fun randomSurvey(i: Int) = with(Random(i)) {
     Survey(

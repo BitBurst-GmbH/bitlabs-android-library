@@ -6,7 +6,7 @@ import org.junit.Test
 class GlobalKtTest {
 
     @Test
-    fun rounded_WhenTwoOrMoreDecimalPoints_ExpectTwoDecimalPoints() {
+    fun rounded_TwoOrMoreDecimalPoints_TwoDecimalPoints() {
         val numStr = "1.23456789"
         val expected = "1.23"
 
@@ -15,7 +15,7 @@ class GlobalKtTest {
     }
 
     @Test
-    fun rounded_WhenOneDecimalPoints_ExpectTwoDecimalPoints() {
+    fun rounded_OneDecimalPoints_OneDecimalPoints() {
         val numStr = "1.2"
         val expected = "1.2"
 
@@ -24,7 +24,7 @@ class GlobalKtTest {
     }
 
     @Test
-    fun rounded_WhenNoDecimalPoints_ExpectNoDecimalPoints() {
+    fun rounded_NoDecimalPoints_NoDecimalPoints() {
         val numStr = "1"
         val expected = "1"
 
@@ -33,7 +33,7 @@ class GlobalKtTest {
     }
 
     @Test
-    fun snakeToCamelCase_WhenSnakeCase_ExpectCamelCase() {
+    fun snakeToCamelCase_SnakeCase_CamelCase() {
         val snakeCase = "snake_case"
         val expected = "snakeCase"
 
@@ -42,7 +42,7 @@ class GlobalKtTest {
     }
 
     @Test
-    fun snakeToCamelCase_WhenCamelCase_ExpectCamelCase() {
+    fun snakeToCamelCase_CamelCase_CamelCase() {
         val snakeCase = "camelCase"
         val expected = "camelCase"
 
@@ -51,7 +51,7 @@ class GlobalKtTest {
     }
 
     @Test
-    fun snakeToCamelCase_WhenUnderscoreAtFirst_ExpectCamelCase() {
+    fun snakeToCamelCase_UnderscoreAtFirst_CamelCase() {
         val snakeCase = "_snake_case"
         val expected = "snakeCase"
 
@@ -60,7 +60,7 @@ class GlobalKtTest {
     }
 
     @Test
-    fun snakeToCamelCase_WhenUnderscoreAtLast_ExpectCamelCase() {
+    fun snakeToCamelCase_UnderscoreAtLast_CamelCase() {
         val snakeCase = "snake_case_"
         val expected = "snakeCase"
 

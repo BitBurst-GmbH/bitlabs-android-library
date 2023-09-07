@@ -149,17 +149,17 @@ object BitLabs {
     /**
      * Gets the required settings from the BitLabs API.
      */
-    private fun getAppSettings() = bitLabsRepo?.getAppSettings({
-        it.visual.run {
-            widgetColors = extractColors(surveyIconColor)
-            headerColor = extractColors(navigationColor)
+    private fun getAppSettings() = bitLabsRepo?.getAppSettings({ app ->
+        app.visual.run {
+            widgetColors = extractColors(surveyIconColor).takeIf { it.isNotEmpty() } ?: widgetColors
+            headerColor = extractColors(navigationColor).takeIf { it.isNotEmpty() } ?: headerColor
         }
 
-        it.currency.symbol.run { currencyIconUrl = content.takeIf { isImage } ?: "" }
-        bonusPercentage = it.currency.bonusPercentage / 100.0
+        app.currency.symbol.run { currencyIconUrl = content.takeIf { isImage } ?: "" }
+        bonusPercentage = app.currency.bonusPercentage / 100.0
 
 
-        it.promotion?.bonusPercentage?.run {
+        app.promotion?.bonusPercentage?.run {
             bonusPercentage += this / 100.0 + this * bonusPercentage / 100.0
         }
     }, { Log.e(TAG, "$it") })

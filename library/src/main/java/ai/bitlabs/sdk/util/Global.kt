@@ -14,9 +14,11 @@ import kotlin.random.Random
 
 internal const val TAG = "BitLabs"
 
-internal const val BUNDLE_KEY_PARAMS = "bundle-key-params"
+internal const val BASE_URL = "https://api.bitlabs.ai/"
 
 internal const val BUNDLE_KEY_COLOR = "bundle-key-color"
+
+internal const val BUNDLE_KEY_PARAMS = "bundle-key-params"
 
 internal fun getLuminance(color: Int) =
     0.2126 * Color.red(color) + 0.7152 * Color.green(color) + 0.0722 * Color.blue(color)

@@ -13,6 +13,7 @@ android {
         minSdkVersion 19
         targetSdkVersion 31
         multiDexEnabled true
+
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -50,11 +51,13 @@ dependencies {
     implementation 'com.google.android.gms:play-services-ads-identifier:18.0.1'
 
     testImplementation 'junit:junit:4.13.2'
-    testImplementation "com.google.truth:truth:1.1.4"
+    testImplementation 'io.mockk:mockk:1.13.1'
+    testImplementation 'com.google.truth:truth:1.1.4'
 
-    androidTestImplementation 'androidx.test:rules:1.4.0'
-    androidTestImplementation 'androidx.test:runner:1.4.0'
-    androidTestImplementation 'com.google.truth:truth:1.1.4'
+    androidTestImplementation 'androidx.test:rules:1.5.0'
+    androidTestImplementation 'androidx.test:runner:1.5.2'
+    androidTestImplementation 'androidx.test.ext:truth:1.5.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 }
 
 afterEvaluate {

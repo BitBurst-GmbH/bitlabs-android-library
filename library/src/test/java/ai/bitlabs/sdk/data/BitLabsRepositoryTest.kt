@@ -8,10 +8,13 @@ import ai.bitlabs.sdk.data.model.Survey
 import ai.bitlabs.sdk.data.network.BitLabsAPI
 import ai.bitlabs.sdk.util.OnExceptionListener
 import ai.bitlabs.sdk.util.OnResponseListener
+import android.util.Log
 import io.mockk.MockKAnnotations
 import io.mockk.every
+import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
+import io.mockk.mockkStatic
 import io.mockk.verify
 import okhttp3.MediaType
 import okhttp3.Request
@@ -31,6 +34,7 @@ class BitLabsRepositoryTest {
     @MockK(relaxed = true)
     private lateinit var onExceptionListener: OnExceptionListener
 
+    @InjectMockKs
     private lateinit var bitLabsRepository: BitLabsRepository
 
     private inline fun <reified T : Any> getWorkingResponseBody() =
@@ -39,7 +43,62 @@ class BitLabsRepositoryTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
-        bitLabsRepository = BitLabsRepository(bitLabsAPI)
+    }
+
+    @Test
+    fun leaveSurvey_Failure() {
+        mockkStatic(Log::class)
+        every { Log.e(any(), any()) } returns 0
+
+        every { bitLabsAPI.updateClick(any(), any()) } returns object :
+            BitLabsCall<BitLabsResponse<Unit>>() {
+            override fun enqueue(callback: Callback<BitLabsResponse<Unit>>) {
+                callback.onFailure(this, Throwable())
+            }
+        }
+
+        bitLabsRepository.leaveSurvey("", "")
+
+        verify { Log.e(any(), any()) }
+    }
+
+    @Test
+    fun leaveSurvey_Response_Error() {
+        mockkStatic(Log::class)
+        every { Log.e(any(), any()) } returns 0
+
+        val errorResponseBody = ResponseBody.create(
+            MediaType.parse("application/json"),
+            "{error:{details:{http:400,msg:\"Any Request\"}}, status:\"\"}"
+        )
+
+        every { bitLabsAPI.updateClick(any(), any()) } returns object :
+            BitLabsCall<BitLabsResponse<Unit>>() {
+            override fun enqueue(callback: Callback<BitLabsResponse<Unit>>) {
+                callback.onResponse(this, Response.error(400, errorResponseBody))
+            }
+        }
+
+        bitLabsRepository.leaveSurvey("", "")
+
+        verify { Log.e(any(), any()) }
+    }
+
+    @Test
+    fun leaveSurvey_Response_Success() {
+        mockkStatic(Log::class)
+        every { Log.i(any(), any()) } returns 0
+
+        every { bitLabsAPI.updateClick(any(), any()) } returns object :
+            BitLabsCall<BitLabsResponse<Unit>>() {
+            override fun enqueue(callback: Callback<BitLabsResponse<Unit>>) {
+                callback.onResponse(this, Response.success(getWorkingResponseBody()))
+            }
+        }
+
+        bitLabsRepository.leaveSurvey("", "")
+
+        verify { Log.i(any(), any()) }
     }
 
     @Test
@@ -128,8 +187,6 @@ class BitLabsRepositoryTest {
     @Test
     fun getAppSettings_Response_Success() {
         val onResponseListener = mockk<OnResponseListener<GetAppSettingsResponse>>(relaxed = true)
-        val responseBody =
-            BitLabsResponse(mockk<GetAppSettingsResponse>(), null, "", "")
 
         every { bitLabsAPI.getAppSettings() } returns object :
             BitLabsCall<BitLabsResponse<GetAppSettingsResponse>>() {

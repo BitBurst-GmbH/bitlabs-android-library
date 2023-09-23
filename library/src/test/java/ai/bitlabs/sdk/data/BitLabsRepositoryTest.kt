@@ -46,8 +46,7 @@ class BitLabsRepositoryTest {
     }
 
     @Test
-    fun leaveSurvey_Failure() {
-        mockkStatic(Log::class)
+    fun leaveSurvey_Failure() = mockkStatic(Log::class) {
         every { Log.e(any(), any()) } returns 0
 
         every { bitLabsAPI.updateClick(any(), any()) } returns object :
@@ -63,8 +62,7 @@ class BitLabsRepositoryTest {
     }
 
     @Test
-    fun leaveSurvey_Response_Error() {
-        mockkStatic(Log::class)
+    fun leaveSurvey_Response_Error() = mockkStatic(Log::class) {
         every { Log.e(any(), any()) } returns 0
 
         val errorResponseBody = ResponseBody.create(
@@ -85,8 +83,7 @@ class BitLabsRepositoryTest {
     }
 
     @Test
-    fun leaveSurvey_Response_Success() {
-        mockkStatic(Log::class)
+    fun leaveSurvey_Response_Success() = mockkStatic(Log::class) {
         every { Log.i(any(), any()) } returns 0
 
         every { bitLabsAPI.updateClick(any(), any()) } returns object :

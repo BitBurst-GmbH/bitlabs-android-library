@@ -1,5 +1,7 @@
 package ai.bitlabs.sdk.views
 
+import ai.bitlabs.sdk.BitLabs
+import ai.bitlabs.sdk.BuildConfig
 import ai.bitlabs.sdk.R
 import ai.bitlabs.sdk.util.BUNDLE_KEY_COLOR
 import ai.bitlabs.sdk.util.BUNDLE_KEY_URL
@@ -12,19 +14,27 @@ import androidx.lifecycle.Lifecycle
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.action.ViewActions.pressBack
+import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.matcher.RootMatchers.isDialog
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+import androidx.test.espresso.matcher.ViewMatchers.isRoot
 import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.matcher.ViewMatchers.withText
 import com.google.common.truth.Truth.assertThat
-import org.junit.Before
+import io.mockk.every
+import io.mockk.mockkObject
+import io.mockk.verify
+import org.hamcrest.Matchers.not
 import org.junit.Test
+
+private const val TOKEN = BuildConfig.APP_TOKEN
+private const val UID = "diffindocongress"
 
 class WebActivityTest {
 
-    private lateinit var context: Context
-
-    @Before
-    fun setUp() {
-        context = ApplicationProvider.getApplicationContext()
-    }
+    private val context = ApplicationProvider.getApplicationContext<Context>()
 
     @Test
     fun urlExtra_No_BUNDLE_KEY_URL_DestroyActivity() {
@@ -138,6 +148,92 @@ class WebActivityTest {
                 assertThat(view).isInstanceOf(Toolbar::class.java)
                 val gradient = view.background as GradientDrawable
                 assertThat(gradient.colors).isEqualTo(colors)
+            }
+        }
+    }
+
+    @Test
+    fun toolbar_PageIsBitlabsOfferwall_IsNotDisplayed() {
+        val intent = Intent(context, WebActivity::class.java).apply {
+            putExtra(BUNDLE_KEY_URL, "https://web.bitlabs.ai&token=$TOKEN&uid=$UID")
+        }
+
+        ActivityScenario.launch<WebActivity>(intent).use {
+            onView(withId(R.id.toolbar_bitlabs)).check(matches(not(isDisplayed())))
+        }
+    }
+
+    @Test
+    fun toolbar_PageIsNotOfferwall_IsDisplayed() {
+        val intent = Intent(context, WebActivity::class.java).apply {
+            putExtra(BUNDLE_KEY_URL, "https://www.google.com")
+        }
+
+        ActivityScenario.launch<WebActivity>(intent).use {
+            Thread.sleep(500)
+            onView(withId(R.id.toolbar_bitlabs)).check(matches(isDisplayed()))
+        }
+    }
+
+    @Test
+    fun onBackPressed_PageIsNotOfferwall_ShowLeaveSurveyDialog() {
+        val intent = Intent(context, WebActivity::class.java).apply {
+            putExtra(BUNDLE_KEY_URL, "https://www.google.com")
+        }
+
+        ActivityScenario.launch<WebActivity>(intent).use {
+            Thread.sleep(500)
+            onView(isRoot()).perform(pressBack())
+            onView(withId(androidx.appcompat.R.id.alertTitle)).inRoot(isDialog())
+                .check(matches(isDisplayed()))
+        }
+    }
+
+    @Test
+    fun leaveSurveyDialog_AnyOptionClicked_LeaveSurveyCalled() {
+        val url = "https://www.google.com?clk=fjasdljk"
+        // clk because without it LeaveSurvey is not called
+        val intent = Intent(context, WebActivity::class.java).putExtra(BUNDLE_KEY_URL, url)
+
+        mockkObject(BitLabs) {
+            every { BitLabs.leaveSurvey(any(), any()) } returns Unit
+
+            ActivityScenario.launch<WebActivity>(intent).use {
+                Thread.sleep(500)
+                onView(isRoot()).perform(pressBack())
+
+                onView(withText(R.string.leave_reason_other)).inRoot(isDialog())
+                    .check(matches(isDisplayed())).perform(click())
+
+                verify { BitLabs.leaveSurvey(any(), any()) }
+
+                onView(isRoot()).perform(pressBack())
+
+                onView(withText(R.string.leave_reason_sensitive)).inRoot(isDialog())
+                    .check(matches(isDisplayed())).perform(click())
+
+                verify { BitLabs.leaveSurvey(any(), any()) }
+
+                onView(isRoot()).perform(pressBack())
+
+                onView(withText(R.string.leave_reason_technical)).inRoot(isDialog())
+                    .check(matches(isDisplayed())).perform(click())
+
+                verify { BitLabs.leaveSurvey(any(), any()) }
+
+                onView(isRoot()).perform(pressBack())
+
+                onView(withText(R.string.leave_reason_uninteresting)).inRoot(isDialog())
+                    .check(matches(isDisplayed())).perform(click())
+
+                verify { BitLabs.leaveSurvey(any(), any()) }
+
+                onView(isRoot()).perform(pressBack())
+
+                onView(withText(R.string.leave_reason_too_long)).inRoot(isDialog())
+                    .check(matches(isDisplayed())).perform(click())
+
+                verify { BitLabs.leaveSurvey(any(), any()) }
             }
         }
     }

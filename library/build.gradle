@@ -4,6 +4,9 @@ plugins {
     id 'maven-publish'
 }
 
+def keystore = new Properties()
+keystore.load(project.rootProject.file('local.properties').newDataInputStream())
+
 android {
     namespace 'ai.bitlabs.sdk'
 
@@ -13,6 +16,8 @@ android {
         minSdkVersion 19
         targetSdkVersion 31
         multiDexEnabled true
+
+        buildConfigField 'String', 'APP_TOKEN', keystore.getProperty('appToken', '"APP_TOKEN"')
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -31,6 +36,10 @@ android {
 
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
+    }
+
+    packagingOptions {
+        resources.excludes.add("META-INF/*")
     }
 }
 
@@ -56,6 +65,7 @@ dependencies {
 
     androidTestImplementation 'androidx.test:rules:1.5.0'
     androidTestImplementation 'androidx.test:runner:1.5.2'
+    androidTestImplementation 'io.mockk:mockk-android:1.13.1'
     androidTestImplementation 'androidx.test.ext:truth:1.5.0'
     androidTestImplementation 'androidx.test.espresso:espresso-web:3.5.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'

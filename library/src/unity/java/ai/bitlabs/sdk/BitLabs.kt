@@ -2,6 +2,7 @@ package ai.bitlabs.sdk
 
 import ai.bitlabs.sdk.data.BitLabsRepository
 import ai.bitlabs.sdk.data.model.WebActivityParams
+import ai.bitlabs.sdk.data.network.BitLabsAPI
 import ai.bitlabs.sdk.util.*
 import ai.bitlabs.sdk.views.WebActivity
 import android.content.Context
@@ -10,6 +11,9 @@ import android.util.Log
 import com.google.android.gms.ads.identifier.AdvertisingIdClient
 import com.google.gson.GsonBuilder
 import com.unity3d.player.UnityPlayer
+import okhttp3.OkHttpClient
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 /**
  * The main class including all the library functions to use in your code.
@@ -44,7 +48,21 @@ object BitLabs {
     fun init(context: Context, token: String, uid: String) {
         this.token = token
         this.uid = uid
-        bitLabsRepo = BitLabsRepository(token, uid)
+        bitLabsRepo = BitLabsRepository(
+            Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .client(OkHttpClient.Builder().addInterceptor { chain ->
+                    chain.proceed(
+                        chain.request().newBuilder()
+                            .addHeader("X-Api-Token", token)
+                            .addHeader("X-User-Id", uid)
+                            .build()
+                    )
+                }.build())
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+                .create(BitLabsAPI::class.java)
+        )
         determineAdvertisingInfo(context)
 
         getAppSettings()
@@ -157,7 +175,7 @@ object BitLabs {
     fun launchOfferWall(context: Context) = ifInitialised {
         with(Intent(context, WebActivity::class.java)) {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
-            putExtra(BUNDLE_KEY_PARAMS, WebActivityParams(token, uid, "UNITY", adId, tags).url)
+            putExtra(BUNDLE_KEY_URL, WebActivityParams(token, uid, "UNITY", adId, tags).url)
             context.startActivity(this)
         }
     }

@@ -57,8 +57,9 @@ internal fun String.snakeToCamelCase() = split("_")
     .joinToString("") { it.replaceFirstChar { c -> c.uppercase() } }
     .replaceFirstChar { c -> c.lowercase() }
 
-//internal fun String.convertKeysToCamelCase() = Regex("\"([a-z]+(?:_[a-z]+)+)\":")
-//    .replace(this) { match -> match.groupValues[1].snakeToCamelCase().let { "\"$it\":" } }
+// todo: test this
+internal fun String.convertKeysToCamelCase() = Regex("\"([a-z]+(?:_[a-z]+)+)\":")
+    .replace(this) { match -> match.groupValues[1].snakeToCamelCase().let { "\"$it\":" } }
 
 internal fun Number.toPx() = TypedValue.applyDimension(
     TypedValue.COMPLEX_UNIT_DIP,

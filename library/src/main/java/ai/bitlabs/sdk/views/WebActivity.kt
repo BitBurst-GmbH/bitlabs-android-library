@@ -46,8 +46,7 @@ internal class WebActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_web)
 
-        url = intent.getStringExtra(BUNDLE_KEY_URL)
-            ?.takeIf { URLUtil.isValidUrl(it) } ?: run {
+        url = intent.getStringExtra(BUNDLE_KEY_URL)?.takeIf { URLUtil.isValidUrl(it) } ?: run {
             Log.e(TAG, "WebActivity - No bundle data found!")
             finish()
             return
@@ -157,7 +156,8 @@ internal class WebActivity : AppCompatActivity() {
             getString(R.string.leave_reason_too_long),
             getString(R.string.leave_reason_other)
         )
-        AlertDialog.Builder(this).setTitle(getString(R.string.leave_dialog_title))
+        AlertDialog.Builder(this)
+            .setTitle(getString(R.string.leave_dialog_title))
             .setItems(optionsDisplay) { _, which -> leaveSurvey(options[which]) }
             .setNegativeButton(getString(R.string.leave_dialog_continue)) { _, _ -> }.show()
     }

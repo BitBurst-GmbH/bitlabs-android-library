@@ -3,7 +3,7 @@ package ai.bitlabs.sdk.views
 import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.R
 import ai.bitlabs.sdk.util.BUNDLE_KEY_COLOR
-import ai.bitlabs.sdk.util.BUNDLE_KEY_PARAMS
+import ai.bitlabs.sdk.util.BUNDLE_KEY_URL
 import ai.bitlabs.sdk.util.TAG
 import ai.bitlabs.sdk.util.getLuminance
 import ai.bitlabs.sdk.util.setQRCodeBitmap
@@ -16,6 +16,7 @@ import android.util.Base64
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
+import android.webkit.URLUtil
 import android.webkit.WebView
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -39,19 +40,19 @@ internal class WebActivity : AppCompatActivity() {
 
     private var reward: Float = 0.0F
     private var clickId: String? = null
-    private var colors = intArrayOf(0, 0)
+    private var colors = intArrayOf(Color.WHITE, Color.WHITE)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_web)
 
-        url = intent.getStringExtra(BUNDLE_KEY_PARAMS) ?: run {
+        url = intent.getStringExtra(BUNDLE_KEY_URL)?.takeIf { URLUtil.isValidUrl(it) } ?: run {
             Log.e(TAG, "WebActivity - No bundle data found!")
             finish()
             return
         }
 
-        colors = intent.getIntArrayExtra(BUNDLE_KEY_COLOR) ?: colors
+        colors = intent.getIntArrayExtra(BUNDLE_KEY_COLOR)?.takeIf { it.isNotEmpty() } ?: colors
 
         bindUI()
 
@@ -155,7 +156,8 @@ internal class WebActivity : AppCompatActivity() {
             getString(R.string.leave_reason_too_long),
             getString(R.string.leave_reason_other)
         )
-        AlertDialog.Builder(this).setTitle(getString(R.string.leave_dialog_title))
+        AlertDialog.Builder(this)
+            .setTitle(getString(R.string.leave_dialog_title))
             .setItems(optionsDisplay) { _, which -> leaveSurvey(options[which]) }
             .setNegativeButton(getString(R.string.leave_dialog_continue)) { _, _ -> }.show()
     }

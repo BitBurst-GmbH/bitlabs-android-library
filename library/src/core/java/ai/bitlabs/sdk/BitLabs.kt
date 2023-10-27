@@ -4,7 +4,16 @@ import ai.bitlabs.sdk.data.BitLabsRepository
 import ai.bitlabs.sdk.data.model.Survey
 import ai.bitlabs.sdk.data.model.WebActivityParams
 import ai.bitlabs.sdk.data.model.WidgetType
-import ai.bitlabs.sdk.util.*
+import ai.bitlabs.sdk.data.network.BitLabsAPI
+import ai.bitlabs.sdk.util.BASE_URL
+import ai.bitlabs.sdk.util.BUNDLE_KEY_COLOR
+import ai.bitlabs.sdk.util.BUNDLE_KEY_URL
+import ai.bitlabs.sdk.util.OnExceptionListener
+import ai.bitlabs.sdk.util.OnResponseListener
+import ai.bitlabs.sdk.util.OnRewardListener
+import ai.bitlabs.sdk.util.TAG
+import ai.bitlabs.sdk.util.extractColors
+import ai.bitlabs.sdk.util.randomSurvey
 import ai.bitlabs.sdk.views.LeaderboardFragment
 import ai.bitlabs.sdk.views.SurveysAdapter
 import ai.bitlabs.sdk.views.WebActivity
@@ -17,6 +26,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.ads.identifier.AdvertisingIdClient
+import okhttp3.OkHttpClient
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 /**
  * The main class including all the library functions to use in your code.
@@ -51,7 +63,21 @@ object BitLabs {
     fun init(context: Context, token: String, uid: String) {
         this.token = token
         this.uid = uid
-        bitLabsRepo = BitLabsRepository(token, uid)
+        bitLabsRepo = BitLabsRepository(
+            Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .client(OkHttpClient.Builder().addInterceptor { chain ->
+                    chain.proceed(
+                        chain.request().newBuilder()
+                            .addHeader("X-Api-Token", token)
+                            .addHeader("X-User-Id", uid)
+                            .build()
+                    )
+                }.build())
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+                .create(BitLabsAPI::class.java)
+        )
         determineAdvertisingInfo(context)
 
         getAppSettings()
@@ -113,7 +139,7 @@ object BitLabs {
     fun launchOfferWall(context: Context) = ifInitialised {
         with(Intent(context, WebActivity::class.java)) {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
-            putExtra(BUNDLE_KEY_PARAMS, WebActivityParams(token, uid, "NATIVE", adId, tags).url)
+            putExtra(BUNDLE_KEY_URL, WebActivityParams(token, uid, "NATIVE", adId, tags).url)
             putExtra(BUNDLE_KEY_COLOR, headerColor)
             context.startActivity(this)
         }
@@ -149,17 +175,17 @@ object BitLabs {
     /**
      * Gets the required settings from the BitLabs API.
      */
-    private fun getAppSettings() = bitLabsRepo?.getAppSettings({
-        it.visual.run {
-            widgetColors = extractColors(surveyIconColor)
-            headerColor = extractColors(navigationColor)
+    private fun getAppSettings() = bitLabsRepo?.getAppSettings({ app ->
+        app.visual.run {
+            widgetColors = extractColors(surveyIconColor).takeIf { it.isNotEmpty() } ?: widgetColors
+            headerColor = extractColors(navigationColor).takeIf { it.isNotEmpty() } ?: headerColor
         }
 
-        it.currency.symbol.run { currencyIconUrl = content.takeIf { isImage } ?: "" }
-        bonusPercentage = it.currency.bonusPercentage / 100.0
+        app.currency.symbol.run { currencyIconUrl = content.takeIf { isImage } ?: "" }
+        bonusPercentage = app.currency.bonusPercentage / 100.0
 
 
-        it.promotion?.bonusPercentage?.run {
+        app.promotion?.bonusPercentage?.run {
             bonusPercentage += this / 100.0 + this * bonusPercentage / 100.0
         }
     }, { Log.e(TAG, "$it") })

@@ -1,7 +1,13 @@
 package ai.bitlabs.sdk.data
 
 import ai.bitlabs.sdk.BitLabs
-import ai.bitlabs.sdk.data.model.*
+import ai.bitlabs.sdk.data.model.BitLabsResponse
+import ai.bitlabs.sdk.data.model.GetAppSettingsResponse
+import ai.bitlabs.sdk.data.model.GetLeaderboardResponse
+import ai.bitlabs.sdk.data.model.GetSurveysResponse
+import ai.bitlabs.sdk.data.model.LeaveReason
+import ai.bitlabs.sdk.data.model.Survey
+import ai.bitlabs.sdk.data.model.UpdateClickBody
 import ai.bitlabs.sdk.data.network.BitLabsAPI
 import ai.bitlabs.sdk.util.OnExceptionListener
 import ai.bitlabs.sdk.util.OnResponseListener
@@ -14,32 +20,13 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.util.Log
 import com.caverock.androidsvg.SVG
-import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 /** This class is the point of communication between the data and [BitLabs] */
-internal class BitLabsRepository(token: String, uid: String) {
-    private val bitLabsAPI = Retrofit.Builder()
-        .baseUrl("https://api.bitlabs.ai/")
-        .client(OkHttpClient.Builder().addInterceptor { chain ->
-            chain.run {
-                proceed(
-                    request().newBuilder()
-                        .addHeader("X-Api-Token", token)
-                        .addHeader("X-User-Id", uid)
-                        .build()
-                )
-            }
-        }.build())
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-        .create(BitLabsAPI::class.java)
-
+internal class BitLabsRepository(private val bitLabsAPI: BitLabsAPI) {
     internal fun leaveSurvey(clickId: String, reason: String) =
         bitLabsAPI.updateClick(clickId, UpdateClickBody(LeaveReason(reason)))
             .enqueue(object : Callback<BitLabsResponse<Unit>> {

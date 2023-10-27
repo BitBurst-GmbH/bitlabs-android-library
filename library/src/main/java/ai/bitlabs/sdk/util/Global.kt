@@ -14,9 +14,11 @@ import kotlin.random.Random
 
 internal const val TAG = "BitLabs"
 
-internal const val BUNDLE_KEY_PARAMS = "bundle-key-params"
+internal const val BASE_URL = "https://api.bitlabs.ai/"
 
 internal const val BUNDLE_KEY_COLOR = "bundle-key-color"
+
+internal const val BUNDLE_KEY_URL = "bundle-key-params"
 
 internal fun getLuminance(color: Int) =
     0.2126 * Color.red(color) + 0.7152 * Color.green(color) + 0.0722 * Color.blue(color)
@@ -31,7 +33,9 @@ internal fun extractColors(color: String) =
             .split(",\\s".toRegex())
             .map { Color.parseColor(it.trim()) }
             .toIntArray()
-    } ?: intArrayOf(Color.parseColor(color), Color.parseColor(color))
+    } ?: Regex("""#([0-9a-fA-F]{6})""").find(color)?.run {
+        intArrayOf(Color.parseColor(groupValues[0]), Color.parseColor(groupValues[0]))
+    } ?: intArrayOf()
 
 internal fun randomSurvey(i: Int) = with(Random(i)) {
     Survey(
@@ -53,8 +57,8 @@ internal fun String.snakeToCamelCase() = split("_")
     .joinToString("") { it.replaceFirstChar { c -> c.uppercase() } }
     .replaceFirstChar { c -> c.lowercase() }
 
-internal fun String.convertKeysToCamelCase() = Regex("\"([a-z]+(?:_[a-z]+)+)\":")
-    .replace(this) { match -> match.groupValues[1].snakeToCamelCase().let { "\"$it\":" } }
+//internal fun String.convertKeysToCamelCase() = Regex("\"([a-z]+(?:_[a-z]+)+)\":")
+//    .replace(this) { match -> match.groupValues[1].snakeToCamelCase().let { "\"$it\":" } }
 
 internal fun Number.toPx() = TypedValue.applyDimension(
     TypedValue.COMPLEX_UNIT_DIP,
@@ -62,7 +66,11 @@ internal fun Number.toPx() = TypedValue.applyDimension(
     Resources.getSystem().displayMetrics
 )
 
-internal fun String.rounded() = ((toDouble() * 100).roundToInt() / 100.0).toString()
+internal fun String.rounded() = with(((toDouble() * 100).roundToInt() / 100.0)) {
+    if (this % 1.0 == 0.0) String.format("%.0f", this)
+    else this.toString()
+}
+
 
 internal fun ImageView.setQRCodeBitmap(value: String) = Bitmap
     .createBitmap(512, 512, Bitmap.Config.RGB_565)

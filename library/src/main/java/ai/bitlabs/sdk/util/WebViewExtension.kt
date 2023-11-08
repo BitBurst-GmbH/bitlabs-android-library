@@ -16,7 +16,7 @@ import androidx.browser.customtabs.CustomTabsIntent
 fun WebView.setup(
     context: Context,
     onDoUpdateVisitedHistory: (isPageOfferWall: Boolean, url: String) -> Unit,
-    onError: (date: String) -> Unit,
+    onError: (error: WebResourceError?, date: String) -> Unit,
 ) {
     if (Build.VERSION.SDK_INT >= 21) CookieManager.getInstance()
         .setAcceptThirdPartyCookies(this, true)
@@ -71,7 +71,8 @@ fun WebView.setup(
             request: WebResourceRequest?,
             error: WebResourceError?
         ) {
-            onError(System.currentTimeMillis().toString())
+            print("onReceivedError: ${error?.description}")
+            onError(error, System.currentTimeMillis().toString())
             super.onReceivedError(view, request, error)
         }
     }

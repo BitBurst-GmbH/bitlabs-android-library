@@ -11,6 +11,7 @@ import ai.bitlabs.sdk.util.setup
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.Base64
 import android.util.Log
@@ -123,14 +124,21 @@ internal class WebActivity : AppCompatActivity() {
                 Uri.parse(url).getQueryParameter("clk")?.let { clickId = it }
             }
             toggleToolbar(isPageOfferWall)
-        }, { date ->
-            val error = "{ uid: UserId, date: $date }".toByteArray()
+        }, { error, date ->
+
+            val errorInfo =
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                    "code: ${error?.errorCode}, description: ${error?.description}"
+                else ""
+
+            val errorStr = "v2{ ${errorInfo}, uid: UserId, date: $date }".toByteArray()
                 .let { Base64.encodeToString(it, Base64.DEFAULT) }
 
             findViewById<LinearLayout>(R.id.ll_qr_code)?.let {
                 it.visibility = View.VISIBLE
-                (it.children.last() as? TextView)?.text = getString(R.string.error_id, error).trim()
-                (it.children.first() as? ImageView)?.setQRCodeBitmap(error)
+                (it.children.last() as? TextView)?.text =
+                    getString(R.string.error_id, errorStr).trim()
+                (it.children.first() as? ImageView)?.setQRCodeBitmap(errorStr)
             }
         })
     }

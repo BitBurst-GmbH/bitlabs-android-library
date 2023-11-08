@@ -12,8 +12,8 @@ android {
         applicationId 'ai.bitlabs.example'
         minSdkVersion 19
         targetSdkVersion 31
-        versionCode 41
-        versionName '3.1.15'
+        versionCode 42
+        versionName '3.1.16'
         buildConfigField 'String', 'APP_TOKEN', keystore.getProperty('appToken', '"APP_TOKEN"')
     }
 

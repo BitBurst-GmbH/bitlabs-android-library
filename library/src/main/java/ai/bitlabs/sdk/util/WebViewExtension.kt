@@ -71,8 +71,8 @@ fun WebView.setup(
             request: WebResourceRequest?,
             error: WebResourceError?
         ) {
-            print("onReceivedError: ${error?.description}")
-            onError(error, System.currentTimeMillis().toString())
+            if (error?.errorCode != WebViewClient.ERROR_HOST_LOOKUP)
+                onError(error, System.currentTimeMillis().toString())
             super.onReceivedError(view, request, error)
         }
     }

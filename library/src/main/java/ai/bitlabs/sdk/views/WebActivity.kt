@@ -131,7 +131,7 @@ internal class WebActivity : AppCompatActivity() {
                     "code: ${error?.errorCode}, description: ${error?.description}"
                 else ""
 
-            val errorStr = "v2{ ${errorInfo}, uid: UserId, date: $date }".toByteArray()
+            val errorStr = "{ ${errorInfo}, uid: UserId, date: $date }".toByteArray()
                 .let { Base64.encodeToString(it, Base64.DEFAULT) }
 
             findViewById<LinearLayout>(R.id.ll_qr_code)?.let {

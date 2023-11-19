@@ -2,6 +2,8 @@ package ai.bitlabs.sdk.data.model
 
 import ai.bitlabs.sdk.views.WebActivity
 import android.net.Uri
+import android.os.Bundle
+import java.io.Serializable
 
 /**
  * This class holds the parameters of the [WebActivity] responsible to launch the OfferWall.
@@ -18,6 +20,15 @@ internal data class WebActivityParams(
     var url: String = ""
         get() = field.takeIf { it.isNotEmpty() } ?: buildUrl()
         private set
+
+    fun asBundle() = Bundle().apply {
+        putString("url", url)
+        putString("uid", uid)
+        putString("sdk", sdk)
+        putString("maid", maid)
+        putString("token", token)
+        putSerializable("tags", tags as Serializable)
+    }
 
     /** Returns a string representation of the URL with all necessary parameters. */
     private fun buildUrl() = Uri

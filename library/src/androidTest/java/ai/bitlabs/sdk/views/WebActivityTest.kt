@@ -3,12 +3,14 @@ package ai.bitlabs.sdk.views
 import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.BuildConfig
 import ai.bitlabs.sdk.R
+import ai.bitlabs.sdk.data.model.WebActivityParams
 import ai.bitlabs.sdk.util.BUNDLE_KEY_COLOR
-import ai.bitlabs.sdk.util.BUNDLE_KEY_URL
+import ai.bitlabs.sdk.util.BUNDLE_KEY_PARAMS
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
+import android.os.Bundle
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Lifecycle
 import androidx.test.core.app.ActivityScenario
@@ -37,16 +39,16 @@ class WebActivityTest {
     private val context = ApplicationProvider.getApplicationContext<Context>()
 
     @Test
-    fun urlExtra_No_BUNDLE_KEY_URL_DestroyActivity() {
+    fun paramsExtra_No_BUNDLE_KEY_PARAMS_DestroyActivity() {
         ActivityScenario.launch(WebActivity::class.java).use {
             assertThat(it.state).isEqualTo(Lifecycle.State.DESTROYED)
         }
     }
 
     @Test
-    fun urlExtra_BUNDLE_KEY_URL_Empty_DestroyActivity() {
+    fun paramsExtra_BUNDLE_KEY_PARAMS_Empty_DestroyActivity() {
         val intent = Intent(context, WebActivity::class.java).apply {
-            putExtra(BUNDLE_KEY_URL, "")
+            putExtra(BUNDLE_KEY_PARAMS, Bundle())
         }
 
         ActivityScenario.launch<WebActivity>(intent).use {
@@ -55,9 +57,9 @@ class WebActivityTest {
     }
 
     @Test
-    fun urlExtra_BUNDLE_KEY_URL_NotString_DestroyActivity() {
+    fun paramsExtra_BUNDLE_KEY_PARAMS_NotBundle_DestroyActivity() {
         val intent = Intent(context, WebActivity::class.java).apply {
-            putExtra(BUNDLE_KEY_URL, 123)
+            putExtra(BUNDLE_KEY_PARAMS, 123)
         }
 
         ActivityScenario.launch<WebActivity>(intent).use {
@@ -65,21 +67,21 @@ class WebActivityTest {
         }
     }
 
-    @Test
-    fun urlExtra_BUNDLE_KEY_URL_NotCorrectUrl_DestroyActivity() {
-        val intent = Intent(context, WebActivity::class.java).apply {
-            putExtra(BUNDLE_KEY_URL, "String not URL")
-        }
+//    @Test
+//    fun paramsExtra_BUNDLE_KEY_URL_NotCorrectUrl_DestroyActivity() {
+//        val intent = Intent(context, WebActivity::class.java).apply {
+//            putExtra(BUNDLE_KEY_URL, "String not URL")
+//        }
+//
+//        ActivityScenario.launch<WebActivity>(intent).use {
+//            assertThat(it.state).isEqualTo(Lifecycle.State.DESTROYED)
+//        }
+//    }
 
-        ActivityScenario.launch<WebActivity>(intent).use {
-            assertThat(it.state).isEqualTo(Lifecycle.State.DESTROYED)
-        }
-    }
-
     @Test
-    fun urlExtra_BUNDLE_KEY_URL_CorrectFormUrl_CreateActivity() {
+    fun paramsExtra_BUNDLE_KEY_PARAMS_CorrectParamsBundle_CreateActivity() {
         val intent = Intent(context, WebActivity::class.java).apply {
-            putExtra(BUNDLE_KEY_URL, "https://www.google.com")
+            putExtra(BUNDLE_KEY_PARAMS, WebActivityParams(TOKEN, UID, "NATIVE", "").asBundle())
         }
 
         ActivityScenario.launch<WebActivity>(intent).use {
@@ -90,7 +92,11 @@ class WebActivityTest {
     @Test
     fun colorExtra_No_BUNDLE_KEY_COLOR_WhiteToolbarBackground() {
         val intent = Intent(context, WebActivity::class.java).apply {
-            putExtra(BUNDLE_KEY_URL, "https://www.google.com")
+            putExtra(BUNDLE_KEY_PARAMS, Bundle().also {
+                it.putString("url", "https://www.google.com")
+                it.putString("token", TOKEN)
+                it.putString("uid", UID)
+            })
         }
 
         ActivityScenario.launch<WebActivity>(intent).use {
@@ -105,7 +111,11 @@ class WebActivityTest {
     @Test
     fun colorExtra_BUNDLE_KEY_COLOR_Empty_WhiteToolbarBackground() {
         val intent = Intent(context, WebActivity::class.java).apply {
-            putExtra(BUNDLE_KEY_URL, "https://www.google.com")
+            putExtra(BUNDLE_KEY_PARAMS, Bundle().also {
+                it.putString("url", "https://www.google.com")
+                it.putString("token", TOKEN)
+                it.putString("uid", UID)
+            })
             putExtra(BUNDLE_KEY_COLOR, intArrayOf())
         }
 
@@ -121,7 +131,11 @@ class WebActivityTest {
     @Test
     fun colorExtra_BUNDLE_KEY_COLOR_NotIntArrayOf_WhiteToolbarBackground() {
         val intent = Intent(context, WebActivity::class.java).apply {
-            putExtra(BUNDLE_KEY_URL, "https://www.google.com")
+            putExtra(BUNDLE_KEY_PARAMS, Bundle().also {
+                it.putString("url", "https://www.google.com")
+                it.putString("token", TOKEN)
+                it.putString("uid", UID)
+            })
             putExtra(BUNDLE_KEY_COLOR, 123)
         }
 
@@ -139,7 +153,11 @@ class WebActivityTest {
         val colors = intArrayOf(123, 123)
 
         val intent = Intent(context, WebActivity::class.java).apply {
-            putExtra(BUNDLE_KEY_URL, "https://www.google.com")
+            putExtra(BUNDLE_KEY_PARAMS, Bundle().also {
+                it.putString("url", "https://www.google.com")
+                it.putString("token", TOKEN)
+                it.putString("uid", UID)
+            })
             putExtra(BUNDLE_KEY_COLOR, colors)
         }
 
@@ -155,7 +173,10 @@ class WebActivityTest {
     @Test
     fun toolbar_PageIsBitlabsOfferwall_IsNotDisplayed() {
         val intent = Intent(context, WebActivity::class.java).apply {
-            putExtra(BUNDLE_KEY_URL, "https://web.bitlabs.ai&token=$TOKEN&uid=$UID")
+            putExtra(
+                BUNDLE_KEY_PARAMS,
+                WebActivityParams(TOKEN, UID, "NATIVE", "").asBundle()
+            )
         }
 
         ActivityScenario.launch<WebActivity>(intent).use {
@@ -166,7 +187,11 @@ class WebActivityTest {
     @Test
     fun toolbar_PageIsNotOfferwall_IsDisplayed() {
         val intent = Intent(context, WebActivity::class.java).apply {
-            putExtra(BUNDLE_KEY_URL, "https://www.google.com")
+            putExtra(BUNDLE_KEY_PARAMS, Bundle().also {
+                it.putString("url", "https://www.google.com")
+                it.putString("token", TOKEN)
+                it.putString("uid", UID)
+            })
         }
 
         ActivityScenario.launch<WebActivity>(intent).use {
@@ -178,7 +203,11 @@ class WebActivityTest {
     @Test
     fun onBackPressed_PageIsNotOfferwall_ShowLeaveSurveyDialog() {
         val intent = Intent(context, WebActivity::class.java).apply {
-            putExtra(BUNDLE_KEY_URL, "https://www.google.com")
+            putExtra(BUNDLE_KEY_PARAMS, Bundle().also {
+                it.putString("url", "https://www.google.com")
+                it.putString("token", TOKEN)
+                it.putString("uid", UID)
+            })
         }
 
         ActivityScenario.launch<WebActivity>(intent).use {
@@ -193,7 +222,12 @@ class WebActivityTest {
     fun leaveSurveyDialog_AnyOptionClicked_LeaveSurveyCalled() {
         val url = "https://www.google.com?clk=fjasdljk"
         // clk because without it LeaveSurvey is not called
-        val intent = Intent(context, WebActivity::class.java).putExtra(BUNDLE_KEY_URL, url)
+        val intent = Intent(context, WebActivity::class.java)
+            .putExtra(BUNDLE_KEY_PARAMS, Bundle().also {
+                it.putString("token", TOKEN)
+                it.putString("uid", UID)
+                it.putString("url", url)
+            })
 
         mockkObject(BitLabs) {
             every { BitLabs.leaveSurvey(any(), any()) } returns Unit

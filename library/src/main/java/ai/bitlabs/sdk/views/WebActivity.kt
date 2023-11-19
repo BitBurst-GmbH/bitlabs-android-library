@@ -3,7 +3,7 @@ package ai.bitlabs.sdk.views
 import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.R
 import ai.bitlabs.sdk.util.BUNDLE_KEY_COLOR
-import ai.bitlabs.sdk.util.BUNDLE_KEY_URL
+import ai.bitlabs.sdk.util.BUNDLE_KEY_PARAMS
 import ai.bitlabs.sdk.util.TAG
 import ai.bitlabs.sdk.util.getLuminance
 import ai.bitlabs.sdk.util.setQRCodeBitmap
@@ -39,6 +39,14 @@ internal class WebActivity : AppCompatActivity() {
 
     private lateinit var url: String
 
+    private var uid: String = ""
+    private var sdk: String = ""
+    private var maid: String = ""
+    private var token: String = ""
+    private var tags: Map<String, Any> = mapOf()
+
+    private var areParametersInjected = true
+
     private var reward: Float = 0.0F
     private var clickId: String? = null
     private var colors = intArrayOf(Color.WHITE, Color.WHITE)
@@ -47,13 +55,13 @@ internal class WebActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_web)
 
-        url = intent.getStringExtra(BUNDLE_KEY_URL)?.takeIf { URLUtil.isValidUrl(it) } ?: run {
-            Log.e(TAG, "WebActivity - No bundle data found!")
+        try {
+            getDataFromIntent()
+        } catch (e: IllegalArgumentException) {
+            Log.e(TAG, e.message.toString())
             finish()
             return
         }
-
-        colors = intent.getIntArrayExtra(BUNDLE_KEY_COLOR)?.takeIf { it.isNotEmpty() } ?: colors
 
         bindUI()
 
@@ -84,7 +92,31 @@ internal class WebActivity : AppCompatActivity() {
         super.onStop()
     }
 
-    /** A function to configure all UI elements and the logic behind them, if any. */
+    private fun getDataFromIntent() {
+        val bundle = intent.getBundleExtra(BUNDLE_KEY_PARAMS) ?: run {
+            throw IllegalArgumentException("WebActivity - No params found!")
+        }
+
+        url = bundle.getString("url")?.takeIf { URLUtil.isValidUrl(it) } ?: run {
+            throw IllegalArgumentException("WebActivity - Invalid url!")
+        }
+
+        uid = bundle.getString("uid") ?: run {
+            throw IllegalArgumentException("WebActivity - No uid found!")
+        }
+
+        token = bundle.getString("token") ?: run {
+            throw IllegalArgumentException("WebActivity - No token found!")
+        }
+
+        sdk = bundle.getString("sdk", "NATIVE")
+        maid = bundle.getString("maid", "")
+
+        tags = bundle.getSerializable("tags") as? Map<String, Any> ?: mapOf()
+
+        colors = intent.getIntArrayExtra(BUNDLE_KEY_COLOR)?.takeIf { it.isNotEmpty() } ?: colors
+    }
+
     private fun bindUI() {
         val isColorBright =
             getLuminance(colors.first()) > 0.729 * 255 || getLuminance(colors.last()) > 0.729 * 255
@@ -120,15 +152,31 @@ internal class WebActivity : AppCompatActivity() {
                         "/start-bonus"
                     )
                 ) Uri.parse(url).getQueryParameter("val")?.let { reward += it.toFloat() }
+
+                if (!areParametersInjected && !url.contains("sdk=$sdk")) {
+                    webView?.loadUrl(Uri.parse(url).buildUpon()
+                        .appendQueryParameter("os", "ANDROID")
+                        .appendQueryParameter("token", token)
+                        .appendQueryParameter("uid", uid)
+                        .appendQueryParameter("sdk", sdk)
+                        .apply { if (maid.isNotEmpty()) appendQueryParameter("maid", maid) }
+                        .apply {
+                            tags.forEach { tag ->
+                                appendQueryParameter(tag.key, tag.value.toString())
+                            }
+                        }.build().toString()
+                    )
+                    areParametersInjected = true
+                }
             } else {
                 Uri.parse(url).getQueryParameter("clk")?.let { clickId = it }
+                areParametersInjected = false
             }
             toggleToolbar(isPageOfferWall)
         }, { error, date ->
 
             val errorInfo =
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-                    "code: ${error?.errorCode}, description: ${error?.description}"
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) "code: ${error?.errorCode}, description: ${error?.description}"
                 else ""
 
             val errorStr = "{ ${errorInfo}, uid: UserId, date: $date }".toByteArray()
@@ -164,8 +212,7 @@ internal class WebActivity : AppCompatActivity() {
             getString(R.string.leave_reason_too_long),
             getString(R.string.leave_reason_other)
         )
-        AlertDialog.Builder(this)
-            .setTitle(getString(R.string.leave_dialog_title))
+        AlertDialog.Builder(this).setTitle(getString(R.string.leave_dialog_title))
             .setItems(optionsDisplay) { _, which -> leaveSurvey(options[which]) }
             .setNegativeButton(getString(R.string.leave_dialog_continue)) { _, _ -> }.show()
     }

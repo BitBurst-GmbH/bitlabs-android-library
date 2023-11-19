@@ -45,6 +45,8 @@ internal class WebActivity : AppCompatActivity() {
     private var token: String = ""
     private var tags: Map<String, Any> = mapOf()
 
+    private var areParametersInjected = true
+
     private var reward: Float = 0.0F
     private var clickId: String? = null
     private var colors = intArrayOf(Color.WHITE, Color.WHITE)
@@ -110,6 +112,8 @@ internal class WebActivity : AppCompatActivity() {
         sdk = bundle.getString("sdk", "NATIVE")
         maid = bundle.getString("maid", "")
 
+        tags = bundle.getSerializable("tags") as? Map<String, Any> ?: mapOf()
+
         colors = intent.getIntArrayExtra(BUNDLE_KEY_COLOR)?.takeIf { it.isNotEmpty() } ?: colors
     }
 
@@ -148,15 +152,31 @@ internal class WebActivity : AppCompatActivity() {
                         "/start-bonus"
                     )
                 ) Uri.parse(url).getQueryParameter("val")?.let { reward += it.toFloat() }
+
+                if (!areParametersInjected && !url.contains("sdk=$sdk")) {
+                    webView?.loadUrl(Uri.parse(url).buildUpon()
+                        .appendQueryParameter("os", "ANDROID")
+                        .appendQueryParameter("token", token)
+                        .appendQueryParameter("uid", uid)
+                        .appendQueryParameter("sdk", sdk)
+                        .apply { if (maid.isNotEmpty()) appendQueryParameter("maid", maid) }
+                        .apply {
+                            tags.forEach { tag ->
+                                appendQueryParameter(tag.key, tag.value.toString())
+                            }
+                        }.build().toString()
+                    )
+                    areParametersInjected = true
+                }
             } else {
                 Uri.parse(url).getQueryParameter("clk")?.let { clickId = it }
+                areParametersInjected = false
             }
             toggleToolbar(isPageOfferWall)
         }, { error, date ->
 
             val errorInfo =
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-                    "code: ${error?.errorCode}, description: ${error?.description}"
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) "code: ${error?.errorCode}, description: ${error?.description}"
                 else ""
 
             val errorStr = "{ ${errorInfo}, uid: UserId, date: $date }".toByteArray()
@@ -192,8 +212,7 @@ internal class WebActivity : AppCompatActivity() {
             getString(R.string.leave_reason_too_long),
             getString(R.string.leave_reason_other)
         )
-        AlertDialog.Builder(this)
-            .setTitle(getString(R.string.leave_dialog_title))
+        AlertDialog.Builder(this).setTitle(getString(R.string.leave_dialog_title))
             .setItems(optionsDisplay) { _, which -> leaveSurvey(options[which]) }
             .setNegativeButton(getString(R.string.leave_dialog_continue)) { _, _ -> }.show()
     }

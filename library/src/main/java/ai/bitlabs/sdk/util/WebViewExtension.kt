@@ -16,7 +16,7 @@ import androidx.browser.customtabs.CustomTabsIntent
 fun WebView.setup(
     context: Context,
     onDoUpdateVisitedHistory: (isPageOfferWall: Boolean, url: String) -> Unit,
-    onError: (error: WebResourceError?, date: String) -> Unit,
+    onError: (error: WebResourceError?, date: String, url: String) -> Unit,
 ) {
     if (Build.VERSION.SDK_INT >= 21) CookieManager.getInstance()
         .setAcceptThirdPartyCookies(this, true)
@@ -72,7 +72,7 @@ fun WebView.setup(
             error: WebResourceError?
         ) {
             if (error?.errorCode != WebViewClient.ERROR_HOST_LOOKUP)
-                onError(error, System.currentTimeMillis().toString())
+                onError(error, System.currentTimeMillis().toString(), request?.url.toString())
             super.onReceivedError(view, request, error)
         }
     }

@@ -148,12 +148,15 @@ internal class WebActivity : AppCompatActivity() {
 
             Log.i(TAG, "bindUI: $url")
             if (isPageOfferWall) {
-                if (url.contains("/survey-complete") || url.contains("/survey-screenout") || url.contains(
-                        "/start-bonus"
-                    )
-                ) Uri.parse(url).getQueryParameter("val")?.let { reward += it.toFloat() }
+                if (url.contains("/survey-complete")
+                    || url.contains("/survey-screenout")
+                    || url.contains("/start-bonus")
+                ) {
+                    Uri.parse(url).getQueryParameter("val")?.let { reward += it.toFloat() }
+                }
 
                 if (!areParametersInjected && !url.contains("sdk=$sdk")) {
+                    areParametersInjected = true
                     webView?.loadUrl(Uri.parse(url).buildUpon()
                         .appendQueryParameter("os", "ANDROID")
                         .appendQueryParameter("token", token)
@@ -166,20 +169,19 @@ internal class WebActivity : AppCompatActivity() {
                             }
                         }.build().toString()
                     )
-                    areParametersInjected = true
                 }
             } else {
                 Uri.parse(url).getQueryParameter("clk")?.let { clickId = it }
                 areParametersInjected = false
             }
             toggleToolbar(isPageOfferWall)
-        }, { error, date ->
+        }, { error, date, errUrl ->
 
             val errorInfo =
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) "code: ${error?.errorCode}, description: ${error?.description}"
                 else ""
 
-            val errorStr = "{ ${errorInfo}, uid: UserId, date: $date }".toByteArray()
+            val errorStr = "{ ${errorInfo}, uid: UserId, url: $errUrl, date: $date }".toByteArray()
                 .let { Base64.encodeToString(it, Base64.DEFAULT) }
 
             findViewById<LinearLayout>(R.id.ll_qr_code)?.let {

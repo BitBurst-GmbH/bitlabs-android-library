@@ -1,11 +1,13 @@
 package ai.bitlabs.sdk.util
 
+import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.views.WebActivity
 import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.os.Message
+import android.util.Log
 import android.view.View
 import android.webkit.*
 import androidx.annotation.RequiresApi
@@ -71,7 +73,7 @@ fun WebView.setup(
             request: WebResourceRequest?,
             error: WebResourceError?
         ) {
-            if (error?.errorCode != WebViewClient.ERROR_HOST_LOOKUP)
+            if (!BitLabs.debugMode && error?.errorCode != WebViewClient.ERROR_HOST_LOOKUP)
                 onError(error, System.currentTimeMillis().toString(), request?.url.toString())
             super.onReceivedError(view, request, error)
         }

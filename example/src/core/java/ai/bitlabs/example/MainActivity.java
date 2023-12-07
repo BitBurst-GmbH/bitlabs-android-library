@@ -24,6 +24,8 @@ public class MainActivity extends AppCompatActivity {
 
         bitLabs.init(this, BuildConfig.APP_TOKEN, "diffindocongress");
 
+//        bitLabs.setDebugMode(true);
+
         // optionally add custom tags to your users
         Map<String, Object> tags = new HashMap<>();
         tags.put("my_tag", "new_user");

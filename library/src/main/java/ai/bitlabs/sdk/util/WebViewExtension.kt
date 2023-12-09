@@ -1,6 +1,7 @@
 package ai.bitlabs.sdk.util
 
 import ai.bitlabs.sdk.BitLabs
+import ai.bitlabs.sdk.data.model.WebViewError
 import ai.bitlabs.sdk.views.WebActivity
 import android.annotation.SuppressLint
 import android.content.Context
@@ -18,7 +19,7 @@ import androidx.browser.customtabs.CustomTabsIntent
 fun WebView.setup(
     context: Context,
     onDoUpdateVisitedHistory: (isPageOfferWall: Boolean, url: String) -> Unit,
-    onError: (error: WebResourceError?, date: String, url: String) -> Unit,
+    onError: (error: WebViewError?, date: String, url: String) -> Unit,
 ) {
     if (Build.VERSION.SDK_INT >= 21) CookieManager.getInstance()
         .setAcceptThirdPartyCookies(this, true)
@@ -67,14 +68,36 @@ fun WebView.setup(
             CookieManager.getInstance().flush()
         }
 
+        @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+        override fun onReceivedHttpError(
+            view: WebView?,
+            request: WebResourceRequest?,
+            errorResponse: WebResourceResponse?
+        ) {
+            if (BitLabs.debugMode || errorResponse?.statusCode == 404)
+                onError(
+                    WebViewError(errorResponse = errorResponse),
+                    System.currentTimeMillis().toString(),
+                    request?.url.toString()
+                )
+            super.onReceivedHttpError(view, request, errorResponse)
+        }
+
         @RequiresApi(Build.VERSION_CODES.M)
         override fun onReceivedError(
             view: WebView?,
             request: WebResourceRequest?,
             error: WebResourceError?
         ) {
-            if (!BitLabs.debugMode && error?.errorCode != WebViewClient.ERROR_HOST_LOOKUP)
-                onError(error, System.currentTimeMillis().toString(), request?.url.toString())
+            Log.d(TAG, "onReceivedError: ${error?.description}")
+            if (BitLabs.debugMode
+                || error?.description?.contains("ERR_CLEARTEXT_NOT_PERMITTED") == true
+            )
+                onError(
+                    WebViewError(error = error),
+                    System.currentTimeMillis().toString(),
+                    request?.url.toString()
+                )
             super.onReceivedError(view, request, error)
         }
     }

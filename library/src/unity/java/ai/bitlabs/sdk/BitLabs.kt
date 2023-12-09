@@ -22,6 +22,8 @@ import retrofit2.converter.gson.GsonConverterFactory
  * main process(app lifecycle).
  */
 object BitLabs {
+    var debugMode = false
+
     private var uid = ""
     private var adId = ""
     private var token = ""

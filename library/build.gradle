@@ -10,11 +10,11 @@ keystore.load(project.rootProject.file('local.properties').newDataInputStream())
 android {
     namespace 'ai.bitlabs.sdk'
 
-    compileSdkVersion 31 // NOTE: For Jitpack Compatibility
+    compileSdkVersion 33 // NOTE: For Jitpack Compatibility
 
     defaultConfig {
         minSdkVersion 19
-        targetSdkVersion 31
+        targetSdkVersion 33
         multiDexEnabled true
 
         buildConfigField 'String', 'APP_TOKEN', keystore.getProperty('appToken', '"APP_TOKEN"')

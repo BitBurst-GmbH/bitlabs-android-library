@@ -11,7 +11,6 @@ import ai.bitlabs.sdk.util.setup
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.util.Base64
 import android.util.Log
@@ -178,8 +177,7 @@ internal class WebActivity : AppCompatActivity() {
         }, { error, date, errUrl ->
 
             val errorInfo =
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) "code: ${error?.errorCode}, description: ${error?.description}"
-                else ""
+                "code: ${error?.getStatusCode()}, description: ${error?.getDescription()}"
 
             val errorStr = "{ ${errorInfo}, uid: UserId, url: $errUrl, date: $date }".toByteArray()
                 .let { Base64.encodeToString(it, Base64.DEFAULT) }

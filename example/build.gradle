@@ -6,7 +6,7 @@ keystore.load(project.rootProject.file('local.properties').newDataInputStream())
 android {
     namespace 'ai.bitlabs.example'
 
-    compileSdkVersion 31 // NOTE: For Jitpack Compatibility
+    compileSdk 31 // NOTE: For Jitpack Compatibility
 
     defaultConfig {
         applicationId 'ai.bitlabs.example'
@@ -31,6 +31,6 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.2'
 
     // NOTE: you want to use the commented-out implementation for your app
-    //implementation 'com.github.BitBurst-GmbH.bitlabs-android-library:core:<VERSION>'
-    implementation project(':library')
+    implementation 'com.github.BitBurst-GmbH.bitlabs-android-library:core:master-SNAPSHOT'
+//    implementation project(':library')
 }

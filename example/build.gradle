@@ -6,7 +6,7 @@ keystore.load(project.rootProject.file('local.properties').newDataInputStream())
 android {
     namespace 'ai.bitlabs.example'
 
-    compileSdkVersion 34 // NOTE: For Jitpack Compatibility
+    compileSdk 34 // NOTE: For Jitpack Compatibility
 
     defaultConfig {
         applicationId 'ai.bitlabs.example'

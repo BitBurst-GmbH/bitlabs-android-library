@@ -10,11 +10,11 @@ keystore.load(project.rootProject.file('local.properties').newDataInputStream())
 android {
     namespace 'ai.bitlabs.sdk'
 
-    compileSdk 34 // NOTE: For Jitpack Compatibility
+    compileSdk 34
 
     defaultConfig {
         minSdkVersion 19
-        targetSdkVersion 34
+        targetSdk 34
         multiDexEnabled true
 
         buildConfigField 'String', 'APP_TOKEN', keystore.getProperty('appToken', '"APP_TOKEN"')
@@ -33,10 +33,10 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8.toString()
-    }
+//
+//    kotlinOptions {
+//        jvmTarget = JavaVersion.VERSION_1_8.toString()
+//    }
 
     packagingOptions {
         resources.excludes.add("META-INF/*")

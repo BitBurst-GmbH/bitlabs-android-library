@@ -17,6 +17,7 @@ import ai.bitlabs.sdk.util.randomSurvey
 import ai.bitlabs.sdk.views.LeaderboardFragment
 import ai.bitlabs.sdk.views.SurveysAdapter
 import ai.bitlabs.sdk.views.WebActivity
+import ai.bitlabs.sdk.views.WidgetFragment
 import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
@@ -162,6 +163,8 @@ object BitLabs {
             adapter = SurveysAdapter(context, surveys, type, it, widgetColors, bonusPercentage)
         }
     }
+
+    fun getLeaderboardWidget() = WidgetFragment(uid, token, WidgetType.LEADERBOARD)
 
     fun getLeaderboard(onResponseListener: OnResponseListener<LeaderboardFragment?>) =
         bitLabsRepo?.getLeaderboard({ leaderboard ->

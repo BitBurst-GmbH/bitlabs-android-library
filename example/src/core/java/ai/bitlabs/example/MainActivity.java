@@ -45,20 +45,25 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.btn_get_surveys).setOnClickListener(view -> bitLabs.getSurveys(
                 surveys -> {
                     surveyLayout.removeAllViews();
-                    surveyLayout.addView(bitLabs.getSurveyWidgets(this, surveys, WidgetType.FULLWIDTH));
+                    surveyLayout.addView(bitLabs.getSurveyWidgets(this, surveys, WidgetType.FULL_WIDTH));
                 },
                 exception -> Log.e(TAG, "GetSurveysErr: " + exception.getMessage(), exception.getCause()))
         );
 
         findViewById(R.id.btn_launch_offerwall).setOnClickListener(view -> bitLabs.launchOfferWall(this));
 
-        bitLabs.getLeaderboard(leaderboardFragment -> {
-            if (leaderboardFragment == null) return;
+//        bitLabs.getLeaderboard(leaderboardFragment -> {
+//            if (leaderboardFragment == null) return;
+//
+//            getSupportFragmentManager()
+//                    .beginTransaction()
+//                    .add(R.id.fragment_container_view_tag, leaderboardFragment)
+//                    .commit();
+//        });
 
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .add(R.id.fragment_container_view_tag, leaderboardFragment)
-                    .commit();
-        });
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.fragment_container_view_tag, bitLabs.getLeaderboardWidget())
+                .commit();
     }
 }

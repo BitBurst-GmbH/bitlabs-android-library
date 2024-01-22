@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
 
         findViewById(R.id.btn_launch_offerwall).setOnClickListener(view -> bitLabs.launchOfferWall(this));
 
+        // Getting the Leaderboard Fragment the old deprecated way
 //        bitLabs.getLeaderboard(leaderboardFragment -> {
 //            if (leaderboardFragment == null) return;
 //

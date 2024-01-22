@@ -2,6 +2,7 @@ package ai.bitlabs.sdk.views
 
 import ai.bitlabs.sdk.R
 import ai.bitlabs.sdk.data.model.WidgetType
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -16,26 +17,21 @@ class WidgetFragment(
     private val widgetType: WidgetType,
 ) : Fragment(R.layout.fragment_widget) {
 
-    var webView: WebView? = null
+    private var webView: WebView? = null
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        webView = view.findViewById(R.id.widget_webview)
-        val leaderboardData = """
+    private val widgetHtml = """
             <!DOCTYPE html>
             <html style="height: 100%" lang="en">
                 <head>
                     <meta charset="utf-8" />
-                    <title>BitLabs Widget</title>
-                </head>
-                <body style="height: 96%; background-color: #a28089">
                     <script src="https://sdk.bitlabs.ai/bitlabs-sdk-v0.0.2.js"></script>
                     <link
-                      rel="stylesheet"
-                      href="https://sdk.bitlabs.ai/bitlabs-sdk-v0.0.2.css"
+                        rel="stylesheet"
+                        href="https://sdk.bitlabs.ai/bitlabs-sdk-v0.0.2.css"
                     />
-                    
+                    <title>BitLabs Widget</title>
+                </head>
+                <body style="height: 96%">
                     <div id="widget" style="height: 100%"></div>
 
                     <script>
@@ -60,6 +56,25 @@ class WidgetFragment(
             </html>
         """.trimIndent()
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        setupWebView(view)
+
+        webView?.loadDataWithBaseURL(
+            "https://www.google.com",
+            widgetHtml,
+            "text/html",
+            "UTF-8",
+            null
+        )
+    }
+
+    @SuppressLint("SetJavaScriptEnabled")
+    private fun setupWebView(view: View) {
+        webView = view.findViewById(R.id.widget_webview)
+
+
         webView?.webChromeClient = object : WebChromeClient() {
             override fun onConsoleMessage(consoleMessage: ConsoleMessage?): Boolean {
                 consoleMessage?.let {
@@ -73,13 +88,5 @@ class WidgetFragment(
         }
 
         webView?.settings?.javaScriptEnabled = true
-
-        webView?.loadDataWithBaseURL(
-            "https://www.google.com",
-            leaderboardData,
-            "text/html",
-            "UTF-8",
-            null
-        )
     }
 }

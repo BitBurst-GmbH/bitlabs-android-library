@@ -2,9 +2,10 @@ package ai.bitlabs.sdk.views
 
 import ai.bitlabs.sdk.R
 import ai.bitlabs.sdk.data.model.WidgetType
+import ai.bitlabs.sdk.util.log
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.webkit.ConsoleMessage
 import android.webkit.WebChromeClient
@@ -36,16 +37,14 @@ class WidgetFragment(
 
                     <script>
                           function initSDK() {
-                            // Replace YOUR_APP_TOKEN with your API token from the dashboard, insert USER_ID dynamically for each user
                             window.bitlabsSDK.init("${token}", "${uid}")
                               .then(() => {
-                                // You can change the HTML element id or the offerwall position if you like
                                 window.bitlabsSDK.showWidget(
                                   "#widget",
                                   "${widgetType.asString}",
-                                  "bottom-left",
-                                  { onClick: undefined }
+                                  { onClick: () => undefined }
                                 );
+                                
                                 document.removeEventListener("DOMContentLoaded", this.initSDK);
                               });
                           }
@@ -62,7 +61,7 @@ class WidgetFragment(
         setupWebView(view)
 
         webView?.loadDataWithBaseURL(
-            "https://www.google.com",
+            "https://sdk.bitlabs.ai",
             widgetHtml,
             "text/html",
             "UTF-8",
@@ -74,19 +73,17 @@ class WidgetFragment(
     private fun setupWebView(view: View) {
         webView = view.findViewById(R.id.widget_webview)
 
+        webView?.settings?.javaScriptEnabled = true
+
+        webView?.setBackgroundColor(Color.TRANSPARENT)
+
+        if (widgetType != WidgetType.LEADERBOARD) webView?.layoutParams?.height = 500
 
         webView?.webChromeClient = object : WebChromeClient() {
             override fun onConsoleMessage(consoleMessage: ConsoleMessage?): Boolean {
-                consoleMessage?.let {
-                    Log.e(
-                        "BitLabs",
-                        "${it.message()} -- From line ${it.lineNumber()} of ${it.sourceId()}"
-                    )
-                }
+                consoleMessage?.log()
                 return super.onConsoleMessage(consoleMessage)
             }
         }
-
-        webView?.settings?.javaScriptEnabled = true
     }
 }

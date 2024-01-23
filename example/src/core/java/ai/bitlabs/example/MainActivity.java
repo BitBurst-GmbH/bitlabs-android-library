@@ -2,7 +2,6 @@ package ai.bitlabs.example;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.RelativeLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -10,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import ai.bitlabs.sdk.BitLabs;
+import ai.bitlabs.sdk.data.model.Survey;
 
 public class MainActivity extends AppCompatActivity {
     private final String TAG = "Example";
@@ -36,36 +36,32 @@ public class MainActivity extends AppCompatActivity {
 
         findViewById(R.id.btn_check_surveys).setOnClickListener(view -> bitLabs.checkSurveys(hasSurveys -> Log.i(TAG, hasSurveys ? "Found Surveys" : "No Surveys"), e -> Log.e(TAG, "CheckSurveysErr: " + e.getMessage(), e.getCause())));
 
-        RelativeLayout surveyLayout = findViewById(R.id.rl_survey_widgets);
-
-        findViewById(R.id.btn_get_surveys).setOnClickListener(view -> bitLabs.getSurveys(surveys -> {
-                    surveyLayout.removeAllViews();
-//                    surveyLayout.addView(bitLabs.getSurveyWidget());
-                    getSupportFragmentManager()
-                            .beginTransaction()
-                            .add(R.id.rl_survey_widgets, bitLabs.getSurveyWidget())
-                            .commit();
+        findViewById(R.id.btn_get_surveys).setOnClickListener(view -> bitLabs.getSurveys(
+                surveys -> {
+                    for (Survey survey : surveys) {
+                        Log.i(TAG, "Survey Id: " + survey.getId() + " in " + survey.getCategory().getName());
+                    }
                 },
                 exception -> Log.e(
                         TAG,
-                        "GetSurveysErr: " + exception.getMessage(),
-                        exception.getCause())));
+                        "GetSurveys Error: " + exception.getMessage(),
+                        exception.getCause()))
+        );
+
+        findViewById(R.id.btn_show_survey_widget).setOnClickListener(view ->
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.rl_survey_widgets, bitLabs.getSurveyWidget())
+                        .commit()
+        );
 
         findViewById(R.id.btn_launch_offerwall).setOnClickListener(view -> bitLabs.launchOfferWall(this));
 
-        // Getting the Leaderboard Fragment the old deprecated way
-//        bitLabs.getLeaderboard(leaderboardFragment -> {
-//            if (leaderboardFragment == null) return;
-//
-//            getSupportFragmentManager()
-//                    .beginTransaction()
-//                    .add(R.id.fragment_container_view_tag, leaderboardFragment)
-//                    .commit();
-//        });
-
-        getSupportFragmentManager()
-                .beginTransaction()
-                .add(R.id.fragment_container_view_tag, bitLabs.getLeaderboardWidget())
-                .commit();
+        findViewById(R.id.btn_show_leaderboard).setOnClickListener(view ->
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragment_container_view_tag, bitLabs.getLeaderboardWidget())
+                        .commit()
+        );
     }
 }

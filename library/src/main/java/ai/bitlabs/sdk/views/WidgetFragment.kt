@@ -13,8 +13,8 @@ import android.webkit.WebView
 import androidx.fragment.app.Fragment
 
 class WidgetFragment(
-    private val uid: String,
-    private val token: String,
+    uid: String,
+    token: String,
     private val widgetType: WidgetType,
 ) : Fragment(R.layout.fragment_widget) {
 
@@ -37,7 +37,7 @@ class WidgetFragment(
 
                     <script>
                           function initSDK() {
-                            window.bitlabsSDK.init("${token}", "${uid}")
+                            window.bitlabsSDK.init("$token", "$uid")
                               .then(() => {
                                 window.bitlabsSDK.showWidget(
                                   "#widget",

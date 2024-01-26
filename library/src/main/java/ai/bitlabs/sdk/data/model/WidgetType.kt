@@ -5,7 +5,7 @@ enum class WidgetType(val asString: String) {
     SIMPLE("simple"),
     COMPACT("compact"),
     FULL_WIDTH("full-width"),
-    NOTIFICATION("notification"),
-    EARNINGS("earnings"),
-    OFFERS("offers");
+//    NOTIFICATION("notification"),
+//    EARNINGS("earnings"),
+//    OFFERS("offers");
 }

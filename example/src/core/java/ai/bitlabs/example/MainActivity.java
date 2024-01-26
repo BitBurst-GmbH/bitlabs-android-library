@@ -50,19 +50,13 @@ public class MainActivity extends AppCompatActivity {
         );
 
         findViewById(R.id.btn_show_survey_widget).setOnClickListener(view ->
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.container_survey_widget, bitLabs.getSurveyWidget(WidgetType.COMPACT))
-                        .commit()
+                bitLabs.showSurvey(this, R.id.container_survey_widget, WidgetType.COMPACT)
         );
 
         findViewById(R.id.btn_launch_offerwall).setOnClickListener(view -> bitLabs.launchOfferWall(this));
 
         findViewById(R.id.btn_show_leaderboard).setOnClickListener(view ->
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.container_leaderboard, bitLabs.getLeaderboardWidget())
-                        .commit()
+                bitLabs.showLeaderboard(this, R.id.container_leaderboard)
         );
     }
 }

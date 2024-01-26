@@ -23,6 +23,7 @@ import android.content.Intent
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.util.Log
+import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL
 import androidx.recyclerview.widget.RecyclerView
@@ -151,12 +152,22 @@ object BitLabs {
         }
     }
 
-    fun getSurveyWidget(type: WidgetType) = WidgetFragment(uid, token, type)
+    fun showSurvey(
+        activity: FragmentActivity,
+        containerId: Int,
+        type: WidgetType = WidgetType.SIMPLE
+    ) = activity
+        .supportFragmentManager
+        .beginTransaction()
+        .replace(containerId, WidgetFragment(uid, token, type))
+        .commit()
+
 
     /**
      * Returns a RecyclerView populated with the [surveys].
      */
     @JvmOverloads
+    @Deprecated("Use showSurvey instead")
     fun getSurveyWidgets(
         context: Context, surveys: List<Survey>, type: WidgetType = WidgetType.COMPACT
     ) = RecyclerView(context).apply {
@@ -166,8 +177,13 @@ object BitLabs {
         }
     }
 
-    fun getLeaderboardWidget() = WidgetFragment(uid, token, WidgetType.LEADERBOARD)
+    fun showLeaderboard(activity: FragmentActivity, containerId: Int) = activity
+        .supportFragmentManager
+        .beginTransaction()
+        .replace(containerId, WidgetFragment(uid, token, WidgetType.LEADERBOARD))
+        .commit()
 
+    @Deprecated("Use showLeaderboard instead")
     fun getLeaderboard(onResponseListener: OnResponseListener<LeaderboardFragment?>) =
         bitLabsRepo?.getLeaderboard({ leaderboard ->
             onResponseListener.onResponse(leaderboard.topUsers?.takeUnless { it.isEmpty() }?.run {

@@ -4,7 +4,6 @@ import ai.bitlabs.sdk.R
 import ai.bitlabs.sdk.data.model.WidgetType
 import ai.bitlabs.sdk.util.log
 import android.annotation.SuppressLint
-import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.webkit.ConsoleMessage
@@ -22,9 +21,17 @@ class WidgetFragment(
 
     private val widgetHtml = """
             <!DOCTYPE html>
-            <html style="height: 100%" lang="en">
+            <html lang="en">
                 <head>
                     <meta charset="utf-8" />
+                        <style>
+                          html,
+                          body,
+                          #widget {
+                            height: 100%;
+                            margin: 0;
+                          }
+                        </style>
                     <script src="https://sdk.bitlabs.ai/bitlabs-sdk-v0.0.2.js"></script>
                     <link
                         rel="stylesheet"
@@ -32,8 +39,8 @@ class WidgetFragment(
                     />
                     <title>BitLabs Widget</title>
                 </head>
-                <body style="height: 96%">
-                    <div id="widget" style="height: 100%"></div>
+                <body>
+                    <div id="widget"></div>
 
                     <script>
                           function initSDK() {
@@ -75,9 +82,21 @@ class WidgetFragment(
 
         webView?.settings?.javaScriptEnabled = true
 
-        webView?.setBackgroundColor(Color.TRANSPARENT)
+        webView?.layoutParams?.apply {
+            if (widgetType == WidgetType.SIMPLE) {
+                height = 359
+                width = 769
+            }
 
-        if (widgetType != WidgetType.LEADERBOARD) webView?.layoutParams?.height = 500
+            if (widgetType == WidgetType.COMPACT) {
+                height = 200
+                width = 690
+            }
+
+            if (widgetType == WidgetType.FULL_WIDTH) {
+                height = 160
+            }
+        }
 
         webView?.webChromeClient = object : WebChromeClient() {
             override fun onConsoleMessage(consoleMessage: ConsoleMessage?): Boolean {

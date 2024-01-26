@@ -151,7 +151,7 @@ object BitLabs {
         }
     }
 
-    fun getSurveyWidget() = WidgetFragment(uid, token, WidgetType.SIMPLE)
+    fun getSurveyWidget(type: WidgetType) = WidgetFragment(uid, token, type)
 
     /**
      * Returns a RecyclerView populated with the [surveys].

@@ -5,11 +5,13 @@ import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.time.Year;
 import java.util.HashMap;
 import java.util.Map;
 
 import ai.bitlabs.sdk.BitLabs;
 import ai.bitlabs.sdk.data.model.Survey;
+import ai.bitlabs.sdk.data.model.WidgetType;
 
 public class MainActivity extends AppCompatActivity {
     private final String TAG = "Example";
@@ -51,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.btn_show_survey_widget).setOnClickListener(view ->
                 getSupportFragmentManager()
                         .beginTransaction()
-                        .replace(R.id.rl_survey_widgets, bitLabs.getSurveyWidget())
+                        .replace(R.id.rl_survey_widgets, bitLabs.getSurveyWidget(WidgetType.FULL_WIDTH))
                         .commit()
         );
 

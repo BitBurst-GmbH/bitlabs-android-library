@@ -4,6 +4,7 @@ import ai.bitlabs.sdk.R
 import ai.bitlabs.sdk.data.model.WidgetType
 import ai.bitlabs.sdk.util.log
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.webkit.ConsoleMessage
@@ -82,15 +83,17 @@ class WidgetFragment(
 
         webView?.settings?.javaScriptEnabled = true
 
+        webView?.setBackgroundColor(Color.TRANSPARENT)
+
         webView?.layoutParams?.apply {
             if (widgetType == WidgetType.SIMPLE) {
                 height = 359
-                width = 769
+                width = 800
             }
 
             if (widgetType == WidgetType.COMPACT) {
-                height = 200
-                width = 690
+                height = 205
+                width = 710
             }
 
             if (widgetType == WidgetType.FULL_WIDTH) {

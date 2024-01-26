@@ -5,7 +5,6 @@ import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.time.Year;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.btn_show_survey_widget).setOnClickListener(view ->
                 getSupportFragmentManager()
                         .beginTransaction()
-                        .replace(R.id.rl_survey_widgets, bitLabs.getSurveyWidget(WidgetType.FULL_WIDTH))
+                        .replace(R.id.container_survey_widget, bitLabs.getSurveyWidget(WidgetType.COMPACT))
                         .commit()
         );
 
@@ -62,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.btn_show_leaderboard).setOnClickListener(view ->
                 getSupportFragmentManager()
                         .beginTransaction()
-                        .replace(R.id.fragment_container_view_tag, bitLabs.getLeaderboardWidget())
+                        .replace(R.id.container_leaderboard, bitLabs.getLeaderboardWidget())
                         .commit()
         );
     }

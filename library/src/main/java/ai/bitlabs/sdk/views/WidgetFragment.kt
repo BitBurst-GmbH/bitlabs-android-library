@@ -1,11 +1,13 @@
 package ai.bitlabs.sdk.views
 
+import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.R
 import ai.bitlabs.sdk.data.model.WidgetType
 import ai.bitlabs.sdk.util.log
 import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
+import android.view.MotionEvent
 import android.view.View
 import android.webkit.ConsoleMessage
 import android.webkit.WebChromeClient
@@ -50,7 +52,7 @@ class WidgetFragment(
                                 window.bitlabsSDK.showWidget(
                                   "#widget",
                                   "${widgetType.asString}",
-                                  { onClick: () => undefined }
+                                  { onClick: undefined }
                                 );
                                 
                                 document.removeEventListener("DOMContentLoaded", this.initSDK);
@@ -77,7 +79,7 @@ class WidgetFragment(
         )
     }
 
-    @SuppressLint("SetJavaScriptEnabled")
+    @SuppressLint("SetJavaScriptEnabled", "ClickableViewAccessibility")
     private fun setupWebView(view: View) {
         webView = view.findViewById(R.id.widget_webview)
 
@@ -106,6 +108,19 @@ class WidgetFragment(
                 consoleMessage?.log()
                 return super.onConsoleMessage(consoleMessage)
             }
+        }
+
+        webView?.setOnTouchListener { v, e ->
+            when (e.action) {
+                MotionEvent.ACTION_UP -> {
+                    // check if the action was a click not any other action
+                    if (e.eventTime - e.downTime < 200) {
+                        v.performClick()
+                        BitLabs.launchOfferWall(requireActivity())
+                    }
+                }
+            }
+            false
         }
     }
 }

@@ -152,15 +152,19 @@ object BitLabs {
         }
     }
 
+    /**
+     * Shows a Survey Fragment in the [activity] with the [containerId] as its container.
+     */
     fun showSurvey(
         activity: FragmentActivity,
         containerId: Int,
         type: WidgetType = WidgetType.SIMPLE
-    ) = activity
-        .supportFragmentManager
-        .beginTransaction()
-        .replace(containerId, WidgetFragment(uid, token, type))
-        .commit()
+    ) = ifInitialised {
+        activity.supportFragmentManager
+            .beginTransaction()
+            .replace(containerId, WidgetFragment(uid, token, type))
+            .commit()
+    }
 
 
     /**
@@ -177,11 +181,15 @@ object BitLabs {
         }
     }
 
-    fun showLeaderboard(activity: FragmentActivity, containerId: Int) = activity
-        .supportFragmentManager
-        .beginTransaction()
-        .replace(containerId, WidgetFragment(uid, token, WidgetType.LEADERBOARD))
-        .commit()
+    /**
+     * Shows a Leaderboard Fragment in the [activity] with the [containerId] as its container.
+     */
+    fun showLeaderboard(activity: FragmentActivity, containerId: Int) = ifInitialised {
+        activity.supportFragmentManager
+            .beginTransaction()
+            .replace(containerId, WidgetFragment(uid, token, WidgetType.LEADERBOARD))
+            .commit()
+    }
 
     @Deprecated("Use showLeaderboard instead")
     fun getLeaderboard(onResponseListener: OnResponseListener<LeaderboardFragment?>) =

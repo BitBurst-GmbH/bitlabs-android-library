@@ -174,7 +174,7 @@ internal class WebActivity : AppCompatActivity() {
                 areParametersInjected = false
             }
             toggleToolbar(isPageOfferWall)
-        }, { error, date, errUrl ->
+        }) { error, date, errUrl ->
 
             val errorInfo =
                 "code: ${error?.getStatusCode()}, description: ${error?.getDescription()}"
@@ -188,7 +188,7 @@ internal class WebActivity : AppCompatActivity() {
                     getString(R.string.error_id, errorStr).trim()
                 (it.children.first() as? ImageView)?.setQRCodeBitmap(errorStr)
             }
-        })
+        }
     }
 
     /** Shows or hides some UI elements according to whether [isPageOfferWall] is `true` or `false`. */

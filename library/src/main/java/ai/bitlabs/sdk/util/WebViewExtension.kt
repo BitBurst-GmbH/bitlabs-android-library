@@ -4,7 +4,6 @@ import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.data.model.WebViewError
 import ai.bitlabs.sdk.views.WebActivity
 import android.annotation.SuppressLint
-import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.os.Message
@@ -18,15 +17,13 @@ import androidx.browser.customtabs.CustomTabsIntent
 /** Adds all necessary configurations for its receiver [WebActivity.webView] */
 @SuppressLint("SetJavaScriptEnabled")
 fun WebView.setup(
-    context: Context,
     onDoUpdateVisitedHistory: (isPageOfferWall: Boolean, url: String) -> Unit,
     onError: (error: WebViewError?, date: String, url: String) -> Unit,
 ) {
-
+    val context = context
     var uriResult: ValueCallback<Array<Uri>>? = null
 
     val chooser = (context as WebActivity).registerForActivityResult(GetMultipleContents()) {
-        Log.i(TAG, "onActivityResult called")
         if (it != null) {
             uriResult?.onReceiveValue(it.toTypedArray())
         } else {
@@ -91,7 +88,11 @@ fun WebView.setup(
         override fun onReceivedHttpError(
             view: WebView?, request: WebResourceRequest?, errorResponse: WebResourceResponse?
         ) {
-            if (BitLabs.debugMode || errorResponse?.statusCode == 404) onError(
+
+            val isPageMagicReceipts =
+                request?.url?.toString()?.contains("/heap-undefined.js") == true
+
+            if (!isPageMagicReceipts && (BitLabs.debugMode || errorResponse?.statusCode == 404)) onError(
                 WebViewError(errorResponse = errorResponse),
                 System.currentTimeMillis().toString(),
                 request?.url.toString()

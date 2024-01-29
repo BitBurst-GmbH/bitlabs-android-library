@@ -139,7 +139,7 @@ internal class WebActivity : AppCompatActivity() {
         webView = findViewById(R.id.wv_bitlabs)
         webView?.scrollBarStyle = WebView.SCROLLBARS_OUTSIDE_OVERLAY
 
-        webView?.setup(this, { isPageOfferWall, url ->
+        webView?.setup({ isPageOfferWall, url ->
             if (url.contains("/close")) {
                 finish()
                 return@setup

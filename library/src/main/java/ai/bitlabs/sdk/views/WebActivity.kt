@@ -6,6 +6,7 @@ import ai.bitlabs.sdk.util.BUNDLE_KEY_COLOR
 import ai.bitlabs.sdk.util.BUNDLE_KEY_PARAMS
 import ai.bitlabs.sdk.util.TAG
 import ai.bitlabs.sdk.util.getLuminance
+import ai.bitlabs.sdk.util.getSerializableCompat
 import ai.bitlabs.sdk.util.setQRCodeBitmap
 import ai.bitlabs.sdk.util.setup
 import android.graphics.Color
@@ -111,7 +112,8 @@ internal class WebActivity : AppCompatActivity() {
         sdk = bundle.getString("sdk", "NATIVE")
         maid = bundle.getString("maid", "")
 
-        tags = bundle.getSerializable("tags") as? Map<String, Any> ?: mapOf()
+        tags = bundle.getSerializableCompat<HashMap<String, Any>>("tags")
+            ?: mapOf()
 
         colors = intent.getIntArrayExtra(BUNDLE_KEY_COLOR)?.takeIf { it.isNotEmpty() } ?: colors
     }

@@ -92,7 +92,7 @@ fun WebView.setup(
             val isPageMagicReceipts =
                 request?.url?.toString()?.contains("/heap-undefined.js") == true
 
-            if (!isPageMagicReceipts && (BitLabs.debugMode || errorResponse?.statusCode == 404)) onError(
+            if (BitLabs.debugMode || (!isPageMagicReceipts && errorResponse?.statusCode == 404)) onError(
                 WebViewError(errorResponse = errorResponse),
                 System.currentTimeMillis().toString(),
                 request?.url.toString()

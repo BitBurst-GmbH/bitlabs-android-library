@@ -139,7 +139,7 @@ internal class WebActivity : AppCompatActivity() {
         webView = findViewById(R.id.wv_bitlabs)
         webView?.scrollBarStyle = WebView.SCROLLBARS_OUTSIDE_OVERLAY
 
-        webView?.setup(this, { isPageOfferWall, url ->
+        webView?.setup({ isPageOfferWall, url ->
             if (url.contains("/close")) {
                 finish()
                 return@setup
@@ -174,7 +174,7 @@ internal class WebActivity : AppCompatActivity() {
                 areParametersInjected = false
             }
             toggleToolbar(isPageOfferWall)
-        }, { error, date, errUrl ->
+        }) { error, date, errUrl ->
 
             val errorInfo =
                 "code: ${error?.getStatusCode()}, description: ${error?.getDescription()}"
@@ -188,7 +188,7 @@ internal class WebActivity : AppCompatActivity() {
                     getString(R.string.error_id, errorStr).trim()
                 (it.children.first() as? ImageView)?.setQRCodeBitmap(errorStr)
             }
-        })
+        }
     }
 
     /** Shows or hides some UI elements according to whether [isPageOfferWall] is `true` or `false`. */

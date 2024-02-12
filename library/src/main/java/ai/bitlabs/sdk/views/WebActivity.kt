@@ -6,6 +6,7 @@ import ai.bitlabs.sdk.util.BUNDLE_KEY_COLOR
 import ai.bitlabs.sdk.util.BUNDLE_KEY_PARAMS
 import ai.bitlabs.sdk.util.TAG
 import ai.bitlabs.sdk.util.getLuminance
+import ai.bitlabs.sdk.util.getSerializableCompat
 import ai.bitlabs.sdk.util.setQRCodeBitmap
 import ai.bitlabs.sdk.util.setup
 import android.graphics.Color
@@ -111,7 +112,8 @@ internal class WebActivity : AppCompatActivity() {
         sdk = bundle.getString("sdk", "NATIVE")
         maid = bundle.getString("maid", "")
 
-        tags = bundle.getSerializable("tags") as? Map<String, Any> ?: mapOf()
+        tags = bundle.getSerializableCompat<HashMap<String, Any>>("tags")
+            ?: mapOf()
 
         colors = intent.getIntArrayExtra(BUNDLE_KEY_COLOR)?.takeIf { it.isNotEmpty() } ?: colors
     }
@@ -139,7 +141,7 @@ internal class WebActivity : AppCompatActivity() {
         webView = findViewById(R.id.wv_bitlabs)
         webView?.scrollBarStyle = WebView.SCROLLBARS_OUTSIDE_OVERLAY
 
-        webView?.setup(this, { isPageOfferWall, url ->
+        webView?.setup({ isPageOfferWall, url ->
             if (url.contains("/close")) {
                 finish()
                 return@setup
@@ -174,7 +176,7 @@ internal class WebActivity : AppCompatActivity() {
                 areParametersInjected = false
             }
             toggleToolbar(isPageOfferWall)
-        }, { error, date, errUrl ->
+        }) { error, date, errUrl ->
 
             val errorInfo =
                 "code: ${error?.getStatusCode()}, description: ${error?.getDescription()}"
@@ -188,7 +190,7 @@ internal class WebActivity : AppCompatActivity() {
                     getString(R.string.error_id, errorStr).trim()
                 (it.children.first() as? ImageView)?.setQRCodeBitmap(errorStr)
             }
-        })
+        }
     }
 
     /** Shows or hides some UI elements according to whether [isPageOfferWall] is `true` or `false`. */

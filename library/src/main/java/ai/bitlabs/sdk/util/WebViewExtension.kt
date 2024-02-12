@@ -4,23 +4,33 @@ import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.data.model.WebViewError
 import ai.bitlabs.sdk.views.WebActivity
 import android.annotation.SuppressLint
-import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.os.Message
 import android.util.Log
 import android.view.View
 import android.webkit.*
+import androidx.activity.result.contract.ActivityResultContracts.*
 import androidx.annotation.RequiresApi
 import androidx.browser.customtabs.CustomTabsIntent
 
-/** Adds all necessary configurations for the its receiver [WebActivity.webView] */
+/** Adds all necessary configurations for its receiver [WebActivity.webView] */
 @SuppressLint("SetJavaScriptEnabled")
 fun WebView.setup(
-    context: Context,
     onDoUpdateVisitedHistory: (isPageOfferWall: Boolean, url: String) -> Unit,
     onError: (error: WebViewError?, date: String, url: String) -> Unit,
 ) {
+    val context = context
+    var uriResult: ValueCallback<Array<Uri>>? = null
+
+    val chooser = (context as WebActivity).registerForActivityResult(GetMultipleContents()) {
+        if (it != null) {
+            uriResult?.onReceiveValue(it.toTypedArray())
+        } else {
+            uriResult?.onReceiveValue(null)
+        }
+    }
+
     if (Build.VERSION.SDK_INT >= 21) CookieManager.getInstance()
         .setAcceptThirdPartyCookies(this, true)
     else CookieManager.getInstance().setAcceptCookie(true)
@@ -29,10 +39,7 @@ fun WebView.setup(
 
     this.webChromeClient = object : WebChromeClient() {
         override fun onCreateWindow(
-            view: WebView,
-            dialog: Boolean,
-            userGesture: Boolean,
-            resultMsg: Message
+            view: WebView, dialog: Boolean, userGesture: Boolean, resultMsg: Message
         ): Boolean {
             val newWebView = WebView(view.context)
             with(resultMsg.obj as WebView.WebViewTransport) { webView = newWebView }
@@ -40,15 +47,25 @@ fun WebView.setup(
 
             newWebView.webViewClient = object : WebViewClient() {
                 override fun doUpdateVisitedHistory(
-                    view: WebView?,
-                    url: String?,
-                    isReload: Boolean
+                    view: WebView?, url: String?, isReload: Boolean
                 ) {
-                    if (!url.isNullOrEmpty())
-                        CustomTabsIntent.Builder().build().launchUrl(context, Uri.parse(url))
+                    if (!url.isNullOrEmpty()) CustomTabsIntent.Builder().build()
+                        .launchUrl(context, Uri.parse(url))
                     super.doUpdateVisitedHistory(view, url, isReload)
                 }
             }
+
+            return true
+        }
+
+        override fun onShowFileChooser(
+            webView: WebView?,
+            filePathCallback: ValueCallback<Array<Uri>>?,
+            fileChooserParams: FileChooserParams?
+        ): Boolean {
+            uriResult = filePathCallback
+
+            chooser.launch("image/*")
 
             return true
         }
@@ -57,8 +74,7 @@ fun WebView.setup(
     this.webViewClient = object : WebViewClient() {
         override fun doUpdateVisitedHistory(view: WebView?, url: String?, isReload: Boolean) {
             onDoUpdateVisitedHistory(
-                url?.startsWith("https://web.bitlabs.ai") ?: true,
-                url ?: ""
+                url?.startsWith("https://web.bitlabs.ai") ?: true, url ?: ""
             )
             super.doUpdateVisitedHistory(view, url, isReload)
         }
@@ -70,34 +86,30 @@ fun WebView.setup(
 
         @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
         override fun onReceivedHttpError(
-            view: WebView?,
-            request: WebResourceRequest?,
-            errorResponse: WebResourceResponse?
+            view: WebView?, request: WebResourceRequest?, errorResponse: WebResourceResponse?
         ) {
-            if (BitLabs.debugMode || errorResponse?.statusCode == 404)
-                onError(
-                    WebViewError(errorResponse = errorResponse),
-                    System.currentTimeMillis().toString(),
-                    request?.url.toString()
-                )
+
+            val isPageMagicReceipts =
+                request?.url?.toString()?.contains("/heap-undefined.js") == true
+
+            if (BitLabs.debugMode || (!isPageMagicReceipts && errorResponse?.statusCode == 404)) onError(
+                WebViewError(errorResponse = errorResponse),
+                System.currentTimeMillis().toString(),
+                request?.url.toString()
+            )
             super.onReceivedHttpError(view, request, errorResponse)
         }
 
         @RequiresApi(Build.VERSION_CODES.M)
         override fun onReceivedError(
-            view: WebView?,
-            request: WebResourceRequest?,
-            error: WebResourceError?
+            view: WebView?, request: WebResourceRequest?, error: WebResourceError?
         ) {
             Log.d(TAG, "onReceivedError: ${error?.description}")
-            if (BitLabs.debugMode
-                || error?.description?.contains("ERR_CLEARTEXT_NOT_PERMITTED") == true
+            if (BitLabs.debugMode || error?.description?.contains("ERR_CLEARTEXT_NOT_PERMITTED") == true) onError(
+                WebViewError(error = error),
+                System.currentTimeMillis().toString(),
+                request?.url.toString()
             )
-                onError(
-                    WebViewError(error = error),
-                    System.currentTimeMillis().toString(),
-                    request?.url.toString()
-                )
             super.onReceivedError(view, request, error)
         }
     }

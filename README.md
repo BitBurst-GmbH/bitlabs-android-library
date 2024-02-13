@@ -9,8 +9,9 @@ reference on how to integrate this SDK. Take a look at `/example` for more detai
 
 ### Dependencies
 
-Add the following above the __dependencies__ section of your app level build.gradle file:
-``` Groovy
+Add the following above the **dependencies** section of your app level build.gradle file:
+
+```Groovy
 repositories {
     maven {
         url 'https://jitpack.io'
@@ -19,9 +20,10 @@ repositories {
 ```
 
 Then add the dependency in the same file:
-``` Groovy
+
+```Groovy
 dependencies {
-    implementation 'com.github.BitBurst-GmbH.bitlabs-android-library:core:3.0.0'
+    implementation 'com.github.BitBurst-GmbH.bitlabs-android-library:core:3.2.0'
 }
 ```
 

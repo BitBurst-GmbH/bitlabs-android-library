@@ -2,7 +2,6 @@ package ai.bitlabs.example;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.RelativeLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -10,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import ai.bitlabs.sdk.BitLabs;
+import ai.bitlabs.sdk.data.model.Survey;
 import ai.bitlabs.sdk.data.model.WidgetType;
 
 public class MainActivity extends AppCompatActivity {
@@ -35,30 +35,28 @@ public class MainActivity extends AppCompatActivity {
         // Get client-side callbacks to reward the user (We highly recommend using server-to-server callbacks!)
         bitLabs.setOnRewardListener(payout -> Log.i(TAG, "Reward payout: " + payout));
 
-        findViewById(R.id.btn_check_surveys).setOnClickListener(view -> bitLabs.checkSurveys(
-                hasSurveys -> Log.i(TAG, hasSurveys ? "Found Surveys" : "No Surveys"),
-                e -> Log.e(TAG, "CheckSurveysErr: " + e.getMessage(), e.getCause()))
-        );
-
-        RelativeLayout surveyLayout = findViewById(R.id.rl_survey_widgets);
+        findViewById(R.id.btn_check_surveys).setOnClickListener(view -> bitLabs.checkSurveys(hasSurveys -> Log.i(TAG, hasSurveys ? "Found Surveys" : "No Surveys"), e -> Log.e(TAG, "CheckSurveysErr: " + e.getMessage(), e.getCause())));
 
         findViewById(R.id.btn_get_surveys).setOnClickListener(view -> bitLabs.getSurveys(
                 surveys -> {
-                    surveyLayout.removeAllViews();
-                    surveyLayout.addView(bitLabs.getSurveyWidgets(this, surveys, WidgetType.FULLWIDTH));
+                    for (Survey survey : surveys) {
+                        Log.i(TAG, "Survey Id: " + survey.getId() + " in " + survey.getCategory().getName());
+                    }
                 },
-                exception -> Log.e(TAG, "GetSurveysErr: " + exception.getMessage(), exception.getCause()))
+                exception -> Log.e(
+                        TAG,
+                        "GetSurveys Error: " + exception.getMessage(),
+                        exception.getCause()))
+        );
+
+        findViewById(R.id.btn_show_survey_widget).setOnClickListener(view ->
+                bitLabs.showSurvey(this, R.id.container_survey_widget, WidgetType.COMPACT)
         );
 
         findViewById(R.id.btn_launch_offerwall).setOnClickListener(view -> bitLabs.launchOfferWall(this));
 
-        bitLabs.getLeaderboard(leaderboardFragment -> {
-            if (leaderboardFragment == null) return;
-
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .add(R.id.fragment_container_view_tag, leaderboardFragment)
-                    .commit();
-        });
+        findViewById(R.id.btn_show_leaderboard).setOnClickListener(view ->
+                bitLabs.showLeaderboard(this, R.id.container_leaderboard)
+        );
     }
 }

@@ -77,21 +77,27 @@ class SurveyView(context: Context, private val type: WidgetType = WidgetType.SIM
                 .colors = when (type) {
                 WidgetType.COMPACT -> value
                 WidgetType.SIMPLE -> intArrayOf(Color.WHITE, Color.WHITE)
-                WidgetType.FULLWIDTH -> intArrayOf(Color.WHITE, Color.WHITE)
+                WidgetType.FULL_WIDTH -> intArrayOf(Color.WHITE, Color.WHITE)
+
+                else -> intArrayOf(Color.WHITE, Color.WHITE)
             }
 
             bonusPercentageTV?.setTextColor(
                 when (type) {
                     WidgetType.COMPACT -> Color.WHITE
                     WidgetType.SIMPLE -> value.first()
-                    WidgetType.FULLWIDTH -> value.first()
+                    WidgetType.FULL_WIDTH -> value.first()
+
+                    else -> value.first()
                 }
             )
 
             val usedColor = when (type) {
                 WidgetType.COMPACT -> value.first()
                 WidgetType.SIMPLE -> Color.WHITE
-                WidgetType.FULLWIDTH -> Color.WHITE
+                WidgetType.FULL_WIDTH -> Color.WHITE
+
+                else -> Color.WHITE
             }
 
             (findViewById<android.widget.ImageView>(R.id.iv_play)
@@ -117,7 +123,9 @@ class SurveyView(context: Context, private val type: WidgetType = WidgetType.SIM
         val layout = when (type) {
             WidgetType.COMPACT -> R.layout.view_compact_survey
             WidgetType.SIMPLE -> R.layout.view_simple_survey
-            WidgetType.FULLWIDTH -> R.layout.view_fullwidth_survey
+            WidgetType.FULL_WIDTH -> R.layout.view_fullwidth_survey
+
+            else -> R.layout.view_simple_survey
         }
 
         android.view.LayoutInflater.from(context).inflate(layout, this, true)
@@ -159,12 +167,16 @@ class SurveyView(context: Context, private val type: WidgetType = WidgetType.SIM
     private fun getLoiString(value: Int) = when (type) {
         WidgetType.SIMPLE -> resources.getString(R.string.simple_loi, value)
         WidgetType.COMPACT -> resources.getString(R.string.compact_loi, value)
-        WidgetType.FULLWIDTH -> resources.getString(R.string.compact_loi, value)
+        WidgetType.FULL_WIDTH -> resources.getString(R.string.compact_loi, value)
+
+        else -> resources.getString(R.string.simple_loi, value)
     }
 
     private fun getEarnRewardString(value: String) = when (type) {
         WidgetType.COMPACT -> value
         WidgetType.SIMPLE -> resources.getString(R.string.simple_earn_reward, value)
-        WidgetType.FULLWIDTH -> value
+        WidgetType.FULL_WIDTH -> value
+
+        else -> value
     }
 }

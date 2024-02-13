@@ -17,11 +17,13 @@ import ai.bitlabs.sdk.util.randomSurvey
 import ai.bitlabs.sdk.views.LeaderboardFragment
 import ai.bitlabs.sdk.views.SurveysAdapter
 import ai.bitlabs.sdk.views.WebActivity
+import ai.bitlabs.sdk.views.WidgetFragment
 import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.util.Log
+import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL
 import androidx.recyclerview.widget.RecyclerView
@@ -151,9 +153,25 @@ object BitLabs {
     }
 
     /**
-     * Returns a RecyclerView populating the [surveys].
+     * Shows a Survey Fragment in the [activity] with the [containerId] as its container.
+     */
+    fun showSurvey(
+        activity: FragmentActivity,
+        containerId: Int,
+        type: WidgetType = WidgetType.SIMPLE
+    ) = ifInitialised {
+        activity.supportFragmentManager
+            .beginTransaction()
+            .replace(containerId, WidgetFragment(uid, token, type))
+            .commit()
+    }
+
+
+    /**
+     * Returns a RecyclerView populated with the [surveys].
      */
     @JvmOverloads
+    @Deprecated("Use showSurvey instead")
     fun getSurveyWidgets(
         context: Context, surveys: List<Survey>, type: WidgetType = WidgetType.COMPACT
     ) = RecyclerView(context).apply {
@@ -163,6 +181,17 @@ object BitLabs {
         }
     }
 
+    /**
+     * Shows a Leaderboard Fragment in the [activity] with the [containerId] as its container.
+     */
+    fun showLeaderboard(activity: FragmentActivity, containerId: Int) = ifInitialised {
+        activity.supportFragmentManager
+            .beginTransaction()
+            .replace(containerId, WidgetFragment(uid, token, WidgetType.LEADERBOARD))
+            .commit()
+    }
+
+    @Deprecated("Use showLeaderboard instead")
     fun getLeaderboard(onResponseListener: OnResponseListener<LeaderboardFragment?>) =
         bitLabsRepo?.getLeaderboard({ leaderboard ->
             onResponseListener.onResponse(leaderboard.topUsers?.takeUnless { it.isEmpty() }?.run {

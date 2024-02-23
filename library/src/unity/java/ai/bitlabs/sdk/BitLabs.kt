@@ -3,7 +3,14 @@ package ai.bitlabs.sdk
 import ai.bitlabs.sdk.data.BitLabsRepository
 import ai.bitlabs.sdk.data.model.WebActivityParams
 import ai.bitlabs.sdk.data.network.BitLabsAPI
-import ai.bitlabs.sdk.util.*
+import ai.bitlabs.sdk.util.BASE_URL
+import ai.bitlabs.sdk.util.BUNDLE_KEY_COLOR
+import ai.bitlabs.sdk.util.BUNDLE_KEY_PARAMS
+import ai.bitlabs.sdk.util.OnRewardListener
+import ai.bitlabs.sdk.util.TAG
+import ai.bitlabs.sdk.util.convertKeysToCamelCase
+import ai.bitlabs.sdk.util.extractColors
+import ai.bitlabs.sdk.util.randomSurvey
 import ai.bitlabs.sdk.views.WebActivity
 import android.content.Context
 import android.content.Intent
@@ -40,14 +47,14 @@ object BitLabs {
 
     /**
      * Initialises the connection with BitLabs API using your app [token] and [uid]
-     * and gets the user [Advertising Id][AdvertisingIdClient.Info] using the activity [context].
+     * and gets the user [Advertising Id][AdvertisingIdClient.Info] using the currentActivity context.
      * ######
      * **IMPORTANT:** This is the essential function. Without it, the library will not function
      * properly. So make sure you call it before using the library's functions.
      * @param[token] Found on your [BitLabs Dashboard](https://dashboard.bitlabs.ai/),
      * @param[uid] Unique for every user to initialise the connection with the BitLabs API.
      */
-    fun init(context: Context, token: String, uid: String) {
+    fun init(token: String, uid: String) {
         this.token = token
         this.uid = uid
         bitLabsRepo = BitLabsRepository(
@@ -65,7 +72,8 @@ object BitLabs {
                 .build()
                 .create(BitLabsAPI::class.java)
         )
-        determineAdvertisingInfo(context)
+
+        determineAdvertisingInfo(UnityPlayer.currentActivity)
 
         getAppSettings()
     }
@@ -169,12 +177,11 @@ object BitLabs {
     fun getBonusPercentage() = bonusPercentage
 
     /**
-     * Launches the OfferWall from the [context] of the Activity you pass.
-     * ######
-     * It's recommended that that you use a context you know the lifecycle of
-     * in order to avoid memory leaks and other issues associated with Activities.
+     * Launches the OfferWall from the currentActivity.
      */
-    fun launchOfferWall(context: Context) = ifInitialised {
+    fun launchOfferWall() = ifInitialised {
+        val context = UnityPlayer.currentActivity
+
         with(Intent(context, WebActivity::class.java)) {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
             putExtra(
@@ -185,6 +192,11 @@ object BitLabs {
             context.startActivity(this)
         }
     }
+
+    /** This overload is used internally to tackle the difference between the Core and Unity variants.
+     * In Unity, the context is not needed as an argument, but internally it is.
+     */
+    internal fun launchOfferWall(context: Context) = launchOfferWall()
 
     internal fun leaveSurvey(clickId: String, reason: String) =
         bitLabsRepo?.leaveSurvey(clickId, reason)
@@ -199,8 +211,8 @@ object BitLabs {
     }.start()
 
     /**
-     * Checks whether [token] and [uid] have been set and aren't blank/empty and
-     * [bitLabsRepo] is initialised and executes the [block] accordingly.
+     * Checks whether [token] and [uid] have been set and aren't blank/empty
+     * and executes the [block] accordingly.
      */
     private inline fun ifInitialised(block: () -> Unit) {
         val isInitialised = token.isNotBlank().and(uid.isNotBlank()).and(bitLabsRepo != null)

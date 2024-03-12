@@ -2,6 +2,7 @@
 
     <string name="web_toolbar_header">Survey</string>
 
+    <!--    LEAVE SURVEY DIALOG    -->
     <string name="leave_dialog_title">Choose a reason for leaving the survey</string>
     <string name="leave_reason_sensitive">Too sensitive</string>
     <string name="leave_reason_uninteresting">Uninteresting</string>
@@ -10,15 +11,23 @@
     <string name="leave_reason_other">Other reasons</string>
     <string name="leave_dialog_continue">Continue the survey</string>
 
+    <!--    FILE CHOOSER DIALOG    -->
+    <string name="file_chooser_title">Choose an action</string>
+    <string name="file_chooser_gallery">Gallery</string>
+    <string name="file_chooser_camera">Camera</string>
+
+    <!--    SURVEY WIDGETS    -->
     <string name="simple_earn_reward" translatable="false">EARN %s</string>
     <string name="simple_loi" translatable="false">Now in %d minutes!</string>
     <string name="compact_loi" translatable="false">%d minutes</string>
 
+    <!--    LEADERBOARD WIDGET    -->
     <string name="leaderboard_title" translatable="false">Leaderboard</string>
     <string name="leaderboard_own_user_rank" translatable="false">
         You are currently ranked %d on our leaderboard.
     </string>
 
+    <!--    ERROR MESSAGES    -->
     <string name="error_id" translatable="false">Error ID:\n%1$s</string>
 
     <!--    CONTENT DESCRIPTION    -->

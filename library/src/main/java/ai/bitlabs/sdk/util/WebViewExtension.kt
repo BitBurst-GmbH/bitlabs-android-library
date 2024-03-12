@@ -1,9 +1,11 @@
 package ai.bitlabs.sdk.util
 
 import ai.bitlabs.sdk.BitLabs
+import ai.bitlabs.sdk.R
 import ai.bitlabs.sdk.data.model.WebViewError
 import ai.bitlabs.sdk.views.WebActivity
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.net.Uri
 import android.os.Build
 import android.os.Message
@@ -13,6 +15,9 @@ import android.webkit.*
 import androidx.activity.result.contract.ActivityResultContracts.*
 import androidx.annotation.RequiresApi
 import androidx.browser.customtabs.CustomTabsIntent
+import androidx.core.content.FileProvider
+import androidx.core.net.toUri
+import java.io.File
 
 /** Adds all necessary configurations for its receiver [WebActivity.webView] */
 @SuppressLint("SetJavaScriptEnabled")
@@ -20,15 +25,16 @@ fun WebView.setup(
     onDoUpdateVisitedHistory: (isPageOfferWall: Boolean, url: String) -> Unit,
     onError: (error: WebViewError?, date: String, url: String) -> Unit,
 ) {
-    val context = context
+    var tempFile: File? = null
     var uriResult: ValueCallback<Array<Uri>>? = null
 
     val chooser = (context as WebActivity).registerForActivityResult(GetMultipleContents()) {
-        if (it != null) {
-            uriResult?.onReceiveValue(it.toTypedArray())
-        } else {
-            uriResult?.onReceiveValue(null)
-        }
+        uriResult?.onReceiveValue(it?.toTypedArray())
+    }
+
+    val camera = (context as WebActivity).registerForActivityResult(TakePicture()) {
+        if (tempFile == null) uriResult?.onReceiveValue(null)
+        uriResult?.onReceiveValue(arrayOf(tempFile!!.toUri()))
     }
 
     if (Build.VERSION.SDK_INT >= 21) CookieManager.getInstance()
@@ -65,9 +71,37 @@ fun WebView.setup(
         ): Boolean {
             uriResult = filePathCallback
 
-            chooser.launch("image/*")
+            AlertDialog.Builder(context)
+                .setTitle(context.resources.getString(R.string.file_chooser_title))
+                .setItems(
+                    arrayOf(
+                        context.resources.getString(R.string.file_chooser_camera),
+                        context.resources.getString(R.string.file_chooser_gallery)
+                    )
+                ) { _, which ->
+                    if (which == 0) takePhoto()
+                    else chooser.launch("image/*")
+                }
+                .show()
 
             return true
+        }
+
+        private fun takePhoto() {
+            try {
+                tempFile = with(File(context.cacheDir, "bitlabs")) {
+                    if (exists()) delete()
+                    mkdir()
+                    File.createTempFile("temp_photo", ".jpg", this)
+                }
+                if (tempFile == null) throw Exception("Could not create tmp photo")
+                val uri = FileProvider.getUriForFile(
+                    context, "ai.bitlabs.sdk.provider", tempFile!!
+                )
+                camera.launch(uri)
+            } catch (e: Exception) {
+                Log.e(TAG, e.message, e)
+            }
         }
     }
 

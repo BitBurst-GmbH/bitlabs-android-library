@@ -18,6 +18,15 @@
                 android:name="android.webkit.WebView.EnableSafeBrowsing"
                 android:value="true" />
         </activity>
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="ai.bitlabs.sdk.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/bitlabs_file_paths" />
+        </provider>
 
     </application>
 </manifest>

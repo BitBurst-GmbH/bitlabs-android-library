@@ -1,6 +1,7 @@
 package ai.bitlabs.sdk.util
 
 import ai.bitlabs.sdk.BitLabs
+import ai.bitlabs.sdk.R
 import ai.bitlabs.sdk.data.model.WebViewError
 import ai.bitlabs.sdk.views.WebActivity
 import android.annotation.SuppressLint
@@ -71,13 +72,17 @@ fun WebView.setup(
             uriResult = filePathCallback
 
             AlertDialog.Builder(context)
-                .setTitle("Choose an action")
-                .setItems(arrayOf("Camera", "Gallery")) { _, which ->
+                .setTitle(context.resources.getString(R.string.file_chooser_title))
+                .setItems(
+                    arrayOf(
+                        context.resources.getString(R.string.file_chooser_camera),
+                        context.resources.getString(R.string.file_chooser_gallery)
+                    )
+                ) { _, which ->
                     if (which == 0) takePhoto()
                     else chooser.launch("image/*")
                 }
                 .show()
-
 
             return true
         }
@@ -87,15 +92,12 @@ fun WebView.setup(
                 tempFile = with(File(context.cacheDir, "bitlabs")) {
                     if (exists()) delete()
                     mkdir()
-                    Log.d(TAG, "takePhoto dir: $this")
                     File.createTempFile("temp_photo", ".jpg", this)
                 }
                 if (tempFile == null) throw Exception("Could not create tmp photo")
-                Log.d(TAG, "takePhoto tempFile: $tempFile")
                 val uri = FileProvider.getUriForFile(
                     context, "ai.bitlabs.sdk.provider", tempFile!!
                 )
-                Log.d(TAG, "takePhoto provider: $uri")
                 camera.launch(uri)
             } catch (e: Exception) {
                 Log.e(TAG, e.message, e)

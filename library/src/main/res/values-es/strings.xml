@@ -2,6 +2,7 @@
 
     <string name="web_toolbar_header">Encuesta</string>
 
+    <!--    LEAVE SURVEY DIALOG    -->
     <string name="leave_dialog_title">Por favor, seleccione una razón para dejar la encuesta</string>
     <string name="leave_reason_sensitive">Demasiado sensible</string>
     <string name="leave_reason_uninteresting">Sin interés</string>
@@ -9,5 +10,10 @@
     <string name="leave_reason_too_long">Demasiado tiempo</string>
     <string name="leave_reason_other">Otras razones</string>
     <string name="leave_dialog_continue">Continúe la encuesta</string>
+
+    <!--    FILE CHOOSER DIALOG    -->
+    <string name="file_chooser_title">Seleccione una acción</string>
+    <string name="file_chooser_gallery">Galería</string>
+    <string name="file_chooser_camera">Cámara</string>
 
 </resources>

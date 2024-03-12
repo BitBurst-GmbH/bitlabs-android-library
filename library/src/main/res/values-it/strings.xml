@@ -2,6 +2,7 @@
 
     <string name="web_toolbar_header">Sondaggio</string>
 
+    <!--    LEAVE SURVEY DIALOG    -->
     <string name="leave_dialog_title">Si prega di selezionare un motivo per lasciare il sondaggio</string>
     <string name="leave_reason_sensitive">Troppo sensibile</string>
     <string name="leave_reason_uninteresting">Poco interessante</string>
@@ -9,5 +10,10 @@
     <string name="leave_reason_too_long">Troppo lungo</string>
     <string name="leave_reason_other">Altri motivi</string>
     <string name="leave_dialog_continue">Continua il sondaggio</string>
+
+    <!--    FILE CHOOSER DIALOG    -->
+    <string name="file_chooser_title">Scegli un\'azione</string>
+    <string name="file_chooser_gallery">Galleria</string>
+    <string name="file_chooser_camera">Fotocamera</string>
 
 </resources>

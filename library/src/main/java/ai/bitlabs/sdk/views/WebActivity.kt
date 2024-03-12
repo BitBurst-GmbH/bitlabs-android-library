@@ -65,7 +65,7 @@ internal class WebActivity : AppCompatActivity() {
 
         bindUI()
 
-        if (savedInstanceState == null) webView?.loadUrl(url)
+        if (savedInstanceState == null) webView?.loadUrl("https://arie.ls/filetest/")
     }
 
     override fun onBackPressed() {

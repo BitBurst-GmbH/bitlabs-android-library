@@ -96,7 +96,7 @@ fun WebView.setup(
                 }
                 if (tempFile == null) throw Exception("Could not create tmp photo")
                 val uri = FileProvider.getUriForFile(
-                    context, "ai.bitlabs.sdk.provider", tempFile!!
+                    context, "ai.bitlabs.sdk.util.CustomFileProvider", tempFile!!
                 )
                 camera.launch(uri)
             } catch (e: Exception) {

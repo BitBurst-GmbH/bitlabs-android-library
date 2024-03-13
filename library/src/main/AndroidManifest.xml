@@ -20,7 +20,7 @@
         </activity>
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="ai.bitlabs.sdk.provider"
+            android:authorities="ai.bitlabs.sdk.util.CustomFileProvider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data

@@ -36,6 +36,7 @@ object BitLabs {
     private var token = ""
     private var currencyIconUrl = ""
     private var bonusPercentage = 0.0
+    internal var fileProviderAuthority = ""
     private var widgetColor = intArrayOf(0, 0)
     private var headerColor = intArrayOf(0, 0)
 
@@ -74,6 +75,8 @@ object BitLabs {
         )
 
         determineAdvertisingInfo(UnityPlayer.currentActivity)
+
+        fileProviderAuthority = "${UnityPlayer.currentActivity.packageName}.provider.bitlabs"
 
         getAppSettings()
     }

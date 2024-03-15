@@ -241,12 +241,16 @@ class WebActivityTest {
 
                 verify { BitLabs.leaveSurvey(any(), any()) }
 
+                Thread.sleep(400)
+
                 onView(isRoot()).perform(pressBack())
 
                 onView(withText(R.string.leave_reason_sensitive)).inRoot(isDialog())
                     .check(matches(isDisplayed())).perform(click())
 
                 verify { BitLabs.leaveSurvey(any(), any()) }
+
+                Thread.sleep(400)
 
                 onView(isRoot()).perform(pressBack())
 
@@ -255,12 +259,16 @@ class WebActivityTest {
 
                 verify { BitLabs.leaveSurvey(any(), any()) }
 
+                Thread.sleep(400)
+
                 onView(isRoot()).perform(pressBack())
 
                 onView(withText(R.string.leave_reason_uninteresting)).inRoot(isDialog())
                     .check(matches(isDisplayed())).perform(click())
 
                 verify { BitLabs.leaveSurvey(any(), any()) }
+
+                Thread.sleep(400)
 
                 onView(isRoot()).perform(pressBack())
 

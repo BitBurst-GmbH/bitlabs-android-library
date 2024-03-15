@@ -22,6 +22,7 @@ import android.webkit.WebView
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -66,10 +67,12 @@ internal class WebActivity : AppCompatActivity() {
         bindUI()
 
         if (savedInstanceState == null) webView?.loadUrl(url)
-    }
 
-    override fun onBackPressed() {
-        if (toolbar?.visibility == View.VISIBLE) showLeaveSurveyAlertDialog()
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (toolbar?.visibility == View.VISIBLE) showLeaveSurveyAlertDialog()
+            }
+        })
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

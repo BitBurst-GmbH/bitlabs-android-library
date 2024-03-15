@@ -39,13 +39,14 @@ import retrofit2.converter.gson.GsonConverterFactory
  * main process(app lifecycle).
  */
 object BitLabs {
-    var debugMode = false;
+    var debugMode = false
 
     private var uid = ""
     private var adId = ""
     private var token = ""
     private var currencyIconUrl = ""
     private var bonusPercentage = 0.0
+    internal var fileProviderAuthority = ""
     private var headerColor = intArrayOf(0, 0)
     private var widgetColors = intArrayOf(0, 0)
 
@@ -83,6 +84,8 @@ object BitLabs {
                 .create(BitLabsAPI::class.java)
         )
         determineAdvertisingInfo(context)
+
+        fileProviderAuthority = "${context.packageName}.provider.bitlabs"
 
         getAppSettings()
     }

@@ -13,8 +13,8 @@ android {
 
         minSdk 19
         targetSdk 34
-        versionCode 52
-        versionName '3.2.0'
+        versionCode 53
+        versionName '3.2.1'
 
         buildConfigField 'String', 'APP_TOKEN', keystore.getProperty('appToken', '"APP_TOKEN"')
     }

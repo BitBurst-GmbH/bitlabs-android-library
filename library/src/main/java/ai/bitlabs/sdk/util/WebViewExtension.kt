@@ -82,6 +82,7 @@ fun WebView.setup(
                     if (which == 0) takePhoto()
                     else chooser.launch("image/*")
                 }
+                .setOnCancelListener { uriResult?.onReceiveValue(null) }
                 .show()
 
             return true

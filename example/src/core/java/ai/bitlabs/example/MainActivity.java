@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        bitLabs.init(this, BuildConfig.APP_TOKEN, "diffindocongress");
+        bitLabs.init(this, BuildConfig.APP_TOKEN, "oblivatevariegata");
 
 //        bitLabs.setDebugMode(true);
 

@@ -145,20 +145,13 @@ internal class WebActivity : AppCompatActivity() {
         webView?.scrollBarStyle = WebView.SCROLLBARS_OUTSIDE_OVERLAY
 
         webView?.setup({ isPageOfferWall, url ->
-            if (url.contains("/close")) {
+            if (url.endsWith("/close")) {
                 finish()
                 return@setup
             }
 
             Log.i(TAG, "bindUI: $url")
             if (isPageOfferWall) {
-                if (url.contains("/survey-complete")
-                    || url.contains("/survey-screenout")
-                    || url.contains("/start-bonus")
-                ) {
-                    Uri.parse(url).getQueryParameter("val")?.let { reward += it.toFloat() }
-                }
-
                 if (!areParametersInjected && !url.contains("sdk=$sdk")) {
                     areParametersInjected = true
                     webView?.loadUrl(Uri.parse(url).buildUpon()
@@ -175,7 +168,6 @@ internal class WebActivity : AppCompatActivity() {
                     )
                 }
             } else {
-                Uri.parse(url).getQueryParameter("clk")?.let { clickId = it }
                 areParametersInjected = false
             }
             toggleToolbar(isPageOfferWall)

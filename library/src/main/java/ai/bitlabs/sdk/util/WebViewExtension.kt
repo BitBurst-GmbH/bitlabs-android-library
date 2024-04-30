@@ -122,15 +122,12 @@ fun WebView.setup(
         override fun onReceivedHttpError(
             view: WebView?, request: WebResourceRequest?, errorResponse: WebResourceResponse?
         ) {
-
-            val isPageMagicReceipts =
-                request?.url?.toString()?.contains("/heap-undefined.js") == true
-
-            if (BitLabs.debugMode || (!isPageMagicReceipts && errorResponse?.statusCode == 404)) onError(
+            if (BitLabs.debugMode) onError(
                 WebViewError(errorResponse = errorResponse),
                 System.currentTimeMillis().toString(),
                 request?.url.toString()
             )
+
             super.onReceivedHttpError(view, request, errorResponse)
         }
 
@@ -138,7 +135,6 @@ fun WebView.setup(
         override fun onReceivedError(
             view: WebView?, request: WebResourceRequest?, error: WebResourceError?
         ) {
-            Log.d(TAG, "onReceivedError: ${error?.description}")
             if (BitLabs.debugMode || error?.description?.contains("ERR_CLEARTEXT_NOT_PERMITTED") == true) onError(
                 WebViewError(error = error),
                 System.currentTimeMillis().toString(),

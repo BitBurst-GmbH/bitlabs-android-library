@@ -145,10 +145,10 @@ internal class WebActivity : AppCompatActivity() {
         webView?.scrollBarStyle = WebView.SCROLLBARS_OUTSIDE_OVERLAY
 
         webView?.setup({ isPageOfferWall, url ->
-            if (url.endsWith("/close")) {
-                finish()
-                return@setup
-            }
+//            if (url.endsWith("/close")) {
+//                finish()
+//                return@setup
+//            }
 
             Log.i(TAG, "bindUI: $url")
             if (isPageOfferWall) {

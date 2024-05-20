@@ -6,6 +6,7 @@ import ai.bitlabs.sdk.data.model.WebViewError
 import ai.bitlabs.sdk.views.WebActivity
 import android.annotation.SuppressLint
 import android.app.AlertDialog
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import android.os.Message
@@ -113,6 +114,17 @@ fun WebView.setup(
             super.doUpdateVisitedHistory(view, url, isReload)
         }
 
+        override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+            super.onPageStarted(view, url, favicon)
+            view?.evaluateJavascript(
+                """
+            window.addEventListener('message', (event) => {
+                window.AndroidWebView.postMessage(JSON.stringify(event.data));
+            });
+            """.trimIndent()
+            ) { }
+        }
+
         @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
         override fun onPageFinished(view: WebView?, url: String?) {
             CookieManager.getInstance().flush()
@@ -143,6 +155,24 @@ fun WebView.setup(
             super.onReceivedError(view, request, error)
         }
     }
+
+    this.addJavascriptInterface(object {
+        @JavascriptInterface
+        fun postMessage(message: String) {
+            val hookMessage = message.hookMessage<Unit>()
+            Log.d(TAG, "postMessage: $hookMessage")
+
+            if (hookMessage?.type != "hook") return;
+
+            when (hookMessage.name) {
+                "offerwall-core:sdk.close" -> {
+                    (context as WebActivity).finish()
+                }
+            }
+
+
+        }
+    }, "AndroidWebView")
 
     this.settings.run {
         databaseEnabled = true

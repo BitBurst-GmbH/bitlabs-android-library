@@ -159,18 +159,49 @@ fun WebView.setup(
     this.addJavascriptInterface(object {
         @JavascriptInterface
         fun postMessage(message: String) {
-            val hookMessage = message.hookMessage<Unit>()
+            val hookMessage = message.asHookMessage()
             Log.d(TAG, "postMessage: $hookMessage")
 
             if (hookMessage?.type != "hook") return;
 
             when (hookMessage.name) {
-                "offerwall-core:sdk.close" -> {
+                HookName.SDK_CLOSE -> {
                     (context as WebActivity).finish()
                 }
+
+                HookName.SURVEY_START -> {
+                    val clickId =
+                        hookMessage.args.filterIsInstance<SurveyStartArgs>().firstOrNull()?.clickId
+                            ?: ""
+                    Log.i(TAG, "Click Id: $clickId}")
+                }
+
+                HookName.SURVEY_COMPLETE -> {
+                    val reward =
+                        hookMessage.args.filterIsInstance<RewardArgs>().firstOrNull()?.reward ?: 0
+                    Log.i(TAG, "Reward: $reward")
+                }
+
+                HookName.SURVEY_SCREENOUT -> {
+                    val reward =
+                        hookMessage.args.filterIsInstance<RewardArgs>().firstOrNull()?.reward ?: 0
+                    Log.i(TAG, "Reward: $reward")
+                }
+
+                HookName.SURVEY_START_BONUS -> {
+                    val reward =
+                        hookMessage.args.filterIsInstance<RewardArgs>().firstOrNull()?.reward ?: 0
+                    Log.i(TAG, "Reward: $reward")
+                }
+
+                HookName.INIT -> {
+                    this@setup.evaluateJavascript(
+                        """
+                        window.postMessage({target: 'app.visual.show_close_button', value: true});
+                    """.trimIndent()
+                    ) {}
+                }
             }
-
-
         }
     }, "AndroidWebView")
 

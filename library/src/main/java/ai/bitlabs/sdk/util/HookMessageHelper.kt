@@ -41,45 +41,31 @@ internal class HookMessageDeserializer : JsonDeserializer<HookMessage<*>> {
 
         val args: List<Any> = when (name) {
             HookName.INIT -> argsJsonArray.map {
-                context.deserialize<Unit>(
-                    it, Unit::class.java
-                )
+                context.deserialize<Unit>(it, Unit::class.java)
             }
 
             HookName.SDK_CLOSE -> argsJsonArray.map {
-                context.deserialize<Unit>(
-                    it, Unit::class.java
-                )
+                context.deserialize<Unit>(it, Unit::class.java)
             }
 
             HookName.SURVEY_START -> argsJsonArray.map {
-                context.deserialize<SurveyStartArgs>(
-                    it, SurveyStartArgs::class.java
-                )
+                context.deserialize<SurveyStartArgs>(it, SurveyStartArgs::class.java)
             }
 
             HookName.SURVEY_COMPLETE -> argsJsonArray.map {
-                context.deserialize<RewardArgs>(
-                    it, RewardArgs::class.java
-                )
+                context.deserialize<RewardArgs>(it, RewardArgs::class.java)
             }
 
             HookName.SURVEY_SCREENOUT -> argsJsonArray.map {
-                context.deserialize<RewardArgs>(
-                    it, RewardArgs::class.java
-                )
+                context.deserialize<RewardArgs>(it, RewardArgs::class.java)
             }
 
             HookName.SURVEY_START_BONUS -> argsJsonArray.map {
-                context.deserialize<RewardArgs>(
-                    it, RewardArgs::class.java
-                )
+                context.deserialize<RewardArgs>(it, RewardArgs::class.java)
             }
         }
 
-        return HookMessage(
-            type = type, name = name, args = args
-        )
+        return HookMessage(type = type, name = name, args = args)
     }
 }
 
@@ -117,7 +103,7 @@ internal enum class HookName {
  * Reward Arguments data class that holds the reward data.
  */
 internal data class RewardArgs(
-    val reward: Double
+    val reward: Float
 )
 
 /**

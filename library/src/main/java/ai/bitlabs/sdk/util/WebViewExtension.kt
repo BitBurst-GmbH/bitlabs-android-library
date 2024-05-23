@@ -9,6 +9,8 @@ import android.app.AlertDialog
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.os.Message
 import android.util.Log
 import android.view.View
@@ -23,6 +25,7 @@ import java.io.File
 /** Adds all necessary configurations for its receiver [WebActivity.webView] */
 @SuppressLint("SetJavaScriptEnabled")
 fun WebView.setup(
+    addReward: (reward: Float) -> Unit,
     onDoUpdateVisitedHistory: (isPageOfferWall: Boolean, url: String) -> Unit,
     onError: (error: WebViewError?, date: String, url: String) -> Unit,
 ) {
@@ -122,7 +125,7 @@ fun WebView.setup(
                 window.AndroidWebView.postMessage(JSON.stringify(event.data));
             });
             """.trimIndent()
-            ) { }
+            ) {}
         }
 
         @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
@@ -159,10 +162,11 @@ fun WebView.setup(
     this.addJavascriptInterface(object {
         @JavascriptInterface
         fun postMessage(message: String) {
-            val hookMessage = message.asHookMessage()
+            Log.d(TAG, "postMessage: $message")
+            val hookMessage = message.asHookMessage() ?: return
             Log.d(TAG, "postMessage: $hookMessage")
 
-            if (hookMessage?.type != "hook") return;
+            if (hookMessage.type != "hook") return;
 
             when (hookMessage.name) {
                 HookName.SDK_CLOSE -> {
@@ -173,33 +177,40 @@ fun WebView.setup(
                     val clickId =
                         hookMessage.args.filterIsInstance<SurveyStartArgs>().firstOrNull()?.clickId
                             ?: ""
-                    Log.i(TAG, "Click Id: $clickId}")
+                    Log.i(TAG, "Caught Survey Start event with clickId: $clickId}")
                 }
 
                 HookName.SURVEY_COMPLETE -> {
                     val reward =
-                        hookMessage.args.filterIsInstance<RewardArgs>().firstOrNull()?.reward ?: 0
-                    Log.i(TAG, "Reward: $reward")
+                        hookMessage.args.filterIsInstance<RewardArgs>().firstOrNull()?.reward ?: 0f
+                    addReward(reward)
+                    Log.i(TAG, "Caught Survey Complete event with reward: $reward")
                 }
 
                 HookName.SURVEY_SCREENOUT -> {
                     val reward =
-                        hookMessage.args.filterIsInstance<RewardArgs>().firstOrNull()?.reward ?: 0
-                    Log.i(TAG, "Reward: $reward")
+                        hookMessage.args.filterIsInstance<RewardArgs>().firstOrNull()?.reward ?: 0f
+                    addReward(reward)
+                    Log.i(TAG, "Caught Survey Screenout with reward: $reward")
                 }
 
                 HookName.SURVEY_START_BONUS -> {
                     val reward =
-                        hookMessage.args.filterIsInstance<RewardArgs>().firstOrNull()?.reward ?: 0
-                    Log.i(TAG, "Reward: $reward")
+                        hookMessage.args.filterIsInstance<RewardArgs>().firstOrNull()?.reward ?: 0f
+                    addReward(reward)
+                    Log.i(TAG, "Caught Survey Start Bonus event with reward: $reward")
                 }
 
                 HookName.INIT -> {
-                    this@setup.evaluateJavascript(
-                        """
-                        window.postMessage({target: 'app.visual.show_close_button', value: true});
-                    """.trimIndent()
-                    ) {}
+                    Handler(Looper.getMainLooper()).postDelayed(
+                        {
+                            this@setup.evaluateJavascript(
+                                """
+                                window.parent.postMessage({ target: 'app.visual.show_close_button', value: true });
+                                """.trimIndent()
+                            ) {}
+                        }, 1000
+                    )
                 }
             }
         }

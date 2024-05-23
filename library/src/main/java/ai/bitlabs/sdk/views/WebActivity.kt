@@ -48,7 +48,7 @@ internal class WebActivity : AppCompatActivity() {
 
     private var areParametersInjected = true
 
-    private var reward: Float = 0.0F
+    private var totalReward: Float = 0.0F
     private var clickId: String? = null
     private var colors = intArrayOf(Color.WHITE, Color.WHITE)
 
@@ -91,7 +91,7 @@ internal class WebActivity : AppCompatActivity() {
     }
 
     override fun onStop() {
-        BitLabs.onRewardListener?.onReward(reward)
+        BitLabs.onRewardListener?.onReward(totalReward)
         super.onStop()
     }
 
@@ -144,14 +144,10 @@ internal class WebActivity : AppCompatActivity() {
         webView = findViewById(R.id.wv_bitlabs)
         webView?.scrollBarStyle = WebView.SCROLLBARS_OUTSIDE_OVERLAY
 
-        webView?.setup({ isPageOfferWall, url ->
-//            if (url.endsWith("/close")) {
-//                finish()
-//                return@setup
-//            }
-
+        webView?.setup({ reward -> totalReward += reward }, { isPageOfferWall, url ->
             Log.i(TAG, "bindUI: $url")
             if (isPageOfferWall) {
+                // TODO: Remove this block when the front-end ready to handle the close button event
                 if (!areParametersInjected && !url.contains("sdk=$sdk")) {
                     areParametersInjected = true
                     webView?.loadUrl(Uri.parse(url).buildUpon()

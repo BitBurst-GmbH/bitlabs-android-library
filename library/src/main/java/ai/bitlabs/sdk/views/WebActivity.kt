@@ -144,7 +144,10 @@ internal class WebActivity : AppCompatActivity() {
         webView = findViewById(R.id.wv_bitlabs)
         webView?.scrollBarStyle = WebView.SCROLLBARS_OUTSIDE_OVERLAY
 
-        webView?.setup({ reward -> totalReward += reward }, { isPageOfferWall, url ->
+        webView?.setup(
+            { reward -> totalReward += reward },
+            { clk -> clickId = clk },
+            { isPageOfferWall, url ->
             Log.i(TAG, "bindUI: $url")
             if (isPageOfferWall) {
                 // TODO: Remove this block when the front-end ready to handle the close button event

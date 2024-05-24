@@ -26,6 +26,7 @@ import java.io.File
 @SuppressLint("SetJavaScriptEnabled")
 fun WebView.setup(
     addReward: (reward: Float) -> Unit,
+    setClickId: (clickId: String?) -> Unit,
     onDoUpdateVisitedHistory: (isPageOfferWall: Boolean, url: String) -> Unit,
     onError: (error: WebViewError?, date: String, url: String) -> Unit,
 ) {
@@ -176,8 +177,8 @@ fun WebView.setup(
                 HookName.SURVEY_START -> {
                     val clickId =
                         hookMessage.args.filterIsInstance<SurveyStartArgs>().firstOrNull()?.clickId
-                            ?: ""
-                    Log.i(TAG, "Caught Survey Start event with clickId: $clickId}")
+                    setClickId(clickId)
+                    Log.i(TAG, "Caught Survey Start event with clickId: $clickId")
                 }
 
                 HookName.SURVEY_COMPLETE -> {

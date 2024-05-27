@@ -30,12 +30,14 @@ internal fun String.asHookMessage(): HookMessage<*>? = try {
 internal class HookMessageDeserializer : JsonDeserializer<HookMessage<*>> {
     override fun deserialize(
         json: JsonElement?, typeOfT: Type?, context: JsonDeserializationContext?
-    ): HookMessage<*> {
+    ): HookMessage<*>? {
         val jsonObject = json?.asJsonObject ?: throw JsonParseException("Invalid JSON")
+
+        jsonObject.isHookMessage() || return null
 
         val type = jsonObject.get("type").asString
         val name = context?.deserialize<HookName>(jsonObject.get("name"), HookName::class.java)
-            ?: throw JsonParseException("Invalid name")
+            ?: throw JsonParseException("Invalid name: ${jsonObject.get("name")}.")
 
         val argsJsonArray = jsonObject.getAsJsonArray("args")
 
@@ -67,6 +69,14 @@ internal class HookMessageDeserializer : JsonDeserializer<HookMessage<*>> {
 
         return HookMessage(type = type, name = name, args = args)
     }
+}
+
+/**
+ * Check if JSON is of shape HookMessage
+ */
+internal fun JsonElement.isHookMessage(): Boolean {
+    val jsonObject = this.asJsonObject
+    return jsonObject.has("type") && jsonObject.has("name") && jsonObject.has("args")
 }
 
 /**

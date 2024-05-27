@@ -163,9 +163,7 @@ fun WebView.setup(
     this.addJavascriptInterface(object {
         @JavascriptInterface
         fun postMessage(message: String) {
-            Log.d(TAG, "postMessage: $message")
             val hookMessage = message.asHookMessage() ?: return
-            Log.d(TAG, "postMessage: $hookMessage")
 
             if (hookMessage.type != "hook") return;
 
@@ -207,7 +205,7 @@ fun WebView.setup(
                         {
                             this@setup.evaluateJavascript(
                                 """
-                                window.parent.postMessage({ target: 'app.visual.show_close_button', value: true });
+                                window.parent.postMessage({ target: 'app.behaviour.show_close_button', value: true });
                                 """.trimIndent()
                             ) {}
                         }, 1000

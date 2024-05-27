@@ -6,8 +6,11 @@ import ai.bitlabs.sdk.data.model.WebViewError
 import ai.bitlabs.sdk.views.WebActivity
 import android.annotation.SuppressLint
 import android.app.AlertDialog
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.os.Message
 import android.util.Log
 import android.view.View
@@ -22,6 +25,8 @@ import java.io.File
 /** Adds all necessary configurations for its receiver [WebActivity.webView] */
 @SuppressLint("SetJavaScriptEnabled")
 fun WebView.setup(
+    addReward: (reward: Float) -> Unit,
+    setClickId: (clickId: String?) -> Unit,
     onDoUpdateVisitedHistory: (isPageOfferWall: Boolean, url: String) -> Unit,
     onError: (error: WebViewError?, date: String, url: String) -> Unit,
 ) {
@@ -113,6 +118,17 @@ fun WebView.setup(
             super.doUpdateVisitedHistory(view, url, isReload)
         }
 
+        override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+            super.onPageStarted(view, url, favicon)
+            view?.evaluateJavascript(
+                """
+            window.addEventListener('message', (event) => {
+                window.AndroidWebView.postMessage(JSON.stringify(event.data));
+            });
+            """.trimIndent()
+            ) {}
+        }
+
         @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
         override fun onPageFinished(view: WebView?, url: String?) {
             CookieManager.getInstance().flush()
@@ -143,6 +159,61 @@ fun WebView.setup(
             super.onReceivedError(view, request, error)
         }
     }
+
+    this.addJavascriptInterface(object {
+        @JavascriptInterface
+        fun postMessage(message: String) {
+            val hookMessage = message.asHookMessage() ?: return
+
+            if (hookMessage.type != "hook") return;
+
+            when (hookMessage.name) {
+                HookName.SDK_CLOSE -> {
+                    (context as WebActivity).finish()
+                }
+
+                HookName.SURVEY_START -> {
+                    val clickId =
+                        hookMessage.args.filterIsInstance<SurveyStartArgs>().firstOrNull()?.clickId
+                    setClickId(clickId)
+                    Log.i(TAG, "Caught Survey Start event with clickId: $clickId")
+                }
+
+                HookName.SURVEY_COMPLETE -> {
+                    val reward =
+                        hookMessage.args.filterIsInstance<RewardArgs>().firstOrNull()?.reward ?: 0f
+                    addReward(reward)
+                    Log.i(TAG, "Caught Survey Complete event with reward: $reward")
+                }
+
+                HookName.SURVEY_SCREENOUT -> {
+                    val reward =
+                        hookMessage.args.filterIsInstance<RewardArgs>().firstOrNull()?.reward ?: 0f
+                    addReward(reward)
+                    Log.i(TAG, "Caught Survey Screenout with reward: $reward")
+                }
+
+                HookName.SURVEY_START_BONUS -> {
+                    val reward =
+                        hookMessage.args.filterIsInstance<RewardArgs>().firstOrNull()?.reward ?: 0f
+                    addReward(reward)
+                    Log.i(TAG, "Caught Survey Start Bonus event with reward: $reward")
+                }
+
+                HookName.INIT -> {
+                    Handler(Looper.getMainLooper()).postDelayed(
+                        {
+                            this@setup.evaluateJavascript(
+                                """
+                                window.parent.postMessage({ target: 'app.behaviour.show_close_button', value: true });
+                                """.trimIndent()
+                            ) {}
+                        }, 1000
+                    )
+                }
+            }
+        }
+    }, "AndroidWebView")
 
     this.settings.run {
         databaseEnabled = true

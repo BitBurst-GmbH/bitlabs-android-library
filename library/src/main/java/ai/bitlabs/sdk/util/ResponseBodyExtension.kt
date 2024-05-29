@@ -3,6 +3,7 @@ package ai.bitlabs.sdk.util
 import ai.bitlabs.sdk.data.model.BitLabsResponse
 import android.util.Log
 import com.google.gson.GsonBuilder
+import com.google.gson.reflect.TypeToken
 import okhttp3.ResponseBody
 
 /**
@@ -11,8 +12,8 @@ import okhttp3.ResponseBody
  */
 internal inline fun <reified T> ResponseBody.body(): BitLabsResponse<T>? =
     try {
-        GsonBuilder().create()
-            .fromJson<BitLabsResponse<T>>(this.string(), BitLabsResponse::class.java)
+        val type = object : TypeToken<BitLabsResponse<T>>() {}.type
+        GsonBuilder().create().fromJson(this.string(), type)
     } catch (e: Exception) {
         Log.e(TAG, e.toString())
         null

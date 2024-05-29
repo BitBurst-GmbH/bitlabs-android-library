@@ -5,10 +5,15 @@ import ai.bitlabs.sdk.data.model.Survey
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.os.Build
+import android.util.Log
 import android.util.TypedValue
 import android.widget.ImageView
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.qrcode.QRCodeWriter
+import java.math.BigDecimal
+import java.math.RoundingMode
+import java.util.Locale
 import kotlin.math.roundToInt
 import kotlin.random.Random
 
@@ -19,6 +24,12 @@ internal const val BASE_URL = "https://api.bitlabs.ai/"
 internal const val BUNDLE_KEY_COLOR = "bundle-key-color"
 
 internal const val BUNDLE_KEY_PARAMS = "bundle-key-params"
+
+internal fun locale() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+    Resources.getSystem().configuration.locales.get(0)
+} else {
+    Resources.getSystem().configuration.locale
+}
 
 internal fun getLuminance(color: Int) =
     0.2126 * Color.red(color) + 0.7152 * Color.green(color) + 0.0722 * Color.blue(color)
@@ -53,11 +64,11 @@ internal fun randomSurvey(i: Int) = with(Random(i)) {
     )
 }
 
-internal fun String.snakeToCamelCase() = split("_")
+internal fun String.snakeToCamelCase() = lowercase()
+    .split("_")
     .joinToString("") { it.replaceFirstChar { c -> c.uppercase() } }
     .replaceFirstChar { c -> c.lowercase() }
 
-// todo: test this
 internal fun String.convertKeysToCamelCase() = Regex("\"([a-z]+(?:_[a-z]+)+)\":")
     .replace(this) { match -> match.groupValues[1].snakeToCamelCase().let { "\"$it\":" } }
 
@@ -67,11 +78,17 @@ internal fun Number.toPx() = TypedValue.applyDimension(
     Resources.getSystem().displayMetrics
 )
 
-internal fun String.rounded() = with(((toDouble() * 100).roundToInt() / 100.0)) {
-    if (this % 1.0 == 0.0) String.format("%.0f", this)
-    else this.toString()
+internal fun String.rounded(): String {
+    try {
+        with(BigDecimal(this).setScale(2, RoundingMode.DOWN)) {
+            return if (this.scale() == 0) toPlainString()
+            else stripTrailingZeros().toPlainString()
+        }
+    } catch (e: NumberFormatException) {
+        Log.e(TAG, "rounded: Tried to round non-number!", e)
+        return this
+    }
 }
-
 
 internal fun ImageView.setQRCodeBitmap(value: String) = Bitmap
     .createBitmap(512, 512, Bitmap.Config.RGB_565)

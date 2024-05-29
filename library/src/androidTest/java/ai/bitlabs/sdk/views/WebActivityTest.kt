@@ -264,7 +264,6 @@ object TestUtils {
             if (color != null) putExtra(BUNDLE_KEY_COLOR, color)
         }
 
-
     /**
      * Creates a common [WebActivityParams] Bundle.
      */

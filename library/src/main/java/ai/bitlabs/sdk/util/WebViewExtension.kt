@@ -27,7 +27,7 @@ import java.io.File
 fun WebView.setup(
     addReward: (reward: Float) -> Unit,
     setClickId: (clickId: String?) -> Unit,
-    onDoUpdateVisitedHistory: (isPageOfferWall: Boolean, url: String) -> Unit,
+    onDoUpdateVisitedHistory: (isPageOfferWall: Boolean) -> Unit,
     onError: (error: WebViewError?, date: String, url: String) -> Unit,
 ) {
     var tempFile: File? = null
@@ -113,7 +113,7 @@ fun WebView.setup(
     this.webViewClient = object : WebViewClient() {
         override fun doUpdateVisitedHistory(view: WebView?, url: String?, isReload: Boolean) {
             onDoUpdateVisitedHistory(
-                url?.startsWith("https://web.bitlabs.ai") ?: true, url ?: ""
+                url?.startsWith("https://web.bitlabs.ai") ?: true
             )
             super.doUpdateVisitedHistory(view, url, isReload)
         }
@@ -205,7 +205,7 @@ fun WebView.setup(
                         {
                             this@setup.evaluateJavascript(
                                 """
-                                window.parent.postMessage({ target: 'app.behaviour.show_close_button', value: true });
+                                window.parent.postMessage({ target: 'app.behaviour.close_button_visible', value: true });
                                 """.trimIndent()
                             ) {}
                         }, 1000

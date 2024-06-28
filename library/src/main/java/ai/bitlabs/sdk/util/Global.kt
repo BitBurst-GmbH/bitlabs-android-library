@@ -13,8 +13,6 @@ import com.google.zxing.BarcodeFormat
 import com.google.zxing.qrcode.QRCodeWriter
 import java.math.BigDecimal
 import java.math.RoundingMode
-import java.util.Locale
-import kotlin.math.roundToInt
 import kotlin.random.Random
 
 internal const val TAG = "BitLabs"
@@ -23,7 +21,7 @@ internal const val BASE_URL = "https://api.bitlabs.ai/"
 
 internal const val BUNDLE_KEY_COLOR = "bundle-key-color"
 
-internal const val BUNDLE_KEY_PARAMS = "bundle-key-params"
+internal const val BUNDLE_KEY_URL = "bundle-key-url"
 
 internal fun locale() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
     Resources.getSystem().configuration.locales.get(0)

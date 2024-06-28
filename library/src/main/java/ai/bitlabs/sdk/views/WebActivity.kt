@@ -3,15 +3,13 @@ package ai.bitlabs.sdk.views
 import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.R
 import ai.bitlabs.sdk.util.BUNDLE_KEY_COLOR
-import ai.bitlabs.sdk.util.BUNDLE_KEY_PARAMS
+import ai.bitlabs.sdk.util.BUNDLE_KEY_URL
 import ai.bitlabs.sdk.util.TAG
 import ai.bitlabs.sdk.util.getLuminance
-import ai.bitlabs.sdk.util.getSerializableCompat
 import ai.bitlabs.sdk.util.setQRCodeBitmap
 import ai.bitlabs.sdk.util.setup
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
-import android.net.Uri
 import android.os.Bundle
 import android.util.Base64
 import android.util.Log
@@ -39,14 +37,6 @@ internal class WebActivity : AppCompatActivity() {
     private var toolbar: Toolbar? = null
 
     private lateinit var url: String
-
-    private var uid: String = ""
-    private var sdk: String = ""
-    private var maid: String = ""
-    private var token: String = ""
-    private var tags: Map<String, Any> = mapOf()
-
-    private var areParametersInjected = true
 
     private var totalReward: Float = 0.0F
     private var clickId: String? = null
@@ -96,27 +86,10 @@ internal class WebActivity : AppCompatActivity() {
     }
 
     private fun getDataFromIntent() {
-        val bundle = intent.getBundleExtra(BUNDLE_KEY_PARAMS) ?: run {
-            throw IllegalArgumentException("WebActivity - No params found!")
-        }
-
-        url = bundle.getString("url")?.takeIf { URLUtil.isValidUrl(it) } ?: run {
+        url = intent.getStringExtra(BUNDLE_KEY_URL)
+            .takeIf { URLUtil.isValidUrl(it) } ?: run {
             throw IllegalArgumentException("WebActivity - Invalid url!")
         }
-
-        uid = bundle.getString("uid") ?: run {
-            throw IllegalArgumentException("WebActivity - No uid found!")
-        }
-
-        token = bundle.getString("token") ?: run {
-            throw IllegalArgumentException("WebActivity - No token found!")
-        }
-
-        sdk = bundle.getString("sdk", "NATIVE")
-        maid = bundle.getString("maid", "")
-
-        tags = bundle.getSerializableCompat<HashMap<String, Any>>("tags")
-            ?: mapOf()
 
         colors = intent.getIntArrayExtra(BUNDLE_KEY_COLOR)?.takeIf { it.isNotEmpty() } ?: colors
     }
@@ -147,31 +120,8 @@ internal class WebActivity : AppCompatActivity() {
         webView?.setup(
             { reward -> totalReward += reward },
             { clk -> clickId = clk },
-            { isPageOfferWall, url ->
-            Log.i(TAG, "bindUI: $url")
-            if (isPageOfferWall) {
-                // TODO: Remove this block when the front-end ready to handle the close button event
-                if (!areParametersInjected && !url.contains("sdk=$sdk")) {
-                    areParametersInjected = true
-                    webView?.loadUrl(Uri.parse(url).buildUpon()
-                        .appendQueryParameter("os", "ANDROID")
-                        .appendQueryParameter("token", token)
-                        .appendQueryParameter("uid", uid)
-                        .appendQueryParameter("sdk", sdk)
-                        .apply { if (maid.isNotEmpty()) appendQueryParameter("maid", maid) }
-                        .apply {
-                            tags.forEach { tag ->
-                                appendQueryParameter(tag.key, tag.value.toString())
-                            }
-                        }.build().toString()
-                    )
-                }
-            } else {
-                areParametersInjected = false
-            }
-            toggleToolbar(isPageOfferWall)
-        }) { error, date, errUrl ->
-
+            { isPageOfferWall -> toggleToolbar(isPageOfferWall) }
+        ) { error, date, errUrl ->
             val errorInfo =
                 "code: ${error?.getStatusCode()}, description: ${error?.getDescription()}"
 

@@ -5,7 +5,7 @@ import ai.bitlabs.sdk.data.model.WebActivityParams
 import ai.bitlabs.sdk.data.network.BitLabsAPI
 import ai.bitlabs.sdk.util.BASE_URL
 import ai.bitlabs.sdk.util.BUNDLE_KEY_COLOR
-import ai.bitlabs.sdk.util.BUNDLE_KEY_PARAMS
+import ai.bitlabs.sdk.util.BUNDLE_KEY_URL
 import ai.bitlabs.sdk.util.OnRewardListener
 import ai.bitlabs.sdk.util.TAG
 import ai.bitlabs.sdk.util.convertKeysToCamelCase
@@ -188,8 +188,8 @@ object BitLabs {
         with(Intent(context, WebActivity::class.java)) {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
             putExtra(
-                BUNDLE_KEY_PARAMS,
-                WebActivityParams(token, uid, "UNITY", adId, tags).asBundle()
+                BUNDLE_KEY_URL,
+                WebActivityParams(token, uid, "UNITY", adId, tags).url
             )
             putExtra(BUNDLE_KEY_COLOR, headerColor)
             context.startActivity(this)

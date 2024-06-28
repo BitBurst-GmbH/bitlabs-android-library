@@ -21,15 +21,6 @@ internal data class WebActivityParams(
         get() = field.takeIf { it.isNotEmpty() } ?: buildUrl()
         private set
 
-    fun asBundle() = Bundle().apply {
-        putString("url", url)
-        putString("uid", uid)
-        putString("sdk", sdk)
-        putString("maid", maid)
-        putString("token", token)
-        putSerializable("tags", tags as Serializable)
-    }
-
     /** Returns a string representation of the URL with all necessary parameters. */
     private fun buildUrl() = Uri
         .parse("https://web.bitlabs.ai").buildUpon()

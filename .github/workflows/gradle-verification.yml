@@ -1,0 +1,23 @@
+name: Gradle Verification
+
+on:
+  - push
+  - pull_request
+
+jobs:
+  gradle-verification:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - run: ./gradlew build
+
+      - run: ./gradlew test

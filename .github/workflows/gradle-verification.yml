@@ -10,13 +10,16 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
+
+      - name: Create dummy local.properties
+        run: echo "appToken=\"ARBITRARY\"" > local.properties
 
       - run: ./gradlew build
 

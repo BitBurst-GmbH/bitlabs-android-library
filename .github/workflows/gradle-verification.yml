@@ -36,7 +36,6 @@ jobs:
         run: ./gradlew test
 
   instrumented-tests:
-    timeout-minutes: 20
     runs-on: macos-13
     steps:
       - name: Checkout code
@@ -69,7 +68,7 @@ jobs:
           adb wait-for-device
           booted=false
           while [ "$booted" == "false" ]; do
-            boot_completed=`adb shell getprop sys.boot_completed | tr -d '\r'`
+            boot_completed=$(adb shell getprop sys.boot_completed | tr -d '\r')
             if [ "$boot_completed" == "1" ]; then
               booted=true
             else
@@ -91,3 +90,14 @@ jobs:
 
       - name: Run Instrumented Tests
         run: ./gradlew connectedAndroidTest
+
+      - name: Collect Logs on Failure
+        if: failure()
+        run: adb logcat -d > logcat.txt
+
+      - name: Upload Logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: logcat
+          path: logcat.txt

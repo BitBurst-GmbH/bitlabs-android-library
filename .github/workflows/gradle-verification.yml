@@ -85,19 +85,5 @@ jobs:
       - name: Add Dummy local.properties
         run: echo "appToken=\"ARBITRARY\"" > local.properties
 
-      - name: Build with Gradle
-        run: ./gradlew build
-
       - name: Run Instrumented Tests
         run: ./gradlew connectedAndroidTest
-
-      - name: Collect Logs on Failure
-        if: failure()
-        run: adb logcat -d > logcat.txt
-
-      - name: Upload Logs
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: logcat
-          path: logcat.txt

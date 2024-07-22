@@ -9,12 +9,15 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
+import android.view.View
 import android.webkit.WebView
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Lifecycle
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.NoMatchingViewException
+import androidx.test.espresso.ViewInteraction
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.pressBack
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -27,6 +30,7 @@ import com.google.common.truth.Truth.assertThat
 import io.mockk.every
 import io.mockk.mockkObject
 import io.mockk.verify
+import org.hamcrest.Matcher
 import org.hamcrest.Matchers.not
 import org.junit.Test
 
@@ -81,7 +85,7 @@ class WebActivityTest {
         val intent = TestUtils.createWebActivityIntent(url)
 
         ActivityScenario.launch<WebActivity>(intent).use {
-            onView(withId(R.id.toolbar_bitlabs)).check { view, _ ->
+            awaitView(withId(R.id.toolbar_bitlabs)).check { view, _ ->
                 assertThat(view).isInstanceOf(Toolbar::class.java)
                 val gradient = view.background as GradientDrawable
                 assertThat(gradient.colors).isEqualTo(intArrayOf(Color.WHITE, Color.WHITE))
@@ -96,7 +100,7 @@ class WebActivityTest {
         val intent = TestUtils.createWebActivityIntent(url, intArrayOf())
 
         ActivityScenario.launch<WebActivity>(intent).use {
-            onView(withId(R.id.toolbar_bitlabs)).check { view, _ ->
+            awaitView(withId(R.id.toolbar_bitlabs)).check { view, _ ->
                 assertThat(view).isInstanceOf(Toolbar::class.java)
                 val gradient = view.background as GradientDrawable
                 assertThat(gradient.colors).isEqualTo(intArrayOf(Color.WHITE, Color.WHITE))
@@ -114,7 +118,7 @@ class WebActivityTest {
         }
 
         ActivityScenario.launch<WebActivity>(intent).use {
-            onView(withId(R.id.toolbar_bitlabs)).check { view, _ ->
+            awaitView(withId(R.id.toolbar_bitlabs)).check { view, _ ->
                 assertThat(view).isInstanceOf(Toolbar::class.java)
                 val gradient = view.background as GradientDrawable
                 assertThat(gradient.colors).isEqualTo(intArrayOf(Color.WHITE, Color.WHITE))
@@ -129,7 +133,7 @@ class WebActivityTest {
         val intent = TestUtils.createWebActivityIntent(url, colors)
 
         ActivityScenario.launch<WebActivity>(intent).use {
-            onView(withId(R.id.toolbar_bitlabs)).check { view, _ ->
+            awaitView(withId(R.id.toolbar_bitlabs)).check { view, _ ->
                 assertThat(view).isInstanceOf(Toolbar::class.java)
                 val gradient = view.background as GradientDrawable
                 assertThat(gradient.colors).isEqualTo(colors)
@@ -153,8 +157,7 @@ class WebActivityTest {
         val intent = TestUtils.createWebActivityIntent(url)
 
         ActivityScenario.launch<WebActivity>(intent).use {
-            Thread.sleep(500)
-            onView(withId(R.id.toolbar_bitlabs)).check(matches(isDisplayed()))
+            awaitView(withId(R.id.toolbar_bitlabs)).check(matches(isDisplayed()))
         }
     }
 
@@ -164,9 +167,8 @@ class WebActivityTest {
         val intent = TestUtils.createWebActivityIntent(url)
 
         ActivityScenario.launch<WebActivity>(intent).use {
-            Thread.sleep(500)
-            onView(isRoot()).perform(pressBack())
-            onView(withId(androidx.appcompat.R.id.alertTitle)).inRoot(isDialog())
+            awaitView(isRoot()).perform(pressBack())
+            awaitView(withId(androidx.appcompat.R.id.alertTitle)).inRoot(isDialog())
                 .check(matches(isDisplayed()))
         }
     }
@@ -188,53 +190,53 @@ class WebActivityTest {
             every { BitLabs.leaveSurvey(any(), any()) } returns Unit
 
             ActivityScenario.launch<WebActivity>(intent).use {
-                Thread.sleep(500)
+                awaitView(withId(R.id.wv_bitlabs))
 
                 it.onActivity { activity ->
                     activity.findViewById<WebView>(R.id.wv_bitlabs).evaluateJavascript(jsCode) {}
                 }
 
-                Thread.sleep(500)
+                awaitView(withId(R.id.wv_bitlabs))
 
-                onView(isRoot()).perform(pressBack())
+                awaitView(isRoot()).perform(pressBack())
 
-                onView(withText(R.string.leave_reason_other)).inRoot(isDialog())
+                awaitView(withText(R.string.leave_reason_other)).inRoot(isDialog())
                     .check(matches(isDisplayed())).perform(click())
 
                 verify(exactly = 1) { BitLabs.leaveSurvey(any(), any()) }
 
-                Thread.sleep(400)
+                awaitView(withId(R.id.wv_bitlabs))
 
-                onView(isRoot()).perform(pressBack())
+                awaitView(isRoot()).perform(pressBack())
 
-                onView(withText(R.string.leave_reason_sensitive)).inRoot(isDialog())
+                awaitView(withText(R.string.leave_reason_sensitive)).inRoot(isDialog())
                     .check(matches(isDisplayed())).perform(click())
 
                 verify(exactly = 2) { BitLabs.leaveSurvey(any(), any()) }
 
-                Thread.sleep(400)
+                awaitView(withId(R.id.wv_bitlabs))
 
-                onView(isRoot()).perform(pressBack())
+                awaitView(isRoot()).perform(pressBack())
 
-                onView(withText(R.string.leave_reason_technical)).inRoot(isDialog())
+                awaitView(withText(R.string.leave_reason_technical)).inRoot(isDialog())
                     .check(matches(isDisplayed())).perform(click())
 
                 verify(exactly = 3) { BitLabs.leaveSurvey(any(), any()) }
 
-                Thread.sleep(400)
+                awaitView(withId(R.id.wv_bitlabs))
 
-                onView(isRoot()).perform(pressBack())
+                awaitView(isRoot()).perform(pressBack())
 
-                onView(withText(R.string.leave_reason_uninteresting)).inRoot(isDialog())
+                awaitView(withText(R.string.leave_reason_uninteresting)).inRoot(isDialog())
                     .check(matches(isDisplayed())).perform(click())
 
                 verify(exactly = 4) { BitLabs.leaveSurvey(any(), any()) }
 
-                Thread.sleep(400)
+                awaitView(withId(R.id.wv_bitlabs))
 
-                onView(isRoot()).perform(pressBack())
+                awaitView(isRoot()).perform(pressBack())
 
-                onView(withText(R.string.leave_reason_too_long)).inRoot(isDialog())
+                awaitView(withText(R.string.leave_reason_too_long)).inRoot(isDialog())
                     .check(matches(isDisplayed())).perform(click())
 
                 verify(exactly = 5) { BitLabs.leaveSurvey(any(), any()) }
@@ -247,7 +249,6 @@ class WebActivityTest {
  * Utility object for creating common Intents and Bundles for tests.
  */
 object TestUtils {
-
     /**
      * Creates a WebActivityIntent Intent with the given [url] and [color].
      */
@@ -256,4 +257,19 @@ object TestUtils {
             putExtra(BUNDLE_KEY_URL, url)
             if (color != null) putExtra(BUNDLE_KEY_COLOR, color)
         }
+}
+
+private fun awaitView(viewMatcher: Matcher<View>, timeoutMillis: Long = 5000): ViewInteraction {
+    val endTime = System.currentTimeMillis() + timeoutMillis
+    while (System.currentTimeMillis() < endTime) {
+        try {
+            val match = onView(viewMatcher).check(matches(isDisplayed()))
+            return match
+        } catch (e: NoMatchingViewException) {
+            Thread.sleep(50)
+        } catch (e: AssertionError) {
+            Thread.sleep(50)
+        }
+    }
+    throw AssertionError("View not displayed: $viewMatcher")
 }

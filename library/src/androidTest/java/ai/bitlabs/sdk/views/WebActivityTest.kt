@@ -17,6 +17,8 @@ import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.NoMatchingViewException
+import androidx.test.espresso.UiController
+import androidx.test.espresso.ViewAction
 import androidx.test.espresso.ViewInteraction
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.pressBack
@@ -167,6 +169,7 @@ class WebActivityTest {
         val intent = TestUtils.createWebActivityIntent(url)
 
         ActivityScenario.launch<WebActivity>(intent).use {
+            onView(isRoot()).perform(waitForFocus())
             awaitView(isRoot()).perform(pressBack())
             awaitView(withId(androidx.appcompat.R.id.alertTitle)).inRoot(isDialog())
                 .check(matches(isDisplayed()))
@@ -198,6 +201,7 @@ class WebActivityTest {
 
                 awaitView(withId(R.id.wv_bitlabs))
 
+                onView(isRoot()).perform(waitForFocus())
                 awaitView(isRoot()).perform(pressBack())
 
                 awaitView(withText(R.string.leave_reason_other)).inRoot(isDialog())
@@ -207,6 +211,7 @@ class WebActivityTest {
 
                 awaitView(withId(R.id.wv_bitlabs))
 
+                onView(isRoot()).perform(waitForFocus())
                 awaitView(isRoot()).perform(pressBack())
 
                 awaitView(withText(R.string.leave_reason_sensitive)).inRoot(isDialog())
@@ -216,6 +221,7 @@ class WebActivityTest {
 
                 awaitView(withId(R.id.wv_bitlabs))
 
+                onView(isRoot()).perform(waitForFocus())
                 awaitView(isRoot()).perform(pressBack())
 
                 awaitView(withText(R.string.leave_reason_technical)).inRoot(isDialog())
@@ -225,6 +231,7 @@ class WebActivityTest {
 
                 awaitView(withId(R.id.wv_bitlabs))
 
+                onView(isRoot()).perform(waitForFocus())
                 awaitView(isRoot()).perform(pressBack())
 
                 awaitView(withText(R.string.leave_reason_uninteresting)).inRoot(isDialog())
@@ -234,6 +241,7 @@ class WebActivityTest {
 
                 awaitView(withId(R.id.wv_bitlabs))
 
+                onView(isRoot()).perform(waitForFocus())
                 awaitView(isRoot()).perform(pressBack())
 
                 awaitView(withText(R.string.leave_reason_too_long)).inRoot(isDialog())
@@ -272,4 +280,27 @@ private fun awaitView(viewMatcher: Matcher<View>, timeoutMillis: Long = 5000): V
         }
     }
     throw AssertionError("View not displayed: $viewMatcher")
+}
+
+fun waitForFocus(timeout: Long = 10000): ViewAction {
+    return object : ViewAction {
+        override fun getDescription(): String {
+            return "Wait for the root view to gain window focus for up to $timeout milliseconds."
+        }
+
+        override fun getConstraints(): Matcher<View> {
+            return isRoot()
+        }
+
+        override fun perform(uiController: UiController?, view: View?) {
+            val endTime = System.currentTimeMillis() + timeout
+            while (System.currentTimeMillis() < endTime) {
+                if (view?.hasWindowFocus() == true) {
+                    return
+                }
+                uiController?.loopMainThreadForAtLeast(50)
+            }
+            throw AssertionError("Root view did not gain window focus within $timeout milliseconds.")
+        }
+    }
 }

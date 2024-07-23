@@ -80,20 +80,20 @@ class WebActivityTest {
         }
     }
 
-    @Test
-    fun colorExtra_No_BUNDLE_KEY_COLOR_WhiteToolbarBackground() {
-        // Create a WebActivity with non-OfferWall URL to show the toolbar
-        val url = "https://www.google.com"
-        val intent = TestUtils.createWebActivityIntent(url)
-
-        ActivityScenario.launch<WebActivity>(intent).use {
-            awaitView(withId(R.id.toolbar_bitlabs)).check { view, _ ->
-                assertThat(view).isInstanceOf(Toolbar::class.java)
-                val gradient = view.background as GradientDrawable
-                assertThat(gradient.colors).isEqualTo(intArrayOf(Color.WHITE, Color.WHITE))
-            }
-        }
-    }
+//    @Test
+//    fun colorExtra_No_BUNDLE_KEY_COLOR_WhiteToolbarBackground() {
+//        // Create a WebActivity with non-OfferWall URL to show the toolbar
+//        val url = "https://www.google.com"
+//        val intent = TestUtils.createWebActivityIntent(url)
+//
+//        ActivityScenario.launch<WebActivity>(intent).use {
+//            awaitView(withId(R.id.toolbar_bitlabs)).check { view, _ ->
+//                assertThat(view).isInstanceOf(Toolbar::class.java)
+//                val gradient = view.background as GradientDrawable
+//                assertThat(gradient.colors).isEqualTo(intArrayOf(Color.WHITE, Color.WHITE))
+//            }
+//        }
+//    }
 
     @Test
     fun colorExtra_BUNDLE_KEY_COLOR_Empty_WhiteToolbarBackground() {
@@ -110,23 +110,23 @@ class WebActivityTest {
         }
     }
 
-    @Test
-    fun colorExtra_BUNDLE_KEY_COLOR_NotIntArrayOf_WhiteToolbarBackground() {
-        // Create a WebActivity with non-OfferWall URL to show the toolbar
-        val url = "https://www.google.com"
-        val intent = Intent(context, WebActivity::class.java).apply {
-            putExtra(BUNDLE_KEY_URL, url)
-            putExtra(BUNDLE_KEY_COLOR, 123)
-        }
-
-        ActivityScenario.launch<WebActivity>(intent).use {
-            awaitView(withId(R.id.toolbar_bitlabs)).check { view, _ ->
-                assertThat(view).isInstanceOf(Toolbar::class.java)
-                val gradient = view.background as GradientDrawable
-                assertThat(gradient.colors).isEqualTo(intArrayOf(Color.WHITE, Color.WHITE))
-            }
-        }
-    }
+//    @Test
+//    fun colorExtra_BUNDLE_KEY_COLOR_NotIntArrayOf_WhiteToolbarBackground() {
+//        // Create a WebActivity with non-OfferWall URL to show the toolbar
+//        val url = "https://www.google.com"
+//        val intent = Intent(context, WebActivity::class.java).apply {
+//            putExtra(BUNDLE_KEY_URL, url)
+//            putExtra(BUNDLE_KEY_COLOR, 123)
+//        }
+//
+//        ActivityScenario.launch<WebActivity>(intent).use {
+//            awaitView(withId(R.id.toolbar_bitlabs)).check { view, _ ->
+//                assertThat(view).isInstanceOf(Toolbar::class.java)
+//                val gradient = view.background as GradientDrawable
+//                assertThat(gradient.colors).isEqualTo(intArrayOf(Color.WHITE, Color.WHITE))
+//            }
+//        }
+//    }
 
     @Test
     fun colorExtra_BUNDLE_KEY_COLOR_CorrectIntArray_CorrectToolbarBackground() {

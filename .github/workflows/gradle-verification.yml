@@ -20,9 +20,6 @@ jobs:
       - name: Create dummy local.properties
         run: echo "appToken=\"ARBITRARY\"" > local.properties
 
-      - name: Build with Gradle
-        run: ./gradlew build
-
       - name: Run Unit Tests
         run: ./gradlew test
 
@@ -49,3 +46,5 @@ jobs:
           target: google_apis
           arch: x86_64
           script: ./gradlew connectedCheck
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true

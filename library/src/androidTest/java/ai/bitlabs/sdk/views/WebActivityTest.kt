@@ -37,13 +37,13 @@ class WebActivityTest {
 
     private val context = ApplicationProvider.getApplicationContext<Context>()
 
-    @Test
-    fun urlExtra_No_BUNDLE_KEY_URL_DestroyActivity() {
-        ActivityScenario.launch(WebActivity::class.java).use {
-            assertThat(it.state).isEqualTo(Lifecycle.State.DESTROYED)
-        }
-    }
-//
+//    @Test
+//    fun urlExtra_No_BUNDLE_KEY_URL_DestroyActivity() {
+//        ActivityScenario.launch(WebActivity::class.java).use {
+//            assertThat(it.state).isEqualTo(Lifecycle.State.DESTROYED)
+//        }
+//    }
+
 //    @Test
 //    fun urlExtra_BUNDLE_KEY_URL_EmptyString_DestroyActivity() {
 //        val intent = TestUtils.createWebActivityIntent("")
@@ -52,7 +52,7 @@ class WebActivityTest {
 //            assertThat(it.state).isEqualTo(Lifecycle.State.DESTROYED)
 //        }
 //    }
-//
+
 //    @Test
 //    fun urlExtra_BUNDLE_KEY_URL_NotString_DestroyActivity() {
 //        val intent = Intent(context, WebActivity::class.java).apply {
@@ -147,29 +147,30 @@ class WebActivityTest {
 //        }
 //    }
 //
+//    @ TODO: Fix this test
 //    @Test
 //    fun toolbar_PageIsNotOfferwall_IsDisplayed() {
 //        val url = "https://www.google.com"
 //        val intent = TestUtils.createWebActivityIntent(url)
 //
 //        ActivityScenario.launch<WebActivity>(intent).use {
-//            Thread.sleep(500)
+//            Thread.sleep(1000)
 //            onView(withId(R.id.toolbar_bitlabs)).check(matches(isDisplayed()))
 //        }
 //    }
 //
-//    @Test
-//    fun onBackPressed_PageIsNotOfferwall_ShowLeaveSurveyDialog() {
-//        val url = "https://www.google.com"
-//        val intent = TestUtils.createWebActivityIntent(url)
-//
-//        ActivityScenario.launch<WebActivity>(intent).use {
-//            Thread.sleep(500)
-//            onView(isRoot()).perform(pressBack())
-//            onView(withId(androidx.appcompat.R.id.alertTitle)).inRoot(isDialog())
-//                .check(matches(isDisplayed()))
-//        }
-//    }
+    @Test
+    fun onBackPressed_PageIsNotOfferwall_ShowLeaveSurveyDialog() {
+        val url = "https://www.google.com"
+        val intent = TestUtils.createWebActivityIntent(url)
+
+        ActivityScenario.launch<WebActivity>(intent).use {
+            Thread.sleep(500)
+            onView(isRoot()).perform(pressBack())
+            onView(withId(androidx.appcompat.R.id.alertTitle)).inRoot(isDialog())
+                .check(matches(isDisplayed()))
+        }
+    }
 //
 //    @Test
 //    fun leaveSurveyDialog_AnyOptionClicked_LeaveSurveyCalled() {

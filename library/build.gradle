@@ -48,7 +48,6 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.test.ext:junit-ktx:1.2.1'
     unityCompileOnly files('libs/classes.jar')
 
     implementation 'androidx.core:core-ktx:1.8.0'

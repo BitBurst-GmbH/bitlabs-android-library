@@ -29,7 +29,6 @@ import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.isRoot
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import io.mockk.every
 import io.mockk.mockkObject
@@ -46,7 +45,6 @@ import org.junit.runner.RunWith
 private const val TOKEN = BuildConfig.APP_TOKEN
 private const val UID = "diffindocongress"
 
-@RunWith(AndroidJUnit4::class)
 class WebActivityTest {
 
     private val context = ApplicationProvider.getApplicationContext<Context>()
@@ -54,7 +52,7 @@ class WebActivityTest {
     @Test
     fun urlExtra_No_BUNDLE_KEY_URL_DestroyActivity() {
         ActivityScenario.launch(WebActivity::class.java).use {
-            Thread.sleep(2000)
+            Thread.sleep(500)
             assertThat(it.state).isEqualTo(Lifecycle.State.DESTROYED)
         }
     }
@@ -64,7 +62,7 @@ class WebActivityTest {
         val intent = TestUtils.createWebActivityIntent("")
 
         ActivityScenario.launch<WebActivity>(intent).use {
-            Thread.sleep(2000)
+            Thread.sleep(500)
             assertThat(it.state).isEqualTo(Lifecycle.State.DESTROYED)
         }
     }
@@ -76,7 +74,7 @@ class WebActivityTest {
         }
 
         ActivityScenario.launch<WebActivity>(intent).use {
-            Thread.sleep(2000)
+            Thread.sleep(500)
             assertThat(it.state).isEqualTo(Lifecycle.State.DESTROYED)
         }
     }
@@ -87,7 +85,7 @@ class WebActivityTest {
         val intent = TestUtils.createWebActivityIntent(url)
 
         ActivityScenario.launch<WebActivity>(intent).use {
-            Thread.sleep(2000)
+            Thread.sleep(500)
             assertThat(it.state).isEqualTo(Lifecycle.State.RESUMED)
         }
     }
@@ -99,7 +97,7 @@ class WebActivityTest {
         val intent = TestUtils.createWebActivityIntent(url)
 
         ActivityScenario.launch<WebActivity>(intent).use {
-            Thread.sleep(2000)
+            Thread.sleep(500)
             it.onActivity { activity ->
                 val toolbar = activity.findViewById<Toolbar>(R.id.toolbar_bitlabs)
                 val gradient = toolbar.background as GradientDrawable
@@ -115,7 +113,7 @@ class WebActivityTest {
         val intent = TestUtils.createWebActivityIntent(url, intArrayOf())
 
         ActivityScenario.launch<WebActivity>(intent).use {
-            Thread.sleep(2000)
+            Thread.sleep(500)
             it.onActivity { activity ->
                 val toolbar = activity.findViewById<Toolbar>(R.id.toolbar_bitlabs)
                 val gradient = toolbar.background as GradientDrawable
@@ -134,7 +132,7 @@ class WebActivityTest {
         }
 
         ActivityScenario.launch<WebActivity>(intent).use {
-            Thread.sleep(2000)
+            Thread.sleep(500)
             it.onActivity { activity ->
                 val toolbar = activity.findViewById<Toolbar>(R.id.toolbar_bitlabs)
                 val gradient = toolbar.background as GradientDrawable
@@ -150,7 +148,7 @@ class WebActivityTest {
         val intent = TestUtils.createWebActivityIntent(url, colors)
 
         ActivityScenario.launch<WebActivity>(intent).use {
-            Thread.sleep(2000)
+            Thread.sleep(500)
             it.onActivity { activity ->
                 val toolbar = activity.findViewById<Toolbar>(R.id.toolbar_bitlabs)
                 val gradient = toolbar.background as GradientDrawable
@@ -165,7 +163,7 @@ class WebActivityTest {
         val intent = TestUtils.createWebActivityIntent(url)
 
         ActivityScenario.launch<WebActivity>(intent).use {
-            Thread.sleep(2000)
+            Thread.sleep(1000)
             onView(withId(R.id.toolbar_bitlabs)).check(matches(not(isDisplayed())))
         }
     }
@@ -176,101 +174,101 @@ class WebActivityTest {
         val intent = TestUtils.createWebActivityIntent(url)
 
         ActivityScenario.launch<WebActivity>(intent).use {
-            Thread.sleep(6000)
+            Thread.sleep(1000)
             onView(withId(R.id.toolbar_bitlabs)).check(matches(isDisplayed()))
         }
     }
 
-//    @Test
-//    fun onBackPressed_PageIsNotOfferwall_ShowLeaveSurveyDialog() {
-//        val url = "https://www.google.com"
-//        val intent = TestUtils.createWebActivityIntent(url)
-//
-//        ActivityScenario.launch<WebActivity>(intent).use {
-//            Thread.sleep(4000)
-//            onView(isRoot()).perform(pressBack())
-//
-//            Thread.sleep(4000)
-//            onView(withId(androidx.appcompat.R.id.alertTitle)).inRoot(isDialog())
-//                .check(matches(isDisplayed()))
-//        }
-//    }
+    @Test
+    fun onBackPressed_PageIsNotOfferwall_ShowLeaveSurveyDialog() {
+        val url = "https://www.google.com"
+        val intent = TestUtils.createWebActivityIntent(url)
 
-//    @Test
-//    fun leaveSurveyDialog_AnyOptionClicked_LeaveSurveyCalled() {
-//        val url = "https://www.google.com"
-//        val intent = TestUtils.createWebActivityIntent(url)
-//        val surveyStartHookEventMessage = """
-//            {
-//                "type": "hook",
-//                "name": "offerwall-surveys:survey.start",
-//                "args": [{clickId: "123", link: ""}]
-//            }
-//        """.trimIndent()
-//        val jsCode = "window.postMessage($surveyStartHookEventMessage, '*');"
-//
-//        mockkObject(BitLabs) {
-//            every { BitLabs.leaveSurvey(any(), any()) } returns Unit
-//
-//            ActivityScenario.launch<WebActivity>(intent).use {
-//                Thread.sleep(10000)
-//
-//                it.onActivity { activity ->
-//                    activity.findViewById<WebView>(R.id.wv_bitlabs).evaluateJavascript(jsCode) {}
-//                }
-//
-//                Thread.sleep(10000)
-//
-//                onView(isRoot()).perform(pressBack())
-//                Thread.sleep(10000)
-//
-//                onView(withText(R.string.leave_reason_other)).inRoot(isDialog())
-//                    .check(matches(isDisplayed())).perform(click())
-//
-//                verify(exactly = 1) { BitLabs.leaveSurvey(any(), any()) }
-//
-//                Thread.sleep(10000)
-//
-//                onView(isRoot()).perform(pressBack())
-//                Thread.sleep(10000)
-//
-//                onView(withText(R.string.leave_reason_sensitive)).inRoot(isDialog())
-//                    .check(matches(isDisplayed())).perform(click())
-//
-//                verify(exactly = 2) { BitLabs.leaveSurvey(any(), any()) }
-//
-//                Thread.sleep(10000)
-//
-//                onView(isRoot()).perform(pressBack())
-//                Thread.sleep(10000)
-//
-//                onView(withText(R.string.leave_reason_technical)).inRoot(isDialog())
-//                    .check(matches(isDisplayed())).perform(click())
-//
-//                verify(exactly = 3) { BitLabs.leaveSurvey(any(), any()) }
-//
-//                Thread.sleep(10000)
-//
-//                onView(isRoot()).perform(pressBack())
-//                Thread.sleep(10000)
-//
-//                onView(withText(R.string.leave_reason_uninteresting)).inRoot(isDialog())
-//                    .check(matches(isDisplayed())).perform(click())
-//
-//                verify(exactly = 4) { BitLabs.leaveSurvey(any(), any()) }
-//
-//                Thread.sleep(10000)
-//
-//                onView(isRoot()).perform(pressBack())
-//                Thread.sleep(10000)
-//
-//                onView(withText(R.string.leave_reason_too_long)).inRoot(isDialog())
-//                    .check(matches(isDisplayed())).perform(click())
-//
-//                verify(exactly = 5) { BitLabs.leaveSurvey(any(), any()) }
-//            }
-//        }
-//    }
+        ActivityScenario.launch<WebActivity>(intent).use {
+            Thread.sleep(500)
+            onView(isRoot()).perform(pressBack())
+
+            Thread.sleep(500)
+            onView(withId(androidx.appcompat.R.id.alertTitle)).inRoot(isDialog())
+                .check(matches(isDisplayed()))
+        }
+    }
+
+    @Test
+    fun leaveSurveyDialog_AnyOptionClicked_LeaveSurveyCalled() {
+        val url = "https://www.google.com"
+        val intent = TestUtils.createWebActivityIntent(url)
+        val surveyStartHookEventMessage = """
+            {
+                "type": "hook",
+                "name": "offerwall-surveys:survey.start",
+                "args": [{clickId: "123", link: ""}]
+            }
+        """.trimIndent()
+        val jsCode = "window.postMessage($surveyStartHookEventMessage, '*');"
+
+        mockkObject(BitLabs) {
+            every { BitLabs.leaveSurvey(any(), any()) } returns Unit
+
+            ActivityScenario.launch<WebActivity>(intent).use {
+                Thread.sleep(500)
+
+                it.onActivity { activity ->
+                    activity.findViewById<WebView>(R.id.wv_bitlabs).evaluateJavascript(jsCode) {}
+                }
+
+                Thread.sleep(500)
+
+                onView(isRoot()).perform(pressBack())
+                Thread.sleep(500)
+
+                onView(withText(R.string.leave_reason_other)).inRoot(isDialog())
+                    .check(matches(isDisplayed())).perform(click())
+
+                verify(exactly = 1) { BitLabs.leaveSurvey(any(), any()) }
+
+                Thread.sleep(500)
+
+                onView(isRoot()).perform(pressBack())
+                Thread.sleep(500)
+
+                onView(withText(R.string.leave_reason_sensitive)).inRoot(isDialog())
+                    .check(matches(isDisplayed())).perform(click())
+
+                verify(exactly = 2) { BitLabs.leaveSurvey(any(), any()) }
+
+                Thread.sleep(500)
+
+                onView(isRoot()).perform(pressBack())
+                Thread.sleep(500)
+
+                onView(withText(R.string.leave_reason_technical)).inRoot(isDialog())
+                    .check(matches(isDisplayed())).perform(click())
+
+                verify(exactly = 3) { BitLabs.leaveSurvey(any(), any()) }
+
+                Thread.sleep(500)
+
+                onView(isRoot()).perform(pressBack())
+                Thread.sleep(500)
+
+                onView(withText(R.string.leave_reason_uninteresting)).inRoot(isDialog())
+                    .check(matches(isDisplayed())).perform(click())
+
+                verify(exactly = 4) { BitLabs.leaveSurvey(any(), any()) }
+
+                Thread.sleep(500)
+
+                onView(isRoot()).perform(pressBack())
+                Thread.sleep(500)
+
+                onView(withText(R.string.leave_reason_too_long)).inRoot(isDialog())
+                    .check(matches(isDisplayed())).perform(click())
+
+                verify(exactly = 5) { BitLabs.leaveSurvey(any(), any()) }
+            }
+        }
+    }
 }
 
 /**

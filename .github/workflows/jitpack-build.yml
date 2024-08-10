@@ -1,0 +1,18 @@
+name: Build Release on JitPack
+
+on:
+  release:
+    types: [ published ]
+
+env:
+  TAG: ${{ github.event.release.tag_name }}
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Request JitPack to build the tag
+        run: curl "https://jitpack.io/com/github/$GITHUB_REPOSITORY/$TAG"
+
+      - name: Check the build status
+        run: curl "https://jitpack.io/com/github/$GITHUB_REPOSITORY/$TAG/build.log"

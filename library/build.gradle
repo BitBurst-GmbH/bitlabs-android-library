@@ -75,7 +75,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
 }
 
-version = '3.2.6'
+version = '3.2.7'
 group = 'ai.bitlabs.sdk'
 
 afterEvaluate {

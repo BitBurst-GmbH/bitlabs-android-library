@@ -6,6 +6,7 @@ import ai.bitlabs.sdk.data.model.GetAppSettingsResponse
 import ai.bitlabs.sdk.data.model.GetLeaderboardResponse
 import ai.bitlabs.sdk.data.model.GetSurveysResponse
 import ai.bitlabs.sdk.data.model.LeaveReason
+import ai.bitlabs.sdk.data.model.RestrictionReason
 import ai.bitlabs.sdk.data.model.Survey
 import ai.bitlabs.sdk.data.model.UpdateClickBody
 import ai.bitlabs.sdk.data.network.BitLabsAPI
@@ -55,8 +56,16 @@ internal class BitLabsRepository(private val bitLabsAPI: BitLabsAPI) {
             call: Call<BitLabsResponse<GetSurveysResponse>>,
             response: Response<BitLabsResponse<GetSurveysResponse>>
         ) {
-            if (response.isSuccessful) {
-                response.body()?.data?.surveys?.run { onResponseListener.onResponse(this) }
+            val surveys = response.body()?.data?.surveys ?: emptyList()
+
+            if (surveys.isNotEmpty()) {
+                onResponseListener.onResponse(surveys)
+                return
+            }
+
+            val restrictionReason = response.body()?.data?.restrictionReason
+            if (restrictionReason != null) {
+                onExceptionListener.onException(Exception("Restriction Reason: $restrictionReason"))
                 return
             }
 

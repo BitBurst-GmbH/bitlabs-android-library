@@ -35,7 +35,10 @@ public class MainActivity extends AppCompatActivity {
         // Get client-side callbacks to reward the user (We highly recommend using server-to-server callbacks!)
         bitLabs.setOnRewardListener(payout -> Log.i(TAG, "Reward payout: " + payout));
 
-        findViewById(R.id.btn_check_surveys).setOnClickListener(view -> bitLabs.checkSurveys(hasSurveys -> Log.i(TAG, hasSurveys ? "Found Surveys" : "No Surveys"), e -> Log.e(TAG, "CheckSurveysErr: " + e.getMessage(), e.getCause())));
+        findViewById(R.id.btn_check_surveys).setOnClickListener(view -> bitLabs.checkSurveys(
+                hasSurveys -> Log.i(TAG, hasSurveys ? "Found Surveys" : "No Surveys"),
+                e -> Log.e(TAG, "CheckSurveysErr: " + e.getMessage(), e.getCause())
+        ));
 
         findViewById(R.id.btn_get_surveys).setOnClickListener(view -> bitLabs.getSurveys(
                 surveys -> {

@@ -139,7 +139,13 @@ class BitLabsRepositoryTest {
         every { bitLabsAPI.getSurveys(any()) } returns object :
             BitLabsCall<BitLabsResponse<GetSurveysResponse>>() {
             override fun enqueue(callback: Callback<BitLabsResponse<GetSurveysResponse>>) {
-                callback.onResponse(this, Response.success(getWorkingResponseBody()))
+                val mockSurveysResponse = BitLabsResponse(
+                    data = GetSurveysResponse(null, mockk<List<Survey>>(relaxed = true)),
+                    error = null,
+                    status = "",
+                    traceId = "",
+                )
+                callback.onResponse(this, Response.success(mockSurveysResponse))
             }
         }
 

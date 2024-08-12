@@ -56,16 +56,15 @@ internal class BitLabsRepository(private val bitLabsAPI: BitLabsAPI) {
             call: Call<BitLabsResponse<GetSurveysResponse>>,
             response: Response<BitLabsResponse<GetSurveysResponse>>
         ) {
-            val surveys = response.body()?.data?.surveys ?: emptyList()
-
-            if (surveys.isNotEmpty()) {
-                onResponseListener.onResponse(surveys)
+            val restrictionReason = response.body()?.data?.restrictionReason
+            if (restrictionReason != null) {
+                onExceptionListener.onException(Exception(restrictionReason.prettyPrint()))
                 return
             }
 
-            val restrictionReason = response.body()?.data?.restrictionReason
-            if (restrictionReason != null) {
-                onExceptionListener.onException(Exception("Restriction Reason: $restrictionReason"))
+            val surveys = response.body()?.data?.surveys ?: emptyList()
+            if (surveys.isNotEmpty()) {
+                onResponseListener.onResponse(surveys)
                 return
             }
 

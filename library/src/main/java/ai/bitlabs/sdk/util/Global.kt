@@ -46,22 +46,6 @@ internal fun extractColors(color: String) =
         intArrayOf(Color.parseColor(groupValues[0]), Color.parseColor(groupValues[0]))
     } ?: intArrayOf()
 
-internal fun randomSurvey(i: Int) = with(Random(i)) {
-    Survey(
-        id = i.toString(),
-        cpi = "0.5",
-        value = "500",
-        loi = nextDouble(10.0),
-        category = Category("Survey-$i", "", "", ""),
-        rating = nextInt(6),
-        country = "US",
-        language = "en",
-        tags = listOf("recontact", "pii"),
-        type = "survey",
-        clickUrl = "",
-    )
-}
-
 internal fun String.snakeToCamelCase() = lowercase()
     .split("_")
     .joinToString("") { it.replaceFirstChar { c -> c.uppercase() } }

@@ -10,7 +10,6 @@ import ai.bitlabs.sdk.util.OnRewardListener
 import ai.bitlabs.sdk.util.TAG
 import ai.bitlabs.sdk.util.convertKeysToCamelCase
 import ai.bitlabs.sdk.util.extractColors
-import ai.bitlabs.sdk.util.randomSurvey
 import ai.bitlabs.sdk.views.WebActivity
 import android.content.Context
 import android.content.Intent
@@ -131,9 +130,7 @@ object BitLabs {
             UnityPlayer.UnitySendMessage(
                 gameObject,
                 "GetSurveysCallback",
-                GsonBuilder().create()
-                    .toJson(surveys.ifEmpty { { (1..3).map { randomSurvey(it) } } })
-                    .convertKeysToCamelCase()
+                GsonBuilder().create().toJson(surveys).convertKeysToCamelCase()
             )
         }, { exception ->
             UnityPlayer.UnitySendMessage(

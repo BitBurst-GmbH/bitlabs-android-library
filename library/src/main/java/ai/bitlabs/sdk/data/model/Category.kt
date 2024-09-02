@@ -1,8 +1,10 @@
 package ai.bitlabs.sdk.data.model
 
 
+import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
 
+@Keep
 data class Category(
     val name: String,
     @SerializedName("icon_name") val iconName: String,

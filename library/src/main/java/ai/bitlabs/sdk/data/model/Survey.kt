@@ -3,6 +3,7 @@ package ai.bitlabs.sdk.data.model
 
 import ai.bitlabs.sdk.BitLabs
 import android.content.Context
+import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
 
 /**
@@ -18,6 +19,7 @@ import com.google.gson.annotations.SerializedName
  * @property[tags] Values are **recontact** or **pii**. The tag **recontact** means that this is a follow-up survey for
  * specific users that completed a different survey before; The tag **pii** means that this survey might collect sensitive information from the user;
  */
+@Keep
 data class Survey(
     val id: String,
     val type: String,

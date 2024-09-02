@@ -1,8 +1,10 @@
 package ai.bitlabs.sdk.data.model
 
 
+import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
 
+@Keep
 internal data class RestrictionReason(
     @SerializedName("not_verified") val notVerified: Boolean?,
     @SerializedName("using_vpn") val usingVpn: Boolean?,

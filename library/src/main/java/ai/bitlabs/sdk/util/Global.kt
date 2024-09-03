@@ -1,7 +1,6 @@
 package ai.bitlabs.sdk.util
 
-import ai.bitlabs.sdk.data.model.Category
-import ai.bitlabs.sdk.data.model.Survey
+import android.content.res.Configuration
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Color
@@ -13,7 +12,6 @@ import com.google.zxing.BarcodeFormat
 import com.google.zxing.qrcode.QRCodeWriter
 import java.math.BigDecimal
 import java.math.RoundingMode
-import kotlin.random.Random
 
 internal const val TAG = "BitLabs"
 
@@ -28,6 +26,14 @@ internal fun locale() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 } else {
     Resources.getSystem().configuration.locale
 }
+
+internal fun deviceType(): String {
+    val isTablet =
+        Resources.getSystem().configuration.screenLayout and Configuration.SCREENLAYOUT_SIZE_MASK >=
+                Configuration.SCREENLAYOUT_SIZE_LARGE
+    return if (isTablet) "tablet" else "phone"
+}
+
 
 internal fun getLuminance(color: Int) =
     0.2126 * Color.red(color) + 0.7152 * Color.green(color) + 0.0722 * Color.blue(color)

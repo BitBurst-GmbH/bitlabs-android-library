@@ -12,6 +12,7 @@ import ai.bitlabs.sdk.util.OnExceptionListener
 import ai.bitlabs.sdk.util.OnResponseListener
 import ai.bitlabs.sdk.util.OnRewardListener
 import ai.bitlabs.sdk.util.TAG
+import ai.bitlabs.sdk.util.deviceType
 import ai.bitlabs.sdk.util.extractColors
 import ai.bitlabs.sdk.views.LeaderboardFragment
 import ai.bitlabs.sdk.views.SurveysAdapter
@@ -23,6 +24,7 @@ import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL
@@ -69,7 +71,8 @@ object BitLabs {
         this.token = token
         this.uid = uid
 
-        val userAgent = "BitLabs (Android; ${Build.VERSION.SDK_INT}; ${Build.MODEL})"
+        val userAgent =
+            "BitLabs/${BuildConfig.VERSION_NAME} (Android ${Build.VERSION.SDK_INT}; ${Build.MODEL}; ${deviceType()})"
 
         val okHttpClient = OkHttpClient.Builder()
             .addInterceptor { chain ->

@@ -1,7 +1,9 @@
 package ai.bitlabs.sdk.data.model
 
+import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
 
+@Keep
 data class GetLeaderboardResponse(
     @SerializedName("next_reset_at") val nextResetAt: String,
     @SerializedName("own_user") val ownUser: User?,

@@ -3,6 +3,7 @@ package ai.bitlabs.sdk.data.model
 import ai.bitlabs.sdk.views.WebActivity
 import android.net.Uri
 import android.os.Bundle
+import androidx.annotation.Keep
 import java.io.Serializable
 
 /**
@@ -10,6 +11,7 @@ import java.io.Serializable
  * @constructor A Constructor that holds the values ([token], [uid], [tags])
  * which will be used in the [WebActivity] to launch the OfferWall correctly.
  */
+@Keep
 internal data class WebActivityParams(
     private val token: String,
     private val uid: String,

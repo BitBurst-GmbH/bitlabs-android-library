@@ -12,6 +12,7 @@ import ai.bitlabs.sdk.util.OnExceptionListener
 import ai.bitlabs.sdk.util.OnResponseListener
 import ai.bitlabs.sdk.util.OnRewardListener
 import ai.bitlabs.sdk.util.TAG
+import ai.bitlabs.sdk.util.deviceType
 import ai.bitlabs.sdk.util.extractColors
 import ai.bitlabs.sdk.views.LeaderboardFragment
 import ai.bitlabs.sdk.views.SurveysAdapter
@@ -21,7 +22,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL
@@ -67,16 +70,30 @@ object BitLabs {
     fun init(context: Context, token: String, uid: String) {
         this.token = token
         this.uid = uid
-        bitLabsRepo = BitLabsRepository(
-            Retrofit.Builder().baseUrl(BASE_URL)
-                .client(OkHttpClient.Builder().addInterceptor { chain ->
-                    chain.proceed(
-                        chain.request().newBuilder().addHeader("X-Api-Token", token)
-                            .addHeader("X-User-Id", uid).build()
-                    )
-                }.build()).addConverterFactory(GsonConverterFactory.create()).build()
-                .create(BitLabsAPI::class.java)
-        )
+
+        val userAgent =
+            "BitLabs/${BuildConfig.VERSION_NAME} (Android ${Build.VERSION.SDK_INT}; ${Build.MODEL}; ${deviceType()})"
+
+        val okHttpClient = OkHttpClient.Builder()
+            .addInterceptor { chain ->
+                val request = chain.request().newBuilder()
+                    .addHeader("User-Agent", userAgent)
+                    .addHeader("X-Api-Token", token)
+                    .addHeader("X-User-Id", uid)
+                    .build()
+
+                chain.proceed(request)
+            }
+            .build()
+
+        val retrofit = Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        bitLabsRepo = BitLabsRepository(retrofit.create(BitLabsAPI::class.java))
+
         determineAdvertisingInfo(context)
 
         fileProviderAuthority = "${context.packageName}.provider.bitlabs"

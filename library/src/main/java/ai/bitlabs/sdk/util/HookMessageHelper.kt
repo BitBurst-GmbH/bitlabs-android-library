@@ -6,6 +6,7 @@ import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
 import com.google.gson.JsonParseException
+import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
 import java.lang.reflect.Type
 
@@ -82,6 +83,7 @@ internal fun JsonElement.isHookMessage(): Boolean {
 /**
  * HookMessage data class that holds the message received from the webview.
  */
+@Keep
 internal data class HookMessage<T>(
     val type: String, val name: HookName, val args: List<T>
 )
@@ -112,6 +114,7 @@ internal enum class HookName {
 /**
  * Reward Arguments data class that holds the reward data.
  */
+@Keep
 internal data class RewardArgs(
     val reward: Float
 )
@@ -119,6 +122,7 @@ internal data class RewardArgs(
 /**
  * Survey Start Arguments data class that holds the survey start data.
  */
+@Keep
 internal data class SurveyStartArgs(
     val clickId: String, val link: String
 )

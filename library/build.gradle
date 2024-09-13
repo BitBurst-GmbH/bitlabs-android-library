@@ -19,6 +19,7 @@ android {
 
         buildConfigField 'String', 'APP_TOKEN', keystore.getProperty('appToken', '"APP_TOKEN"')
 
+        testApplicationId System.getProperty('testApplicationId', 'ai.bitlabs.sdk.test')
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 

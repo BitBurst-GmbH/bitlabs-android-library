@@ -4,8 +4,12 @@ import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.R
 import ai.bitlabs.sdk.data.model.WebViewError
 import ai.bitlabs.sdk.views.WebActivity
+import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.AlertDialog
+import android.content.Context
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
@@ -18,7 +22,10 @@ import android.webkit.*
 import androidx.activity.result.contract.ActivityResultContracts.*
 import androidx.annotation.RequiresApi
 import androidx.browser.customtabs.CustomTabsIntent
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.core.content.PackageManagerCompat
 import androidx.core.net.toUri
 import java.io.File
 
@@ -41,6 +48,33 @@ fun WebView.setup(
         if (tempFile == null) uriResult?.onReceiveValue(null)
         uriResult?.onReceiveValue(arrayOf(tempFile!!.toUri()))
     }
+
+    fun takePhoto() {
+        try {
+            tempFile = with(File(context.cacheDir, "bitlabs")) {
+                if (exists()) delete()
+                mkdir()
+                File.createTempFile("temp_photo", ".jpg", this)
+            }
+            if (tempFile == null) throw Exception("Could not create tmp photo")
+            val uri =
+                FileProvider.getUriForFile(context, BitLabs.fileProviderAuthority, tempFile!!)
+            camera.launch(uri)
+        } catch (e: Exception) {
+            Log.e(TAG, e.message, e)
+        }
+    }
+
+    val permission =
+        (context as WebActivity).registerForActivityResult(RequestPermission()) { granted ->
+            if (granted) takePhoto()
+            else AlertDialog.Builder(context)
+                .setTitle("Permission required")
+                .setMessage("Camera permission is required to take a photo. Please enable it in the app settings.")
+                .setPositiveButton("OK") { _, _ -> }
+                .setOnDismissListener { uriResult?.onReceiveValue(null) }
+                .show()
+        }
 
     if (Build.VERSION.SDK_INT >= 21) CookieManager.getInstance()
         .setAcceptThirdPartyCookies(this, true)
@@ -84,29 +118,13 @@ fun WebView.setup(
                         context.resources.getString(R.string.file_chooser_gallery)
                     )
                 ) { _, which ->
-                    if (which == 0) takePhoto()
+                    if (which == 0) permission.launch(Manifest.permission.CAMERA)
                     else chooser.launch("image/*")
                 }
                 .setOnCancelListener { uriResult?.onReceiveValue(null) }
                 .show()
 
             return true
-        }
-
-        private fun takePhoto() {
-            try {
-                tempFile = with(File(context.cacheDir, "bitlabs")) {
-                    if (exists()) delete()
-                    mkdir()
-                    File.createTempFile("temp_photo", ".jpg", this)
-                }
-                if (tempFile == null) throw Exception("Could not create tmp photo")
-                val uri =
-                    FileProvider.getUriForFile(context, BitLabs.fileProviderAuthority, tempFile!!)
-                camera.launch(uri)
-            } catch (e: Exception) {
-                Log.e(TAG, e.message, e)
-            }
         }
     }
 

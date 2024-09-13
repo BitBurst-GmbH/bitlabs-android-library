@@ -9,11 +9,12 @@ import ai.bitlabs.sdk.util.BUNDLE_KEY_URL
 import ai.bitlabs.sdk.util.OnRewardListener
 import ai.bitlabs.sdk.util.TAG
 import ai.bitlabs.sdk.util.convertKeysToCamelCase
+import ai.bitlabs.sdk.util.deviceType
 import ai.bitlabs.sdk.util.extractColors
-import ai.bitlabs.sdk.util.randomSurvey
 import ai.bitlabs.sdk.views.WebActivity
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.util.Log
 import com.google.android.gms.ads.identifier.AdvertisingIdClient
 import com.google.gson.GsonBuilder
@@ -58,21 +59,29 @@ object BitLabs {
     fun init(token: String, uid: String) {
         this.token = token
         this.uid = uid
-        bitLabsRepo = BitLabsRepository(
-            Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .client(OkHttpClient.Builder().addInterceptor { chain ->
-                    chain.proceed(
-                        chain.request().newBuilder()
-                            .addHeader("X-Api-Token", token)
-                            .addHeader("X-User-Id", uid)
-                            .build()
-                    )
-                }.build())
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
-                .create(BitLabsAPI::class.java)
-        )
+
+        val userAgent =
+            "BitLabs/${BuildConfig.VERSION_NAME} (Android ${Build.VERSION.SDK_INT}; ${Build.MODEL}; ${deviceType()})"
+
+        val okHttpClient = OkHttpClient.Builder()
+            .addInterceptor { chain ->
+                val request = chain.request().newBuilder()
+                    .addHeader("User-Agent", userAgent)
+                    .addHeader("X-Api-Token", token)
+                    .addHeader("X-User-Id", uid)
+                    .build()
+
+                chain.proceed(request)
+            }
+            .build()
+
+        val retrofit = Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        bitLabsRepo = BitLabsRepository(retrofit.create(BitLabsAPI::class.java))
 
         determineAdvertisingInfo(UnityPlayer.currentActivity)
 
@@ -131,9 +140,7 @@ object BitLabs {
             UnityPlayer.UnitySendMessage(
                 gameObject,
                 "GetSurveysCallback",
-                GsonBuilder().create()
-                    .toJson(surveys.ifEmpty { { (1..3).map { randomSurvey(it) } } })
-                    .convertKeysToCamelCase()
+                GsonBuilder().create().toJson(surveys).convertKeysToCamelCase()
             )
         }, { exception ->
             UnityPlayer.UnitySendMessage(

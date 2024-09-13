@@ -7,6 +7,9 @@ plugins {
 def keystore = new Properties()
 keystore.load(project.rootProject.file('local.properties').newDataInputStream())
 
+version = '3.2.10'
+group = 'ai.bitlabs.sdk'
+
 android {
     namespace 'ai.bitlabs.sdk'
 
@@ -18,6 +21,7 @@ android {
         multiDexEnabled true
 
         buildConfigField 'String', 'APP_TOKEN', keystore.getProperty('appToken', '"APP_TOKEN"')
+        buildConfigField 'String', 'VERSION_NAME', "\"${version}\""
 
         testApplicationId System.getProperty('testApplicationId', 'ai.bitlabs.sdk.test')
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

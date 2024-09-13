@@ -12,8 +12,8 @@ import ai.bitlabs.sdk.util.OnExceptionListener
 import ai.bitlabs.sdk.util.OnResponseListener
 import ai.bitlabs.sdk.util.OnRewardListener
 import ai.bitlabs.sdk.util.TAG
+import ai.bitlabs.sdk.util.deviceType
 import ai.bitlabs.sdk.util.extractColors
-import ai.bitlabs.sdk.util.randomSurvey
 import ai.bitlabs.sdk.views.LeaderboardFragment
 import ai.bitlabs.sdk.views.SurveysAdapter
 import ai.bitlabs.sdk.views.WebActivity
@@ -22,6 +22,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.util.Log
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -68,21 +69,30 @@ object BitLabs {
     fun init(context: Context, token: String, uid: String) {
         this.token = token
         this.uid = uid
-        bitLabsRepo = BitLabsRepository(
-            Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .client(OkHttpClient.Builder().addInterceptor { chain ->
-                    chain.proceed(
-                        chain.request().newBuilder()
-                            .addHeader("X-Api-Token", token)
-                            .addHeader("X-User-Id", uid)
-                            .build()
-                    )
-                }.build())
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
-                .create(BitLabsAPI::class.java)
-        )
+
+        val userAgent =
+            "BitLabs/${BuildConfig.VERSION_NAME} (Android ${Build.VERSION.SDK_INT}; ${Build.MODEL}; ${deviceType()})"
+
+        val okHttpClient = OkHttpClient.Builder()
+            .addInterceptor { chain ->
+                val request = chain.request().newBuilder()
+                    .addHeader("User-Agent", userAgent)
+                    .addHeader("X-Api-Token", token)
+                    .addHeader("X-User-Id", uid)
+                    .build()
+
+                chain.proceed(request)
+            }
+            .build()
+
+        val retrofit = Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        bitLabsRepo = BitLabsRepository(retrofit.create(BitLabsAPI::class.java))
+
         determineAdvertisingInfo(context)
 
         fileProviderAuthority = "${context.packageName}.provider.bitlabs"
@@ -120,11 +130,7 @@ object BitLabs {
         onResponseListener: OnResponseListener<List<Survey>>,
         onExceptionListener: OnExceptionListener
     ) = ifInitialised {
-        bitLabsRepo?.getSurveys(
-            "NATIVE",
-            { onResponseListener.onResponse(it.ifEmpty { (1..3).map { i -> randomSurvey(i) } }) },
-            onExceptionListener
-        )
+        bitLabsRepo?.getSurveys("NATIVE", onResponseListener, onExceptionListener)
     }
 
     /** Registers an [OnRewardListener] callback to be invoked when the OfferWall is exited by the user. */
@@ -147,8 +153,7 @@ object BitLabs {
         with(Intent(context, WebActivity::class.java)) {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
             putExtra(
-                BUNDLE_KEY_URL,
-                WebActivityParams(token, uid, "NATIVE", adId, tags).url
+                BUNDLE_KEY_URL, WebActivityParams(token, uid, "NATIVE", adId, tags).url
             )
             putExtra(BUNDLE_KEY_COLOR, headerColor)
             context.startActivity(this)
@@ -159,14 +164,10 @@ object BitLabs {
      * Shows a Survey Fragment in the [activity] with the [containerId] as its container.
      */
     fun showSurvey(
-        activity: FragmentActivity,
-        containerId: Int,
-        type: WidgetType = WidgetType.SIMPLE
+        activity: FragmentActivity, containerId: Int, type: WidgetType = WidgetType.SIMPLE
     ) = ifInitialised {
-        activity.supportFragmentManager
-            .beginTransaction()
-            .replace(containerId, WidgetFragment(uid, token, type))
-            .commit()
+        activity.supportFragmentManager.beginTransaction()
+            .replace(containerId, WidgetFragment(uid, token, type)).commit()
     }
 
 
@@ -188,10 +189,8 @@ object BitLabs {
      * Shows a Leaderboard Fragment in the [activity] with the [containerId] as its container.
      */
     fun showLeaderboard(activity: FragmentActivity, containerId: Int) = ifInitialised {
-        activity.supportFragmentManager
-            .beginTransaction()
-            .replace(containerId, WidgetFragment(uid, token, WidgetType.LEADERBOARD))
-            .commit()
+        activity.supportFragmentManager.beginTransaction()
+            .replace(containerId, WidgetFragment(uid, token, WidgetType.LEADERBOARD)).commit()
     }
 
     @Deprecated("Use showLeaderboard instead")

@@ -7,5 +7,6 @@ jobs:
     uses: ./.github/workflows/unit-tests.yml
 
   ui-tests:
+    needs: [ unit-tests ]
     uses: ./.github/workflows/ui-tests.yml
     secrets: inherit

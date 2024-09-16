@@ -23,6 +23,7 @@ android {
         buildConfigField 'String', 'APP_TOKEN', keystore.getProperty('appToken', '"APP_TOKEN"')
         buildConfigField 'String', 'VERSION_NAME', "\"${version}\""
 
+        testApplicationId System.getProperty('testApplicationId', 'ai.bitlabs.sdk.test')
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -78,6 +79,9 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-web:3.6.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
 }
+
+version = '3.2.6'
+group = 'ai.bitlabs.sdk'
 
 afterEvaluate {
     publishing {

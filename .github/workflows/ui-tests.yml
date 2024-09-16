@@ -1,0 +1,56 @@
+name: UI Tests
+
+on: [ workflow_call ]
+
+jobs:
+  ui-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate Gradle Wrapper
+        uses: gradle/actions/wrapper-validation@v4
+
+      - name: Authenticate Google Cloud
+        id: 'auth'
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Create dummy local.properties
+        run: echo "appToken=\"ARBITRARY\"" > local.properties
+
+      - name: Assemble test APK
+        run: ./gradlew assembleAndroidTest
+
+      - name: Rename test APK
+        run: mv library/build/outputs/apk/androidTest/core/debug/library-core-debug-androidTest.apk ./test.apk
+
+      - name: Assemble app APK
+        run: ./gradlew assembleAndroidTest -DtestApplicationId=ai.bitlabs.sdk
+
+      - name: Rename app APK
+        run: mv library/build/outputs/apk/androidTest/core/debug/library-core-debug-androidTest.apk ./app.apk
+
+      - name: Set gcloud project ID
+        run: gcloud config set project ${{ vars.GCP_PROJECT }}
+
+      - name: Run UI Tests
+        run: |
+          gcloud firebase test android run \
+              --type instrumentation \
+              --app app.apk \
+              --test test.apk \
+              --results-history-name="bitlabs results" \
+              --device model=MediumPhone.arm,version=34,locale=en,orientation=portrait \
+              --timeout 10m

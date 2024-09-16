@@ -44,6 +44,14 @@ import org.junit.runner.RunWith
 
 private const val TOKEN = BuildConfig.APP_TOKEN
 private const val UID = "diffindocongress"
+private val surveyStartHookEventMessage = """
+            {
+                "type": "hook",
+                "name": "offerwall-surveys:survey.start",
+                "args": [{clickId: "123", link: ""}]
+            }
+        """.trimIndent()
+private val jsCode = "window.postMessage($surveyStartHookEventMessage, '*');"
 
 class WebActivityTest {
 
@@ -195,17 +203,9 @@ class WebActivityTest {
     }
 
     @Test
-    fun leaveSurveyDialog_AnyOptionClicked_LeaveSurveyCalled() {
+    fun leaveSurveyDialog_TechnicalReasonClicked_LeaveSurveyCalled() {
         val url = "https://www.google.com"
         val intent = TestUtils.createWebActivityIntent(url)
-        val surveyStartHookEventMessage = """
-            {
-                "type": "hook",
-                "name": "offerwall-surveys:survey.start",
-                "args": [{clickId: "123", link: ""}]
-            }
-        """.trimIndent()
-        val jsCode = "window.postMessage($surveyStartHookEventMessage, '*');"
 
         mockkObject(BitLabs) {
             every { BitLabs.leaveSurvey(any(), any()) } returns Unit
@@ -218,54 +218,121 @@ class WebActivityTest {
                 }
 
                 Thread.sleep(500)
-
                 onView(isRoot()).perform(pressBack())
-                Thread.sleep(500)
-
-                onView(withText(R.string.leave_reason_other)).inRoot(isDialog())
-                    .check(matches(isDisplayed())).perform(click())
-
-                verify(exactly = 1) { BitLabs.leaveSurvey(any(), any()) }
 
                 Thread.sleep(500)
-
-                onView(isRoot()).perform(pressBack())
-                Thread.sleep(500)
-
-                onView(withText(R.string.leave_reason_sensitive)).inRoot(isDialog())
-                    .check(matches(isDisplayed())).perform(click())
-
-                verify(exactly = 2) { BitLabs.leaveSurvey(any(), any()) }
-
-                Thread.sleep(500)
-
-                onView(isRoot()).perform(pressBack())
-                Thread.sleep(500)
-
                 onView(withText(R.string.leave_reason_technical)).inRoot(isDialog())
                     .check(matches(isDisplayed())).perform(click())
 
-                verify(exactly = 3) { BitLabs.leaveSurvey(any(), any()) }
+                verify { BitLabs.leaveSurvey(any(), any()) }
+            }
+        }
+    }
 
+    @Test
+    fun leaveSurveyDialog_OtherReasonClicked_LeaveSurveyCalled() {
+        val url = "https://www.google.com"
+        val intent = TestUtils.createWebActivityIntent(url)
+
+        mockkObject(BitLabs) {
+            every { BitLabs.leaveSurvey(any(), any()) } returns Unit
+
+            ActivityScenario.launch<WebActivity>(intent).use {
                 Thread.sleep(500)
 
+                it.onActivity { activity ->
+                    activity.findViewById<WebView>(R.id.wv_bitlabs).evaluateJavascript(jsCode) {}
+                }
+
+                Thread.sleep(500)
                 onView(isRoot()).perform(pressBack())
-                Thread.sleep(500)
 
-                onView(withText(R.string.leave_reason_uninteresting)).inRoot(isDialog())
+                Thread.sleep(500)
+                onView(withText(R.string.leave_reason_other)).inRoot(isDialog())
                     .check(matches(isDisplayed())).perform(click())
 
-                verify(exactly = 4) { BitLabs.leaveSurvey(any(), any()) }
+                verify { BitLabs.leaveSurvey(any(), any()) }
+            }
+        }
+    }
 
+    @Test
+    fun leaveSurveyDialog_TooLongReasonClicked_LeaveSurveyCalled() {
+        val url = "https://www.google.com"
+        val intent = TestUtils.createWebActivityIntent(url)
+
+        mockkObject(BitLabs) {
+            every { BitLabs.leaveSurvey(any(), any()) } returns Unit
+
+            ActivityScenario.launch<WebActivity>(intent).use {
                 Thread.sleep(500)
 
+                it.onActivity { activity ->
+                    activity.findViewById<WebView>(R.id.wv_bitlabs).evaluateJavascript(jsCode) {}
+                }
+
+                Thread.sleep(500)
                 onView(isRoot()).perform(pressBack())
-                Thread.sleep(500)
 
+                Thread.sleep(500)
                 onView(withText(R.string.leave_reason_too_long)).inRoot(isDialog())
                     .check(matches(isDisplayed())).perform(click())
 
-                verify(exactly = 5) { BitLabs.leaveSurvey(any(), any()) }
+                verify { BitLabs.leaveSurvey(any(), any()) }
+            }
+        }
+    }
+
+    @Test
+    fun leaveSurveyDialog_SensitiveReasonClicked_LeaveSurveyCalled() {
+        val url = "https://www.google.com"
+        val intent = TestUtils.createWebActivityIntent(url)
+
+        mockkObject(BitLabs) {
+            every { BitLabs.leaveSurvey(any(), any()) } returns Unit
+
+            ActivityScenario.launch<WebActivity>(intent).use {
+                Thread.sleep(500)
+
+                it.onActivity { activity ->
+                    activity.findViewById<WebView>(R.id.wv_bitlabs).evaluateJavascript(jsCode) {}
+                }
+
+                Thread.sleep(500)
+                onView(isRoot()).perform(pressBack())
+
+                Thread.sleep(500)
+                onView(withText(R.string.leave_reason_sensitive)).inRoot(isDialog())
+                    .check(matches(isDisplayed())).perform(click())
+
+                verify { BitLabs.leaveSurvey(any(), any()) }
+            }
+        }
+    }
+
+    @Test
+    fun leaveSurveyDialog_UninterestingReasonClicked_LeaveSurveyCalled() {
+        val url = "https://www.google.com"
+        val intent = TestUtils.createWebActivityIntent(url)
+
+        mockkObject(BitLabs) {
+            every { BitLabs.leaveSurvey(any(), any()) } returns Unit
+
+            ActivityScenario.launch<WebActivity>(intent).use {
+                Thread.sleep(500)
+
+                it.onActivity { activity ->
+                    activity.findViewById<WebView>(R.id.wv_bitlabs).evaluateJavascript(jsCode) {}
+                }
+
+                Thread.sleep(500)
+                onView(isRoot()).perform(pressBack())
+
+                Thread.sleep(500)
+                onView(withText(R.string.leave_reason_uninteresting)).inRoot(isDialog())
+                    .check(matches(isDisplayed())).perform(click())
+
+                verify { BitLabs.leaveSurvey(any(), any()) }
             }
         }
     }

@@ -14,10 +14,10 @@ import ai.bitlabs.sdk.util.OnRewardListener
 import ai.bitlabs.sdk.util.TAG
 import ai.bitlabs.sdk.util.deviceType
 import ai.bitlabs.sdk.util.extractColors
-import ai.bitlabs.sdk.views.LeaderboardFragment
 import ai.bitlabs.sdk.views.SurveysAdapter
-import ai.bitlabs.sdk.views.WebActivity
-import ai.bitlabs.sdk.views.WidgetFragment
+import ai.bitlabs.sdk.views.BitLabsOfferwallActivity
+import ai.bitlabs.sdk.views.BitLabsWidgetFragment
+import ai.bitlabs.sdk.views.LeaderboardFragment
 import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
@@ -150,7 +150,7 @@ object BitLabs {
      * in order to avoid memory leaks and other issues associated with Activities.
      */
     fun launchOfferWall(context: Context) = ifInitialised {
-        with(Intent(context, WebActivity::class.java)) {
+        with(Intent(context, BitLabsOfferwallActivity::class.java)) {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
             putExtra(
                 BUNDLE_KEY_URL, WebActivityParams(token, uid, "NATIVE", adId, tags).url
@@ -167,7 +167,7 @@ object BitLabs {
         activity: FragmentActivity, containerId: Int, type: WidgetType = WidgetType.SIMPLE
     ) = ifInitialised {
         activity.supportFragmentManager.beginTransaction()
-            .replace(containerId, WidgetFragment(uid, token, type)).commit()
+            .replace(containerId, BitLabsWidgetFragment(uid, token, type)).commit()
     }
 
 
@@ -190,7 +190,8 @@ object BitLabs {
      */
     fun showLeaderboard(activity: FragmentActivity, containerId: Int) = ifInitialised {
         activity.supportFragmentManager.beginTransaction()
-            .replace(containerId, WidgetFragment(uid, token, WidgetType.LEADERBOARD)).commit()
+            .replace(containerId, BitLabsWidgetFragment(uid, token, WidgetType.LEADERBOARD))
+            .commit()
     }
 
     @Deprecated("Use showLeaderboard instead")

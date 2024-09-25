@@ -11,6 +11,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.content.withStyledAttributes
 import androidx.core.graphics.drawable.DrawableCompat
 
+@Deprecated("Deprecated since v3.2.0")
 class SurveyView(context: Context, private val type: WidgetType = WidgetType.SIMPLE) :
     android.widget.LinearLayout(context) {
 

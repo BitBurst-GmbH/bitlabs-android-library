@@ -12,6 +12,7 @@ import android.widget.TextView
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.recyclerview.widget.RecyclerView
 
+@Deprecated("Deprecated since v3.2.0")
 class LeaderboardAdapter(
     private val context: Context,
     private val topUsers: List<User>,

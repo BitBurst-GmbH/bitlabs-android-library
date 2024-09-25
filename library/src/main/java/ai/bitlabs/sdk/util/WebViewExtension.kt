@@ -3,7 +3,7 @@ package ai.bitlabs.sdk.util
 import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.R
 import ai.bitlabs.sdk.data.model.WebViewError
-import ai.bitlabs.sdk.views.WebActivity
+import ai.bitlabs.sdk.views.BitLabsOfferwallActivity
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -29,7 +29,7 @@ import androidx.core.content.PackageManagerCompat
 import androidx.core.net.toUri
 import java.io.File
 
-/** Adds all necessary configurations for its receiver [WebActivity.webView] */
+/** Adds all necessary configurations for its receiver [BitLabsOfferwallActivity.webView] */
 @SuppressLint("SetJavaScriptEnabled")
 fun WebView.setup(
     addReward: (reward: Float) -> Unit,
@@ -40,11 +40,11 @@ fun WebView.setup(
     var tempFile: File? = null
     var uriResult: ValueCallback<Array<Uri>>? = null
 
-    val chooser = (context as WebActivity).registerForActivityResult(GetMultipleContents()) {
+    val chooser = (context as BitLabsOfferwallActivity).registerForActivityResult(GetMultipleContents()) {
         uriResult?.onReceiveValue(it?.toTypedArray())
     }
 
-    val camera = (context as WebActivity).registerForActivityResult(TakePicture()) {
+    val camera = (context as BitLabsOfferwallActivity).registerForActivityResult(TakePicture()) {
         if (tempFile == null) uriResult?.onReceiveValue(null)
         uriResult?.onReceiveValue(arrayOf(tempFile!!.toUri()))
     }
@@ -66,7 +66,7 @@ fun WebView.setup(
     }
 
     val permission =
-        (context as WebActivity).registerForActivityResult(RequestPermission()) { granted ->
+        (context as BitLabsOfferwallActivity).registerForActivityResult(RequestPermission()) { granted ->
             if (granted) takePhoto()
             else AlertDialog.Builder(context)
                 .setTitle("Permission required")
@@ -187,7 +187,7 @@ fun WebView.setup(
 
             when (hookMessage.name) {
                 HookName.SDK_CLOSE -> {
-                    (context as WebActivity).finish()
+                    (context as BitLabsOfferwallActivity).finish()
                 }
 
                 HookName.SURVEY_START -> {

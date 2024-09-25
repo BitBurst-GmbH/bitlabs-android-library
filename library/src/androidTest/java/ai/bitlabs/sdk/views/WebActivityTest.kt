@@ -59,7 +59,7 @@ class WebActivityTest {
 
     @Test
     fun urlExtra_No_BUNDLE_KEY_URL_DestroyActivity() {
-        ActivityScenario.launch(WebActivity::class.java).use {
+        ActivityScenario.launch(BitLabsOfferwallActivity::class.java).use {
             Thread.sleep(500)
             assertThat(it.state).isEqualTo(Lifecycle.State.DESTROYED)
         }
@@ -69,7 +69,7 @@ class WebActivityTest {
     fun urlExtra_BUNDLE_KEY_URL_EmptyString_DestroyActivity() {
         val intent = TestUtils.createWebActivityIntent("")
 
-        ActivityScenario.launch<WebActivity>(intent).use {
+        ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
             Thread.sleep(500)
             assertThat(it.state).isEqualTo(Lifecycle.State.DESTROYED)
         }
@@ -77,11 +77,11 @@ class WebActivityTest {
 
     @Test
     fun urlExtra_BUNDLE_KEY_URL_NotString_DestroyActivity() {
-        val intent = Intent(context, WebActivity::class.java).apply {
+        val intent = Intent(context, BitLabsOfferwallActivity::class.java).apply {
             putExtra(BUNDLE_KEY_URL, 123)
         }
 
-        ActivityScenario.launch<WebActivity>(intent).use {
+        ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
             Thread.sleep(500)
             assertThat(it.state).isEqualTo(Lifecycle.State.DESTROYED)
         }
@@ -92,7 +92,7 @@ class WebActivityTest {
         val url = "https://www.google.com"
         val intent = TestUtils.createWebActivityIntent(url)
 
-        ActivityScenario.launch<WebActivity>(intent).use {
+        ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
             Thread.sleep(500)
             assertThat(it.state).isEqualTo(Lifecycle.State.RESUMED)
         }
@@ -104,7 +104,7 @@ class WebActivityTest {
         val url = "https://www.google.com"
         val intent = TestUtils.createWebActivityIntent(url)
 
-        ActivityScenario.launch<WebActivity>(intent).use {
+        ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
             Thread.sleep(500)
             it.onActivity { activity ->
                 val toolbar = activity.findViewById<Toolbar>(R.id.toolbar_bitlabs)
@@ -120,7 +120,7 @@ class WebActivityTest {
         val url = "https://www.google.com"
         val intent = TestUtils.createWebActivityIntent(url, intArrayOf())
 
-        ActivityScenario.launch<WebActivity>(intent).use {
+        ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
             Thread.sleep(500)
             it.onActivity { activity ->
                 val toolbar = activity.findViewById<Toolbar>(R.id.toolbar_bitlabs)
@@ -134,12 +134,12 @@ class WebActivityTest {
     fun colorExtra_BUNDLE_KEY_COLOR_NotIntArrayOf_WhiteToolbarBackground() {
         // Create a WebActivity with non-OfferWall URL to show the toolbar
         val url = "https://www.google.com"
-        val intent = Intent(context, WebActivity::class.java).apply {
+        val intent = Intent(context, BitLabsOfferwallActivity::class.java).apply {
             putExtra(BUNDLE_KEY_URL, url)
             putExtra(BUNDLE_KEY_COLOR, 123)
         }
 
-        ActivityScenario.launch<WebActivity>(intent).use {
+        ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
             Thread.sleep(500)
             it.onActivity { activity ->
                 val toolbar = activity.findViewById<Toolbar>(R.id.toolbar_bitlabs)
@@ -155,7 +155,7 @@ class WebActivityTest {
         val url = "https://www.google.com"
         val intent = TestUtils.createWebActivityIntent(url, colors)
 
-        ActivityScenario.launch<WebActivity>(intent).use {
+        ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
             Thread.sleep(500)
             it.onActivity { activity ->
                 val toolbar = activity.findViewById<Toolbar>(R.id.toolbar_bitlabs)
@@ -170,7 +170,7 @@ class WebActivityTest {
         val url = "https://web.bitlabs.ai"
         val intent = TestUtils.createWebActivityIntent(url)
 
-        ActivityScenario.launch<WebActivity>(intent).use {
+        ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
             Thread.sleep(1000)
             onView(withId(R.id.toolbar_bitlabs)).check(matches(not(isDisplayed())))
         }
@@ -181,7 +181,7 @@ class WebActivityTest {
         val url = "https://www.google.com"
         val intent = TestUtils.createWebActivityIntent(url)
 
-        ActivityScenario.launch<WebActivity>(intent).use {
+        ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
             Thread.sleep(1000)
             onView(withId(R.id.toolbar_bitlabs)).check(matches(isDisplayed()))
         }
@@ -192,7 +192,7 @@ class WebActivityTest {
         val url = "https://www.google.com"
         val intent = TestUtils.createWebActivityIntent(url)
 
-        ActivityScenario.launch<WebActivity>(intent).use {
+        ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
             Thread.sleep(500)
             onView(isRoot()).perform(pressBack())
 
@@ -210,7 +210,7 @@ class WebActivityTest {
         mockkObject(BitLabs) {
             every { BitLabs.leaveSurvey(any(), any()) } returns Unit
 
-            ActivityScenario.launch<WebActivity>(intent).use {
+            ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
                 Thread.sleep(500)
 
                 it.onActivity { activity ->
@@ -237,7 +237,7 @@ class WebActivityTest {
         mockkObject(BitLabs) {
             every { BitLabs.leaveSurvey(any(), any()) } returns Unit
 
-            ActivityScenario.launch<WebActivity>(intent).use {
+            ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
                 Thread.sleep(500)
 
                 it.onActivity { activity ->
@@ -264,7 +264,7 @@ class WebActivityTest {
         mockkObject(BitLabs) {
             every { BitLabs.leaveSurvey(any(), any()) } returns Unit
 
-            ActivityScenario.launch<WebActivity>(intent).use {
+            ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
                 Thread.sleep(500)
 
                 it.onActivity { activity ->
@@ -291,7 +291,7 @@ class WebActivityTest {
         mockkObject(BitLabs) {
             every { BitLabs.leaveSurvey(any(), any()) } returns Unit
 
-            ActivityScenario.launch<WebActivity>(intent).use {
+            ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
                 Thread.sleep(500)
 
                 it.onActivity { activity ->
@@ -318,7 +318,7 @@ class WebActivityTest {
         mockkObject(BitLabs) {
             every { BitLabs.leaveSurvey(any(), any()) } returns Unit
 
-            ActivityScenario.launch<WebActivity>(intent).use {
+            ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
                 Thread.sleep(500)
 
                 it.onActivity { activity ->
@@ -347,7 +347,7 @@ object TestUtils {
      * Creates a WebActivityIntent Intent with the given [url] and [color].
      */
     fun createWebActivityIntent(url: String, color: IntArray? = null): Intent =
-        Intent(ApplicationProvider.getApplicationContext(), WebActivity::class.java).apply {
+        Intent(ApplicationProvider.getApplicationContext(), BitLabsOfferwallActivity::class.java).apply {
             putExtra(BUNDLE_KEY_URL, url)
             if (color != null) putExtra(BUNDLE_KEY_COLOR, color)
         }

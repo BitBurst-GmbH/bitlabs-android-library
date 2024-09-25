@@ -14,11 +14,11 @@ import android.webkit.WebChromeClient
 import android.webkit.WebView
 import androidx.fragment.app.Fragment
 
-class WidgetFragment(
+class BitLabsWidgetFragment(
     uid: String,
     token: String,
     private val widgetType: WidgetType,
-) : Fragment(R.layout.fragment_widget) {
+) : Fragment(R.layout.fragment_widget_bitlabs) {
 
     private var webView: WebView? = null
 
@@ -81,7 +81,7 @@ class WidgetFragment(
 
     @SuppressLint("SetJavaScriptEnabled", "ClickableViewAccessibility")
     private fun setupWebView(view: View) {
-        webView = view.findViewById(R.id.widget_webview)
+        webView = view.findViewById(R.id.widget_webview_bitlabs)
 
         webView?.settings?.javaScriptEnabled = true
 

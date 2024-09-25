@@ -31,7 +31,7 @@ import androidx.core.view.children
 /**
  * The [Activity][AppCompatActivity] that will provide a [WebView] to launch the OfferWall.
  */
-internal class WebActivity : AppCompatActivity() {
+internal class BitLabsOfferwallActivity : AppCompatActivity() {
 
     private var webView: WebView? = null
     private var toolbar: Toolbar? = null
@@ -44,7 +44,7 @@ internal class WebActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_web)
+        setContentView(R.layout.activity_offerwall_bitlabs)
 
         try {
             getDataFromIntent()
@@ -128,7 +128,7 @@ internal class WebActivity : AppCompatActivity() {
             val errorStr = "{ ${errorInfo}, uid: UserId, url: $errUrl, date: $date }".toByteArray()
                 .let { Base64.encodeToString(it, Base64.DEFAULT) }
 
-            findViewById<LinearLayout>(R.id.ll_qr_code)?.let {
+            findViewById<LinearLayout>(R.id.ll_qr_code_bitlabs)?.let {
                 it.visibility = View.VISIBLE
                 (it.children.last() as? TextView)?.text =
                     getString(R.string.error_id, errorStr).trim()
@@ -165,7 +165,7 @@ internal class WebActivity : AppCompatActivity() {
 
     /** Loads the OfferWall page and sends the [reason] to the API */
     private fun leaveSurvey(reason: String) {
-        findViewById<LinearLayout>(R.id.ll_qr_code)?.visibility = View.GONE
+        findViewById<LinearLayout>(R.id.ll_qr_code_bitlabs)?.visibility = View.GONE
         toggleToolbar(true)
         webView?.loadUrl(url)
 

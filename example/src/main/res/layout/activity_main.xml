@@ -14,7 +14,7 @@
         android:layout_marginBottom="10dp"
         app:layout_constraintBottom_toTopOf="@+id/btn_show_leaderboard"
         app:layout_constraintTop_toTopOf="parent"
-        tools:layout="@layout/fragment_widget" />
+        tools:layout="@layout/fragment_widget_bitlabs" />
 
     <Button
         android:id="@+id/btn_show_leaderboard"

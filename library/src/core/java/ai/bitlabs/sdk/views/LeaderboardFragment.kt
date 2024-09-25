@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
+@Deprecated("Deprecated since v3.2.0")
 class LeaderboardFragment(
     private val topUsers: List<User>,
     private val ownUser: User?,

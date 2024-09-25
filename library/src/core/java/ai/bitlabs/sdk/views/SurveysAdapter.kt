@@ -7,6 +7,7 @@ import ai.bitlabs.sdk.util.rounded
 import android.graphics.drawable.Drawable
 import androidx.recyclerview.widget.RecyclerView
 
+@Deprecated("Deprecated since v3.2.0")
 class SurveysAdapter(
     private val context: android.content.Context,
     private val surveys: List<Survey>,

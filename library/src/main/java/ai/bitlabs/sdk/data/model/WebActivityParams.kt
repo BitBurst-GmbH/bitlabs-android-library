@@ -1,15 +1,15 @@
 package ai.bitlabs.sdk.data.model
 
-import ai.bitlabs.sdk.views.WebActivity
+import ai.bitlabs.sdk.views.BitLabsOfferwallActivity
 import android.net.Uri
 import android.os.Bundle
 import androidx.annotation.Keep
 import java.io.Serializable
 
 /**
- * This class holds the parameters of the [WebActivity] responsible to launch the OfferWall.
+ * This class holds the parameters of the [BitLabsOfferwallActivity] responsible to launch the OfferWall.
  * @constructor A Constructor that holds the values ([token], [uid], [tags])
- * which will be used in the [WebActivity] to launch the OfferWall correctly.
+ * which will be used in the [BitLabsOfferwallActivity] to launch the OfferWall correctly.
  */
 @Keep
 internal data class WebActivityParams(

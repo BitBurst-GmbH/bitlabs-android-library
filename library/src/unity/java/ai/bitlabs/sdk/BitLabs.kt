@@ -11,7 +11,7 @@ import ai.bitlabs.sdk.util.TAG
 import ai.bitlabs.sdk.util.convertKeysToCamelCase
 import ai.bitlabs.sdk.util.deviceType
 import ai.bitlabs.sdk.util.extractColors
-import ai.bitlabs.sdk.views.WebActivity
+import ai.bitlabs.sdk.views.BitLabsOfferwallActivity
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -192,7 +192,7 @@ object BitLabs {
     fun launchOfferWall() = ifInitialised {
         val context = UnityPlayer.currentActivity
 
-        with(Intent(context, WebActivity::class.java)) {
+        with(Intent(context, BitLabsOfferwallActivity::class.java)) {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
             putExtra(
                 BUNDLE_KEY_URL,

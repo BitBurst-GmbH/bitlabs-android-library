@@ -1,10 +1,10 @@
 package ai.bitlabs.sdk
 
-import ai.bitlabs.sdk.data.BitLabsRepository
-import ai.bitlabs.sdk.data.model.Survey
-import ai.bitlabs.sdk.data.model.WebActivityParams
-import ai.bitlabs.sdk.data.model.WidgetType
-import ai.bitlabs.sdk.data.network.BitLabsAPI
+import ai.bitlabs.sdk.data.repositories.BitLabsRepository
+import ai.bitlabs.sdk.data.model.bitlabs.Survey
+import ai.bitlabs.sdk.data.model.bitlabs.WebActivityParams
+import ai.bitlabs.sdk.data.model.bitlabs.WidgetType
+import ai.bitlabs.sdk.data.api.bitlabs.BitLabsAPI
 import ai.bitlabs.sdk.util.BASE_URL
 import ai.bitlabs.sdk.util.BUNDLE_KEY_COLOR
 import ai.bitlabs.sdk.util.BUNDLE_KEY_URL

@@ -1,4 +1,4 @@
-package ai.bitlabs.sdk.data.model
+package ai.bitlabs.sdk.data.model.bitlabs
 
 
 import androidx.annotation.Keep

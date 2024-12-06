@@ -1,6 +1,6 @@
 package ai.bitlabs.sdk.util
 
-import ai.bitlabs.sdk.data.model.BitLabsResponse
+import ai.bitlabs.sdk.data.model.bitlabs.BitLabsResponse
 import android.util.Log
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken

@@ -1,4 +1,4 @@
-package ai.bitlabs.sdk.data.model
+package ai.bitlabs.sdk.data.model.bitlabs
 
 import android.os.Build
 import android.os.Build.VERSION

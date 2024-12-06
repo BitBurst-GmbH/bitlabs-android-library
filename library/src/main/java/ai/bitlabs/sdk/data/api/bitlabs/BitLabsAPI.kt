@@ -1,6 +1,10 @@
-package ai.bitlabs.sdk.data.network
+package ai.bitlabs.sdk.data.api.bitlabs
 
-import ai.bitlabs.sdk.data.model.*
+import ai.bitlabs.sdk.data.model.bitlabs.BitLabsResponse
+import ai.bitlabs.sdk.data.model.bitlabs.GetAppSettingsResponse
+import ai.bitlabs.sdk.data.model.bitlabs.GetLeaderboardResponse
+import ai.bitlabs.sdk.data.model.bitlabs.GetSurveysResponse
+import ai.bitlabs.sdk.data.model.bitlabs.UpdateClickBody
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.*

@@ -1,15 +1,14 @@
-package ai.bitlabs.sdk.data
+package ai.bitlabs.sdk.data.repositories
 
 import ai.bitlabs.sdk.BitLabs
-import ai.bitlabs.sdk.data.model.BitLabsResponse
-import ai.bitlabs.sdk.data.model.GetAppSettingsResponse
-import ai.bitlabs.sdk.data.model.GetLeaderboardResponse
-import ai.bitlabs.sdk.data.model.GetSurveysResponse
-import ai.bitlabs.sdk.data.model.LeaveReason
-import ai.bitlabs.sdk.data.model.RestrictionReason
-import ai.bitlabs.sdk.data.model.Survey
-import ai.bitlabs.sdk.data.model.UpdateClickBody
-import ai.bitlabs.sdk.data.network.BitLabsAPI
+import ai.bitlabs.sdk.data.model.bitlabs.BitLabsResponse
+import ai.bitlabs.sdk.data.model.bitlabs.GetAppSettingsResponse
+import ai.bitlabs.sdk.data.model.bitlabs.GetLeaderboardResponse
+import ai.bitlabs.sdk.data.model.bitlabs.GetSurveysResponse
+import ai.bitlabs.sdk.data.model.bitlabs.LeaveReason
+import ai.bitlabs.sdk.data.model.bitlabs.Survey
+import ai.bitlabs.sdk.data.model.bitlabs.UpdateClickBody
+import ai.bitlabs.sdk.data.api.bitlabs.BitLabsAPI
 import ai.bitlabs.sdk.util.OnExceptionListener
 import ai.bitlabs.sdk.util.OnResponseListener
 import ai.bitlabs.sdk.util.TAG

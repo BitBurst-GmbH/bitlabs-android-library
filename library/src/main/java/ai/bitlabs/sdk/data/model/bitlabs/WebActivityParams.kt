@@ -1,10 +1,8 @@
-package ai.bitlabs.sdk.data.model
+package ai.bitlabs.sdk.data.model.bitlabs
 
 import ai.bitlabs.sdk.views.BitLabsOfferwallActivity
 import android.net.Uri
-import android.os.Bundle
 import androidx.annotation.Keep
-import java.io.Serializable
 
 /**
  * This class holds the parameters of the [BitLabsOfferwallActivity] responsible to launch the OfferWall.

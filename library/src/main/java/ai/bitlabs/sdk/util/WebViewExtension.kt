@@ -2,14 +2,11 @@ package ai.bitlabs.sdk.util
 
 import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.R
-import ai.bitlabs.sdk.data.model.WebViewError
+import ai.bitlabs.sdk.data.model.bitlabs.WebViewError
 import ai.bitlabs.sdk.views.BitLabsOfferwallActivity
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.app.AlertDialog
-import android.content.Context
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
@@ -22,10 +19,7 @@ import android.webkit.*
 import androidx.activity.result.contract.ActivityResultContracts.*
 import androidx.annotation.RequiresApi
 import androidx.browser.customtabs.CustomTabsIntent
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import androidx.core.content.PackageManagerCompat
 import androidx.core.net.toUri
 import java.io.File
 

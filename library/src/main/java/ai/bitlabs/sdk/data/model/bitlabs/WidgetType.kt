@@ -1,4 +1,4 @@
-package ai.bitlabs.sdk.data.model
+package ai.bitlabs.sdk.data.model.bitlabs
 
 enum class WidgetType(val asString: String) {
     LEADERBOARD("leaderboard"),

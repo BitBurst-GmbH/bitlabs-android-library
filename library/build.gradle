@@ -21,6 +21,7 @@ android {
         multiDexEnabled true
 
         buildConfigField 'String', 'APP_TOKEN', keystore.getProperty('appToken', '"APP_TOKEN"')
+        buildConfigField 'String', 'SENTRY_DSN', keystore.getProperty('sentryDsn', '"SENTRY_DSN"')
         buildConfigField 'String', 'VERSION_NAME', "\"${version}\""
 
         testApplicationId System.getProperty('testApplicationId', 'ai.bitlabs.sdk.test')

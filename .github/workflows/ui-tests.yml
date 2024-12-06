@@ -28,7 +28,9 @@ jobs:
           java-version: '17'
 
       - name: Create dummy local.properties
-        run: echo "appToken=\"ARBITRARY\"" > local.properties
+        run: |
+          echo "appToken=\"ARBITRARY\"" > local.properties
+          echo "sentryDsn=\"ARBITRARY\"" >> local.properties
 
       - name: Assemble test APK
         run: ./gradlew assembleAndroidTest

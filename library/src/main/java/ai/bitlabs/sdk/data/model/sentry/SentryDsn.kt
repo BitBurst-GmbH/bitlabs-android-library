@@ -1,6 +1,6 @@
 package ai.bitlabs.sdk.data.model.sentry
 
-internal class SentryDsn(dsn: String) {
+internal class SentryDsn(private val dsn: String) {
     val host: String
     val protocol: String
     val publicKey: String
@@ -16,4 +16,6 @@ internal class SentryDsn(dsn: String) {
         this.publicKey = publicKey
         this.projectId = projectId
     }
+
+    override fun toString(): String = dsn;
 }

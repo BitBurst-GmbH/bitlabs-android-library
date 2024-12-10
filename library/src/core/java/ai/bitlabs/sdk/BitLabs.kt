@@ -1,10 +1,10 @@
 package ai.bitlabs.sdk
 
+import ai.bitlabs.sdk.data.api.BitLabsAPI
 import ai.bitlabs.sdk.data.repositories.BitLabsRepository
 import ai.bitlabs.sdk.data.model.bitlabs.Survey
 import ai.bitlabs.sdk.data.model.bitlabs.WebActivityParams
 import ai.bitlabs.sdk.data.model.bitlabs.WidgetType
-import ai.bitlabs.sdk.data.api.bitlabs.BitLabsAPI
 import ai.bitlabs.sdk.util.BASE_URL
 import ai.bitlabs.sdk.util.BUNDLE_KEY_COLOR
 import ai.bitlabs.sdk.util.BUNDLE_KEY_URL
@@ -23,6 +23,8 @@ import android.content.Intent
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -32,6 +34,7 @@ import com.google.android.gms.ads.identifier.AdvertisingIdClient
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.Timer
 
 /**
  * The main class including all the library functions to use in your code.

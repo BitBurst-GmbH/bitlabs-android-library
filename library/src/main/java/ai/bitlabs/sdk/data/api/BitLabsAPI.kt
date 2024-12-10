@@ -1,4 +1,4 @@
-package ai.bitlabs.sdk.data.api.bitlabs
+package ai.bitlabs.sdk.data.api
 
 import ai.bitlabs.sdk.data.model.bitlabs.BitLabsResponse
 import ai.bitlabs.sdk.data.model.bitlabs.GetAppSettingsResponse

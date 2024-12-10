@@ -8,7 +8,7 @@ import ai.bitlabs.sdk.data.model.bitlabs.GetSurveysResponse
 import ai.bitlabs.sdk.data.model.bitlabs.LeaveReason
 import ai.bitlabs.sdk.data.model.bitlabs.Survey
 import ai.bitlabs.sdk.data.model.bitlabs.UpdateClickBody
-import ai.bitlabs.sdk.data.api.bitlabs.BitLabsAPI
+import ai.bitlabs.sdk.data.api.BitLabsAPI
 import ai.bitlabs.sdk.util.OnExceptionListener
 import ai.bitlabs.sdk.util.OnResponseListener
 import ai.bitlabs.sdk.util.TAG

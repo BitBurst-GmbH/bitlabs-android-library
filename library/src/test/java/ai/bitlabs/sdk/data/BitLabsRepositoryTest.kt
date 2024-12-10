@@ -5,7 +5,7 @@ import ai.bitlabs.sdk.data.model.bitlabs.GetAppSettingsResponse
 import ai.bitlabs.sdk.data.model.bitlabs.GetLeaderboardResponse
 import ai.bitlabs.sdk.data.model.bitlabs.GetSurveysResponse
 import ai.bitlabs.sdk.data.model.bitlabs.Survey
-import ai.bitlabs.sdk.data.api.bitlabs.BitLabsAPI
+import ai.bitlabs.sdk.data.api.BitLabsAPI
 import ai.bitlabs.sdk.data.repositories.BitLabsRepository
 import ai.bitlabs.sdk.util.OnExceptionListener
 import ai.bitlabs.sdk.util.OnResponseListener

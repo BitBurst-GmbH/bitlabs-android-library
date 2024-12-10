@@ -1,6 +1,6 @@
 package ai.bitlabs.sdk
 
-import ai.bitlabs.sdk.data.api.bitlabs.BitLabsAPI
+import ai.bitlabs.sdk.data.api.BitLabsAPI
 import ai.bitlabs.sdk.data.model.bitlabs.WebActivityParams
 import ai.bitlabs.sdk.data.repositories.BitLabsRepository
 import ai.bitlabs.sdk.util.BASE_URL

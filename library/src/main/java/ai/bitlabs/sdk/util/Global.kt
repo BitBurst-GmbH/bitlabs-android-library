@@ -9,6 +9,9 @@ import android.util.TypedValue
 import android.widget.ImageView
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.qrcode.QRCodeWriter
+import okhttp3.OkHttpClient
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import java.math.BigDecimal
 import java.math.RoundingMode
 
@@ -19,6 +22,23 @@ internal const val BASE_URL = "https://api.bitlabs.ai/"
 internal const val BUNDLE_KEY_COLOR = "bundle-key-color"
 
 internal const val BUNDLE_KEY_URL = "bundle-key-url"
+
+internal fun buildHttpClientWithHeaders(vararg headers: Pair<String, String>) =
+    OkHttpClient.Builder()
+        .addInterceptor { chain ->
+            val request = chain.request().newBuilder()
+                .apply { headers.forEach { addHeader(it.first, it.second) } }
+                .build()
+            chain.proceed(request)
+        }
+        .build()
+
+internal fun buildRetrofit(baseUrl: String, okHttpClient: OkHttpClient) =
+    Retrofit.Builder()
+        .baseUrl(baseUrl)
+        .client(okHttpClient)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
 
 internal fun deviceType(): String {
     val isTablet =

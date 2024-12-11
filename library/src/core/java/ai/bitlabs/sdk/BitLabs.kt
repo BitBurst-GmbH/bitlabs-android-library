@@ -13,6 +13,8 @@ import ai.bitlabs.sdk.util.OnExceptionListener
 import ai.bitlabs.sdk.util.OnResponseListener
 import ai.bitlabs.sdk.util.OnRewardListener
 import ai.bitlabs.sdk.util.TAG
+import ai.bitlabs.sdk.util.buildHttpClientWithHeaders
+import ai.bitlabs.sdk.util.buildRetrofit
 import ai.bitlabs.sdk.util.deviceType
 import ai.bitlabs.sdk.util.extractColors
 import ai.bitlabs.sdk.views.BitLabsOfferwallActivity
@@ -30,9 +32,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.ads.identifier.AdvertisingIdClient
-import okhttp3.OkHttpClient
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 /**
  * The main class including all the library functions to use in your code.
@@ -71,36 +70,30 @@ object BitLabs {
         this.token = token
         this.uid = uid
 
-        SentryManager.init(BitLabs.token, BitLabs.uid)
+        SentryManager.init(token, uid)
 
-        val userAgent =
-            "BitLabs/${BuildConfig.VERSION_NAME} (Android ${Build.VERSION.SDK_INT}; ${Build.MODEL}; ${deviceType()})"
-
-        val okHttpClient = OkHttpClient.Builder()
-            .addInterceptor { chain ->
-                val request = chain.request().newBuilder()
-                    .addHeader("User-Agent", userAgent)
-                    .addHeader("X-Api-Token", token)
-                    .addHeader("X-User-Id", uid)
-                    .build()
-
-                chain.proceed(request)
-            }
-            .build()
-
-        val retrofit = Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .client(okHttpClient)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-
-        bitLabsRepo = BitLabsRepository(retrofit.create(BitLabsAPI::class.java))
+        bitlabsRepoInit()
 
         determineAdvertisingInfo(context)
 
         fileProviderAuthority = "${context.packageName}.provider.bitlabs"
 
         getAppSettings()
+    }
+
+    private fun bitlabsRepoInit() {
+        val userAgent =
+            "BitLabs/${BuildConfig.VERSION_NAME} (Android ${Build.VERSION.SDK_INT}; ${Build.MODEL}; ${deviceType()})"
+
+        val okHttpClient = buildHttpClientWithHeaders(
+            "User-Agent" to userAgent,
+            "X-Api-Token" to token,
+            "X-User-Id" to uid
+        )
+
+        val retrofit = buildRetrofit(BASE_URL, okHttpClient)
+
+        bitLabsRepo = BitLabsRepository(retrofit.create(BitLabsAPI::class.java))
     }
 
     /**

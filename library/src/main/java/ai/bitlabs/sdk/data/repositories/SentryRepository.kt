@@ -12,13 +12,10 @@ import ai.bitlabs.sdk.data.model.sentry.SentryUser
 import ai.bitlabs.sdk.util.TAG
 import android.util.Log
 import com.google.gson.Gson
-import okhttp3.RequestBody
 import okhttp3.ResponseBody
-import okio.Buffer
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -29,7 +26,7 @@ import java.util.UUID
 internal class SentryRepository(
     private val sentryAPI: SentryAPI, private val token: String, private val uid: String
 ) {
-    fun sendEnvelope() {
+    fun sendEnvelope(throwable: Throwable) {
         val gson = Gson()
 
         val evenId = UUID.randomUUID().toString().replace("-", "")
@@ -37,10 +34,11 @@ internal class SentryRepository(
             timeZone = TimeZone.getTimeZone("UTC")
             format(Date())
         }
+
         val event = SentryEvent(
             eventId = evenId,
             timestamp = now,
-            logentry = SentryMessage("Another Test message"),
+            logentry = SentryMessage(throwable.message ?: "Unlabelled exception"),
             user = SentryUser(id = uid),
             sdk = SentrySDK(version = "0.1.0")
         )
@@ -53,8 +51,6 @@ internal class SentryRepository(
             ),
             items = listOf(eventItem)
         ).toRequestBody()
-
-        Log.i(TAG, "sendEnvelope: ${bodyToString(envelope)}")
 
         sentryAPI.sendEnvelope(envelope = envelope).enqueue(object : Callback<ResponseBody> {
             override fun onResponse(
@@ -79,15 +75,5 @@ internal class SentryRepository(
                 Log.e(TAG, "onFailure: Sentry envelope not sent", t)
             }
         })
-    }
-
-    private fun bodyToString(request: RequestBody): String {
-        try {
-            val buffer = Buffer()
-            request.writeTo(buffer)
-            return buffer.readUtf8()
-        } catch (e: IOException) {
-            return "did not work"
-        }
     }
 }

@@ -4,7 +4,6 @@ import android.content.res.Configuration
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Color
-import android.os.Build
 import android.util.Log
 import android.util.TypedValue
 import android.widget.ImageView
@@ -20,12 +19,6 @@ internal const val BASE_URL = "https://api.bitlabs.ai/"
 internal const val BUNDLE_KEY_COLOR = "bundle-key-color"
 
 internal const val BUNDLE_KEY_URL = "bundle-key-url"
-
-internal fun locale() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-    Resources.getSystem().configuration.locales.get(0)
-} else {
-    Resources.getSystem().configuration.locale
-}
 
 internal fun deviceType(): String {
     val isTablet =

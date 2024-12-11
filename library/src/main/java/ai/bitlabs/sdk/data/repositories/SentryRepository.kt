@@ -83,7 +83,7 @@ internal class SentryRepository(
 
     private fun bodyToString(request: RequestBody): String {
         try {
-            val buffer: Buffer = Buffer()
+            val buffer = Buffer()
             request.writeTo(buffer)
             return buffer.readUtf8()
         } catch (e: IOException) {

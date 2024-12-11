@@ -26,7 +26,7 @@ internal fun String.asHookMessage(): HookMessage<*>? = try {
 }
 
 /**
- * class to deserialise the message received from the webview.
+ * class to deserialize the message received from the webview.
  */
 internal class HookMessageDeserializer : JsonDeserializer<HookMessage<*>> {
     override fun deserialize(

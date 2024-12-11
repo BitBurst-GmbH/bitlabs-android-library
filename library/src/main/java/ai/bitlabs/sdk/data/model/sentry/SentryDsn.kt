@@ -7,7 +7,7 @@ internal class SentryDsn(private val dsn: String) {
     val projectId: String
 
     init {
-        val regex = Regex("(\\w+)://(\\w+)@(.*)/(\\w+)");
+        val regex = Regex("(\\w+)://(\\w+)@(.*)/(\\w+)")
         val match = regex.find(dsn) ?: throw IllegalArgumentException("Invalid DSN")
         val (protocol, publicKey, host, projectId) = match.destructured
 
@@ -17,5 +17,5 @@ internal class SentryDsn(private val dsn: String) {
         this.projectId = projectId
     }
 
-    override fun toString(): String = dsn;
+    override fun toString(): String = dsn
 }

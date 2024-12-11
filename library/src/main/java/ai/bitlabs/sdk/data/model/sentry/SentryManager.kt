@@ -3,8 +3,6 @@ package ai.bitlabs.sdk.data.model.sentry
 import ai.bitlabs.sdk.BuildConfig
 import ai.bitlabs.sdk.data.api.SentryAPI
 import ai.bitlabs.sdk.data.repositories.SentryRepository
-import android.os.Handler
-import android.os.Looper
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory

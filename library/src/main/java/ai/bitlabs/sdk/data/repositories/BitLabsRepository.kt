@@ -12,7 +12,7 @@ import ai.bitlabs.sdk.data.api.BitLabsAPI
 import ai.bitlabs.sdk.util.OnExceptionListener
 import ai.bitlabs.sdk.util.OnResponseListener
 import ai.bitlabs.sdk.util.TAG
-import ai.bitlabs.sdk.util.body
+import ai.bitlabs.sdk.util.extensions.body
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Canvas

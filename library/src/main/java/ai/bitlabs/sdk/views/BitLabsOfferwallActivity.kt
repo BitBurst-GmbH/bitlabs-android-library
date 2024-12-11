@@ -7,7 +7,7 @@ import ai.bitlabs.sdk.util.BUNDLE_KEY_URL
 import ai.bitlabs.sdk.util.TAG
 import ai.bitlabs.sdk.util.getLuminance
 import ai.bitlabs.sdk.util.setQRCodeBitmap
-import ai.bitlabs.sdk.util.setup
+import ai.bitlabs.sdk.util.extensions.setup
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle

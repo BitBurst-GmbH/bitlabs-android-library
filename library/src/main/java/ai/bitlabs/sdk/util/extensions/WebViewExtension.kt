@@ -1,8 +1,13 @@
-package ai.bitlabs.sdk.util
+package ai.bitlabs.sdk.util.extensions
 
 import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.R
 import ai.bitlabs.sdk.data.model.bitlabs.WebViewError
+import ai.bitlabs.sdk.util.HookName
+import ai.bitlabs.sdk.util.RewardArgs
+import ai.bitlabs.sdk.util.SurveyStartArgs
+import ai.bitlabs.sdk.util.TAG
+import ai.bitlabs.sdk.util.asHookMessage
 import ai.bitlabs.sdk.views.BitLabsOfferwallActivity
 import android.Manifest
 import android.annotation.SuppressLint
@@ -177,7 +182,7 @@ fun WebView.setup(
         fun postMessage(message: String) {
             val hookMessage = message.asHookMessage() ?: return
 
-            if (hookMessage.type != "hook") return;
+            if (hookMessage.type != "hook") return
 
             when (hookMessage.name) {
                 HookName.SDK_CLOSE -> {

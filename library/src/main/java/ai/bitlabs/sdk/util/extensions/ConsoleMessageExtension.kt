@@ -1,5 +1,6 @@
-package ai.bitlabs.sdk.util
+package ai.bitlabs.sdk.util.extensions
 
+import ai.bitlabs.sdk.util.TAG
 import android.util.Log
 import android.webkit.ConsoleMessage
 import android.webkit.ConsoleMessage.MessageLevel

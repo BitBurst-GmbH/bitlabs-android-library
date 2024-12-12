@@ -17,7 +17,8 @@ data class SentryEvent(
     val tags: Map<String, String>? = null,
     val fingerprint: List<String>? = null,
     val user: SentryUser?,
-    val sdk: SentrySDK?
+    val sdk: SentrySDK?,
+    val exception: List<SentryException>? = null,
 //    val exception: List<SentryException>,
 //    val breadcrumbs: List<SentryBreadcrumb>
 )

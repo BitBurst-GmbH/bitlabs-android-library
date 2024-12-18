@@ -84,16 +84,12 @@ object BitLabs {
 
         val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
         Thread.setDefaultUncaughtExceptionHandler { _, throwable ->
-            SentryManager.captureException(throwable, defaultHandler)
+            if (throwable.stackTrace.any { it.className.startsWith("ai.bitlabs.sdk") }) {
+                SentryManager.captureException(throwable, defaultHandler)
+            } else {
+                defaultHandler?.uncaughtException(Thread.currentThread(), throwable)
+            }
         }
-
-//        Handler(Looper.getMainLooper()).postDelayed({
-//            throw RuntimeException("Unhandled Test exception")
-//        }, 10000)
-
-//        Handler(Looper.getMainLooper()).postDelayed({
-//            SentryManager.captureException(Exception("Handled Test exception"))
-//        }, 5000)
     }
 
     private fun bitlabsRepoInit() {

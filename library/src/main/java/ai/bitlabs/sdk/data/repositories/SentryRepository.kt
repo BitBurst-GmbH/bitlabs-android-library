@@ -16,6 +16,7 @@ import ai.bitlabs.sdk.data.model.sentry.SentryUser
 import ai.bitlabs.sdk.util.TAG
 import android.util.Log
 import com.google.gson.Gson
+import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
@@ -38,9 +39,33 @@ internal class SentryRepository(
 ) {
 
     fun sendEnvelope(
-        throwable: Throwable,
-        defaultUncaughtExceptionHandler: UncaughtExceptionHandler?
+        throwable: Throwable, defaultUncaughtExceptionHandler: UncaughtExceptionHandler?
     ) {
+
+        val envelope =
+            createEnvelopeJson(throwable, isHandled = defaultUncaughtExceptionHandler == null)
+
+        executor.execute {
+            try {
+                val response = sentryAPI.sendEnvelope(envelope = envelope).execute()
+
+                if (response.isSuccessful) {
+                    Log.i(TAG, "Sentry envelope(#${response.body()?.id}) sent.")
+                } else {
+                    Log.e(
+                        TAG, "Sentry envelope not sent. Error: ${response.errorBody()?.string()}"
+                    )
+                }
+
+            } catch (e: Exception) {
+                Log.e(TAG, "Sentry sendEnvelope Failed", e)
+            }
+
+            defaultUncaughtExceptionHandler?.uncaughtException(Thread.currentThread(), throwable)
+        }
+    }
+
+    private fun createEnvelopeJson(throwable: Throwable, isHandled: Boolean): RequestBody {
         val gson = Gson()
 
         val evenId = UUID.randomUUID().toString().replace("-", "")
@@ -53,18 +78,16 @@ internal class SentryRepository(
             type = throwable.javaClass.simpleName,
             value = throwable.message ?: "Unlabelled exception",
             module = throwable.javaClass.simpleName,
-            stacktrace = SentryStackTrace(
-                frames = throwable.stackTrace.map {
-                    SentryStackFrame(
-                        filename = it.fileName,
-                        function = it.methodName,
-                        module = it.className,
-                        lineno = maxOf(it.lineNumber, 0),
-                        inApp = it.className.startsWith("ai.bitlabs.sdk")
-                    )
-                }
-            ),
-            mechanism = SentryExceptionMechanism(handled = defaultUncaughtExceptionHandler == null)
+            stacktrace = SentryStackTrace(frames = throwable.stackTrace.map {
+                SentryStackFrame(
+                    filename = it.fileName,
+                    function = it.methodName,
+                    module = it.className,
+                    lineno = maxOf(it.lineNumber, 0),
+                    inApp = it.className.startsWith("ai.bitlabs.sdk")
+                )
+            }),
+            mechanism = SentryExceptionMechanism(handled = isHandled)
         )
 
         val event = SentryEvent(
@@ -75,41 +98,15 @@ internal class SentryRepository(
             sdk = SentrySDK(version = "0.1.0"),
             exception = listOf(exception),
             tags = mapOf("token" to token),
-            level = if (defaultUncaughtExceptionHandler == null) "error" else "fatal"
+            level = if (isHandled) "error" else "fatal"
         )
 
         val eventItem = SentryEventItem(event)
 
-        val envelope = SentryEnvelope(
+        return SentryEnvelope(
             headers = SentryEnvelopeHeaders(
                 eventId = evenId, dsn = SentryManager.dsn.toString(), sentAt = now
-            ),
-            items = listOf(eventItem)
+            ), items = listOf(eventItem)
         ).toRequestBody()
-
-        executor.execute {
-            try {
-                val response = sentryAPI.sendEnvelope(envelope = envelope).execute()
-
-                if (response.isSuccessful) {
-                    Log.i(
-                        TAG, "onResponse: Sentry envelope sent. Response: ${
-                            response.body()?.string()
-                        }"
-                    )
-                } else {
-                    Log.e(
-                        TAG, "onResponse: Sentry envelope not sent. Error: ${
-                            response.errorBody()?.string()
-                        }"
-                    )
-                }
-
-            } catch (e: Exception) {
-                Log.e(TAG, "onFailure: Sentry envelope not sent", e)
-            }
-
-            defaultUncaughtExceptionHandler?.uncaughtException(Thread.currentThread(), throwable)
-        }
     }
 }

@@ -5,6 +5,8 @@ import ai.bitlabs.sdk.data.api.SentryAPI
 import ai.bitlabs.sdk.data.repositories.SentryRepository
 import ai.bitlabs.sdk.util.buildHttpClientWithHeaders
 import ai.bitlabs.sdk.util.buildRetrofit
+import java.lang.Thread.UncaughtExceptionHandler
+import java.util.concurrent.Executors
 
 internal object SentryManager {
     val dsn = SentryDsn(BuildConfig.SENTRY_DSN)
@@ -19,17 +21,26 @@ internal object SentryManager {
 
     private lateinit var sentryRepo: SentryRepository
 
-    fun init(uid: String, token: String) {
+    fun init(token: String, uid: String) {
         val okHttpClient = buildHttpClientWithHeaders(
-            "X-Sentry-Auth" to "Sentry sentry_version=7, sentry_key=$publicKey"
+            "X-Sentry-Auth" to "Sentry sentry_version=7, sentry_key=$publicKey, sentry_client=bitlabs-sdk/0.1.0",
+            "User-Agent" to "bitlabs-sdk/0.1.0"
         )
 
         val retrofit = buildRetrofit(url, okHttpClient)
 
-        sentryRepo = SentryRepository(retrofit.create(SentryAPI::class.java), token, uid)
+        sentryRepo = SentryRepository(
+            retrofit.create(SentryAPI::class.java),
+            token,
+            uid,
+            Executors.newSingleThreadExecutor()
+        )
     }
 
-    fun catchException(throwable: Throwable) {
-        sentryRepo.sendEnvelope(throwable)
+    fun captureException(
+        throwable: Throwable,
+        defaultUncaughtExceptionHandler: UncaughtExceptionHandler? = null
+    ) {
+        sentryRepo.sendEnvelope(throwable, defaultUncaughtExceptionHandler)
     }
 }

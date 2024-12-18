@@ -26,6 +26,8 @@ import android.content.Intent
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -79,6 +81,19 @@ object BitLabs {
         fileProviderAuthority = "${context.packageName}.provider.bitlabs"
 
         getAppSettings()
+
+        val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
+        Thread.setDefaultUncaughtExceptionHandler { _, throwable ->
+            SentryManager.captureException(throwable, defaultHandler)
+        }
+
+//        Handler(Looper.getMainLooper()).postDelayed({
+//            throw RuntimeException("Unhandled Test exception")
+//        }, 10000)
+
+//        Handler(Looper.getMainLooper()).postDelayed({
+//            SentryManager.captureException(Exception("Handled Test exception"))
+//        }, 5000)
     }
 
     private fun bitlabsRepoInit() {

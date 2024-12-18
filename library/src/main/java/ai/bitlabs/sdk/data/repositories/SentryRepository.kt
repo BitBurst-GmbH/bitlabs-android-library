@@ -19,17 +19,27 @@ import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.lang.Thread.UncaughtExceptionHandler
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 import java.util.UUID
+import java.util.concurrent.Executor
+import java.util.concurrent.Executors
 
 
 internal class SentryRepository(
-    private val sentryAPI: SentryAPI, private val token: String, private val uid: String
+    private val sentryAPI: SentryAPI,
+    private val token: String,
+    private val uid: String,
+    private val executor: Executor
 ) {
-    fun sendEnvelope(throwable: Throwable) {
+
+    fun sendEnvelope(
+        throwable: Throwable,
+        defaultUncaughtExceptionHandler: UncaughtExceptionHandler? = null
+    ) {
         val gson = Gson()
 
         val evenId = UUID.randomUUID().toString().replace("-", "")
@@ -61,7 +71,8 @@ internal class SentryRepository(
             logentry = SentryMessage(throwable.message ?: "Unlabelled exception"),
             user = SentryUser(id = uid),
             sdk = SentrySDK(version = "0.1.0"),
-            exception = listOf(exception)
+            exception = listOf(exception),
+            tags = mapOf("token" to token)
         )
 
         val eventItem = SentryEventItem(event)
@@ -73,10 +84,10 @@ internal class SentryRepository(
             items = listOf(eventItem)
         ).toRequestBody()
 
-        sentryAPI.sendEnvelope(envelope = envelope).enqueue(object : Callback<ResponseBody> {
-            override fun onResponse(
-                call: Call<ResponseBody>, response: Response<ResponseBody>
-            ) {
+        executor.execute {
+            try {
+                val response = sentryAPI.sendEnvelope(envelope = envelope).execute()
+
                 if (response.isSuccessful) {
                     Log.i(
                         TAG, "onResponse: Sentry envelope sent. Response: ${
@@ -90,11 +101,12 @@ internal class SentryRepository(
                         }"
                     )
                 }
+
+            } catch (e: Exception) {
+                Log.e(TAG, "onFailure: Sentry envelope not sent", e)
             }
 
-            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                Log.e(TAG, "onFailure: Sentry envelope not sent", t)
-            }
-        })
+            defaultUncaughtExceptionHandler?.uncaughtException(Thread.currentThread(), throwable)
+        }
     }
 }

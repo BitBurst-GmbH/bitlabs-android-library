@@ -3,6 +3,7 @@ package ai.bitlabs.sdk.util.extensions
 import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.R
 import ai.bitlabs.sdk.data.model.bitlabs.WebViewError
+import ai.bitlabs.sdk.data.model.sentry.SentryManager
 import ai.bitlabs.sdk.util.HookName
 import ai.bitlabs.sdk.util.RewardArgs
 import ai.bitlabs.sdk.util.SurveyStartArgs
@@ -60,6 +61,7 @@ fun WebView.setup(
                 FileProvider.getUriForFile(context, BitLabs.fileProviderAuthority, tempFile!!)
             camera.launch(uri)
         } catch (e: Exception) {
+            SentryManager.captureException(e)
             Log.e(TAG, e.message, e)
         }
     }

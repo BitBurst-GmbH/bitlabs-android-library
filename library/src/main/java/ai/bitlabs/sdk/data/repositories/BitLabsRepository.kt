@@ -9,6 +9,7 @@ import ai.bitlabs.sdk.data.model.bitlabs.LeaveReason
 import ai.bitlabs.sdk.data.model.bitlabs.Survey
 import ai.bitlabs.sdk.data.model.bitlabs.UpdateClickBody
 import ai.bitlabs.sdk.data.api.BitLabsAPI
+import ai.bitlabs.sdk.data.model.sentry.SentryManager
 import ai.bitlabs.sdk.util.OnExceptionListener
 import ai.bitlabs.sdk.util.OnResponseListener
 import ai.bitlabs.sdk.util.TAG
@@ -31,17 +32,18 @@ internal class BitLabsRepository(private val bitLabsAPI: BitLabsAPI) {
         bitLabsAPI.updateClick(clickId, UpdateClickBody(LeaveReason(reason)))
             .enqueue(object : Callback<BitLabsResponse<Unit>> {
                 override fun onResponse(
-                    call: Call<BitLabsResponse<Unit>>,
-                    response: Response<BitLabsResponse<Unit>>
+                    call: Call<BitLabsResponse<Unit>>, response: Response<BitLabsResponse<Unit>>
                 ) {
-                    if (response.isSuccessful)
-                        Log.i(TAG, "LeaveSurvey - Success")
+                    if (response.isSuccessful) Log.i(TAG, "LeaveSurvey - Success")
                     else response.errorBody()?.body<Unit>()?.error?.details?.run {
-                        Log.e(TAG, "LeaveSurvey $http - $msg")
+                        val errMessage = "LeaveSurvey Error: $http - $msg"
+                        SentryManager.captureException(Exception(errMessage))
+                        Log.e(TAG, errMessage)
                     }
                 }
 
                 override fun onFailure(call: Call<BitLabsResponse<Unit>>, t: Throwable) {
+                    SentryManager.captureException(t)
                     Log.e(TAG, "LeaveSurvey Failure - ${t.message ?: "Unknown Error"}")
                 }
             })
@@ -57,7 +59,10 @@ internal class BitLabsRepository(private val bitLabsAPI: BitLabsAPI) {
         ) {
             val restrictionReason = response.body()?.data?.restrictionReason
             if (restrictionReason != null) {
-                onExceptionListener.onException(Exception(restrictionReason.prettyPrint()))
+                with(Exception("GetSurveys Error: ${restrictionReason.prettyPrint()}")) {
+                    SentryManager.captureException(this)
+                    onExceptionListener.onException(this)
+                }
                 return
             }
 
@@ -68,11 +73,15 @@ internal class BitLabsRepository(private val bitLabsAPI: BitLabsAPI) {
             }
 
             response.errorBody()?.body<GetSurveysResponse>()?.error?.details?.run {
-                onExceptionListener.onException(Exception("$http - $msg"))
+                with(Exception("GetSurveys Error: $http - $msg")) {
+                    SentryManager.captureException(this)
+                    onExceptionListener.onException(this)
+                }
             }
         }
 
         override fun onFailure(call: Call<BitLabsResponse<GetSurveysResponse>>, t: Throwable) {
+            SentryManager.captureException(t)
             onExceptionListener.onException(Exception(t))
         }
     })
@@ -92,15 +101,20 @@ internal class BitLabsRepository(private val bitLabsAPI: BitLabsAPI) {
                 }
 
                 response.errorBody()?.body<GetSurveysResponse>()?.error?.details?.run {
-                    onExceptionListener.onException(Exception("$http - $msg"))
+                    with(Exception("GetAppSettings Error: $http - $msg")) {
+                        SentryManager.captureException(this)
+                        onExceptionListener.onException(this)
+                    }
                 }
             }
 
             override fun onFailure(
-                call: Call<BitLabsResponse<GetAppSettingsResponse>>,
-                t: Throwable
+                call: Call<BitLabsResponse<GetAppSettingsResponse>>, t: Throwable
             ) {
-                onExceptionListener.onException(Exception(t))
+                with(Exception(t)) {
+                    SentryManager.captureException(this)
+                    onExceptionListener.onException(this)
+                }
             }
         })
 
@@ -119,62 +133,65 @@ internal class BitLabsRepository(private val bitLabsAPI: BitLabsAPI) {
                 }
 
                 response.errorBody()?.body<GetLeaderboardResponse>()?.error?.details?.run {
-                    onExceptionListener.onException(Exception("$http - $msg"))
+                    with(Exception("GetLeaderboard Error: $http - $msg")) {
+                        SentryManager.captureException(this)
+                        onExceptionListener.onException(this)
+                    }
                 }
             }
 
             override fun onFailure(
-                call: Call<BitLabsResponse<GetLeaderboardResponse>>,
-                t: Throwable
+                call: Call<BitLabsResponse<GetLeaderboardResponse>>, t: Throwable
             ) {
-                onExceptionListener.onException(Exception(t))
+                with(Exception(t)) {
+                    SentryManager.captureException(this)
+                    onExceptionListener.onException(this)
+                }
             }
         })
 
     internal fun getCurrencyIcon(
-        url: String,
-        resources: Resources,
-        onResponseListener: OnResponseListener<Drawable?>
-    ) = bitLabsAPI.getCurrencyIcon(url)
-        .enqueue(object : Callback<ResponseBody> {
-            override fun onResponse(
-                call: Call<ResponseBody>,
-                response: Response<ResponseBody>
-            ) {
-                if (response.isSuccessful) {
-                    response.body()?.let {
-                        val drawable = if (it.contentType()?.subtype() == "svg+xml")
-                            with(SVG.getFromString(it.string())) {
-                                val bitmap = Bitmap.createBitmap(
-                                    documentWidth.toInt(),
-                                    documentHeight.toInt(),
-                                    Bitmap.Config.ARGB_8888
-                                )
+        url: String, resources: Resources, onResponseListener: OnResponseListener<Drawable?>
+    ) = bitLabsAPI.getCurrencyIcon(url).enqueue(object : Callback<ResponseBody> {
+        override fun onResponse(
+            call: Call<ResponseBody>, response: Response<ResponseBody>
+        ) {
+            if (response.isSuccessful) {
+                response.body()?.let {
+                    val drawable = if (it.contentType()
+                            ?.subtype() == "svg+xml"
+                    ) with(SVG.getFromString(it.string())) {
+                        val bitmap = Bitmap.createBitmap(
+                            documentWidth.toInt(),
+                            documentHeight.toInt(),
+                            Bitmap.Config.ARGB_8888
+                        )
 
-                                val canvas = Canvas(bitmap)
-                                canvas.drawRGB(255, 255, 255)
+                        val canvas = Canvas(bitmap)
+                        canvas.drawRGB(255, 255, 255)
 
-                                renderToCanvas(canvas)
+                        renderToCanvas(canvas)
 
-                                BitmapDrawable(resources, bitmap)
-                            }
-                        else
-                            BitmapDrawable(resources, it.byteStream())
-
-                        onResponseListener.onResponse(drawable)
+                        BitmapDrawable(resources, bitmap)
                     }
-                    return
+                    else BitmapDrawable(resources, it.byteStream())
+
+                    onResponseListener.onResponse(drawable)
                 }
-
-                Log.e(
-                    TAG, "getCurrencyIcon Failure - " +
-                            (response.errorBody()?.string() ?: "Unknown Error")
-                )
-                onResponseListener.onResponse(null)
+                return
             }
 
-            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                Log.e(TAG, "getCurrencyIcon Failure - ${t.message ?: "Unknown Error"}")
-            }
-        })
+            val errMessage =
+                "GetCurrencyIcon Error: ${response.errorBody()?.string() ?: "Unknown Error"}"
+
+            SentryManager.captureException(Exception(errMessage))
+            Log.e(TAG, errMessage)
+            onResponseListener.onResponse(null)
+        }
+
+        override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+            SentryManager.captureException(t)
+            Log.e(TAG, "GetCurrencyIcon Failure: ${t.message ?: "Unknown Error"}")
+        }
+    })
 }

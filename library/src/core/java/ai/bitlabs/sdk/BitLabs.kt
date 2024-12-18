@@ -239,6 +239,7 @@ object BitLabs {
             adId = AdvertisingIdClient.getAdvertisingIdInfo(context).id ?: ""
             Log.d(TAG, "Advertising Id: $adId")
         } catch (e: Exception) {
+            SentryManager.captureException(e)
             Log.e(TAG, "Failed to determine Advertising Id", e)
         }
     }.start()

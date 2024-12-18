@@ -1,5 +1,6 @@
 package ai.bitlabs.sdk.util
 
+import ai.bitlabs.sdk.data.model.sentry.SentryManager
 import android.content.res.Configuration
 import android.content.res.Resources
 import android.graphics.Bitmap
@@ -86,6 +87,7 @@ internal fun String.rounded(): String {
             else stripTrailingZeros().toPlainString()
         }
     } catch (e: NumberFormatException) {
+        SentryManager.captureException(e)
         Log.e(TAG, "rounded: Tried to round non-number!", e)
         return this
     }

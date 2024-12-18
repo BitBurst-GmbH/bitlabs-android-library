@@ -2,6 +2,7 @@ package ai.bitlabs.sdk.views
 
 import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.R
+import ai.bitlabs.sdk.data.model.sentry.SentryManager
 import ai.bitlabs.sdk.util.BUNDLE_KEY_COLOR
 import ai.bitlabs.sdk.util.BUNDLE_KEY_URL
 import ai.bitlabs.sdk.util.TAG
@@ -49,6 +50,7 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
         try {
             getDataFromIntent()
         } catch (e: IllegalArgumentException) {
+            SentryManager.captureException(e)
             Log.e(TAG, e.message.toString())
             finish()
             return

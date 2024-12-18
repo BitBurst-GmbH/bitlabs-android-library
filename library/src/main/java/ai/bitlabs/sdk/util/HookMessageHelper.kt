@@ -1,5 +1,6 @@
 package ai.bitlabs.sdk.util
 
+import ai.bitlabs.sdk.data.model.sentry.SentryManager
 import android.util.Log
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonDeserializationContext
@@ -21,6 +22,7 @@ internal fun String.asHookMessage(): HookMessage<*>? = try {
         .create()
         .fromJson(this, HookMessage::class.java)
 } catch (e: Exception) {
+    SentryManager.captureException(e)
     Log.e(TAG, e.toString())
     null
 }

@@ -1,6 +1,7 @@
 package ai.bitlabs.sdk.util.extensions
 
 import ai.bitlabs.sdk.data.model.bitlabs.BitLabsResponse
+import ai.bitlabs.sdk.data.model.sentry.SentryManager
 import ai.bitlabs.sdk.util.TAG
 import android.util.Log
 import com.google.gson.GsonBuilder
@@ -16,6 +17,7 @@ internal inline fun <reified T> ResponseBody.body(): BitLabsResponse<T>? =
         val type = object : TypeToken<BitLabsResponse<T>>() {}.type
         GsonBuilder().create().fromJson(this.string(), type)
     } catch (e: Exception) {
+        SentryManager.captureException(e)
         Log.e(TAG, e.toString())
         null
     }

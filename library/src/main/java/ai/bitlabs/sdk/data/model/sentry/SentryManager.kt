@@ -19,7 +19,7 @@ internal object SentryManager {
 
     private val url = "$protocol://$host/"
 
-    private lateinit var sentryRepo: SentryRepository
+    private var sentryRepo: SentryRepository? = null
 
     fun init(token: String, uid: String) {
         val okHttpClient = buildHttpClientWithHeaders(
@@ -41,6 +41,6 @@ internal object SentryManager {
         throwable: Throwable,
         defaultUncaughtExceptionHandler: UncaughtExceptionHandler? = null
     ) {
-        sentryRepo.sendEnvelope(throwable, defaultUncaughtExceptionHandler)
+        sentryRepo?.sendEnvelope(throwable, defaultUncaughtExceptionHandler)
     }
 }

@@ -6,6 +6,7 @@ import ai.bitlabs.sdk.data.model.sentry.SentryEnvelopeHeaders
 import ai.bitlabs.sdk.data.model.sentry.SentryEvent
 import ai.bitlabs.sdk.data.model.sentry.SentryEventItem
 import ai.bitlabs.sdk.data.model.sentry.SentryException
+import ai.bitlabs.sdk.data.model.sentry.SentryExceptionMechanism
 import ai.bitlabs.sdk.data.model.sentry.SentryManager
 import ai.bitlabs.sdk.data.model.sentry.SentryMessage
 import ai.bitlabs.sdk.data.model.sentry.SentrySDK
@@ -38,7 +39,7 @@ internal class SentryRepository(
 
     fun sendEnvelope(
         throwable: Throwable,
-        defaultUncaughtExceptionHandler: UncaughtExceptionHandler? = null
+        defaultUncaughtExceptionHandler: UncaughtExceptionHandler?
     ) {
         val gson = Gson()
 
@@ -62,7 +63,8 @@ internal class SentryRepository(
                         inApp = it.className.startsWith("ai.bitlabs.sdk")
                     )
                 }
-            )
+            ),
+            mechanism = SentryExceptionMechanism(handled = defaultUncaughtExceptionHandler == null)
         )
 
         val event = SentryEvent(
@@ -72,7 +74,8 @@ internal class SentryRepository(
             user = SentryUser(id = uid),
             sdk = SentrySDK(version = "0.1.0"),
             exception = listOf(exception),
-            tags = mapOf("token" to token)
+            tags = mapOf("token" to token),
+            level = if (defaultUncaughtExceptionHandler == null) "error" else "fatal"
         )
 
         val eventItem = SentryEventItem(event)

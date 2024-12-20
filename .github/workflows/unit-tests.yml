@@ -16,7 +16,8 @@ jobs:
           java-version: '17'
 
       - name: Create dummy local.properties
-        run: echo "appToken=\"ARBITRARY\"" > local.properties
+        run: |
+          echo "appToken=\"ARBITRARY\"" > local.properties
 
       - name: Run Unit Tests
         run: ./gradlew test

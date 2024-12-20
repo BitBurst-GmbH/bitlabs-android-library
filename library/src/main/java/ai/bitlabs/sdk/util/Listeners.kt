@@ -1,6 +1,6 @@
 package ai.bitlabs.sdk.util
 
-import ai.bitlabs.sdk.data.network.BitLabsAPI
+import ai.bitlabs.sdk.data.api.BitLabsAPI
 
 /** Interface definition for a callback to be invoked when a reward is earned by the user. */
 fun interface OnRewardListener {

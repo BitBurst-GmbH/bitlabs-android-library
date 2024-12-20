@@ -1,12 +1,9 @@
 package ai.bitlabs.sdk.views
 
-import ai.bitlabs.sdk.data.model.WidgetType
-import ai.bitlabs.sdk.util.TAG
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.graphics.Color
-import android.util.Log
 import android.webkit.WebView
 import android.widget.FrameLayout
 

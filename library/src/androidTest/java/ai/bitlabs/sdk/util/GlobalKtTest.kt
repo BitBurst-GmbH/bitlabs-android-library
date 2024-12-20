@@ -1,8 +1,6 @@
 package ai.bitlabs.sdk.util
 
-import android.content.res.Resources
 import android.graphics.Color
-import android.util.Log
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test

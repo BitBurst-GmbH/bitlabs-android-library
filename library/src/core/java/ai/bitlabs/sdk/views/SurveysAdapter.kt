@@ -1,8 +1,8 @@
 package ai.bitlabs.sdk.views
 
 import ai.bitlabs.sdk.BitLabs
-import ai.bitlabs.sdk.data.model.Survey
-import ai.bitlabs.sdk.data.model.WidgetType
+import ai.bitlabs.sdk.data.model.bitlabs.Survey
+import ai.bitlabs.sdk.data.model.bitlabs.WidgetType
 import ai.bitlabs.sdk.util.rounded
 import android.graphics.drawable.Drawable
 import androidx.recyclerview.widget.RecyclerView

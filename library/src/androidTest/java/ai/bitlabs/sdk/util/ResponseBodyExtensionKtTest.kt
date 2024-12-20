@@ -1,6 +1,6 @@
 package ai.bitlabs.sdk.util
 
-import ai.bitlabs.sdk.data.model.BitLabsResponse
+import ai.bitlabs.sdk.util.extensions.body
 import android.util.Log
 import com.google.common.truth.Truth.assertThat
 import okhttp3.MediaType

@@ -1,7 +1,7 @@
 package ai.bitlabs.sdk.views
 
 import ai.bitlabs.sdk.R
-import ai.bitlabs.sdk.data.model.WidgetType
+import ai.bitlabs.sdk.data.model.bitlabs.WidgetType
 import ai.bitlabs.sdk.util.toPx
 import android.content.Context
 import android.graphics.Color

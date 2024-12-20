@@ -2,8 +2,8 @@ package ai.bitlabs.sdk.views
 
 import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.R
-import ai.bitlabs.sdk.data.model.WidgetType
-import ai.bitlabs.sdk.util.log
+import ai.bitlabs.sdk.data.model.bitlabs.WidgetType
+import ai.bitlabs.sdk.util.extensions.log
 import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle

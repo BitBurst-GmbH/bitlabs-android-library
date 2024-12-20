@@ -2,7 +2,7 @@ package ai.bitlabs.sdk.views
 
 import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.R
-import ai.bitlabs.sdk.data.model.User
+import ai.bitlabs.sdk.data.model.bitlabs.User
 import android.view.View
 import android.widget.TextView
 import androidx.fragment.app.Fragment

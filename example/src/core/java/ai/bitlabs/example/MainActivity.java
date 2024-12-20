@@ -9,8 +9,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import ai.bitlabs.sdk.BitLabs;
-import ai.bitlabs.sdk.data.model.Survey;
-import ai.bitlabs.sdk.data.model.WidgetType;
+import ai.bitlabs.sdk.data.model.bitlabs.Survey;
+import ai.bitlabs.sdk.data.model.bitlabs.WidgetType;
 
 public class MainActivity extends AppCompatActivity {
     private final String TAG = "Example";
@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
 
         bitLabs.init(this, BuildConfig.APP_TOKEN, "oblivatevariegata");
 
-//        bitLabs.setDebugMode(true);
+        // bitLabs.setDebugMode(true);
 
         // optionally add custom tags to your users
         Map<String, Object> tags = new HashMap<>();

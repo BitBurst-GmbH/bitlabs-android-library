@@ -1,8 +1,9 @@
 package ai.bitlabs.sdk
 
-import ai.bitlabs.sdk.data.BitLabsRepository
-import ai.bitlabs.sdk.data.model.WebActivityParams
-import ai.bitlabs.sdk.data.network.BitLabsAPI
+import ai.bitlabs.sdk.data.api.BitLabsAPI
+import ai.bitlabs.sdk.data.model.bitlabs.WebActivityParams
+import ai.bitlabs.sdk.data.model.sentry.SentryManager
+import ai.bitlabs.sdk.data.repositories.BitLabsRepository
 import ai.bitlabs.sdk.util.BASE_URL
 import ai.bitlabs.sdk.util.BUNDLE_KEY_COLOR
 import ai.bitlabs.sdk.util.BUNDLE_KEY_URL
@@ -88,6 +89,15 @@ object BitLabs {
         fileProviderAuthority = "${UnityPlayer.currentActivity.packageName}.provider.bitlabs"
 
         getAppSettings()
+
+        val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
+        Thread.setDefaultUncaughtExceptionHandler { _, throwable ->
+            if (throwable.stackTrace.any { it.className.startsWith("ai.bitlabs.sdk") }) {
+                SentryManager.captureException(throwable, defaultHandler)
+            } else {
+                defaultHandler?.uncaughtException(Thread.currentThread(), throwable)
+            }
+        }
     }
 
     /**
@@ -216,6 +226,7 @@ object BitLabs {
             adId = AdvertisingIdClient.getAdvertisingIdInfo(context).id ?: ""
             Log.d(TAG, "Advertising Id: $adId")
         } catch (e: Exception) {
+            SentryManager.captureException(e)
             Log.e(TAG, "Failed to determine Advertising Id", e)
         }
     }.start()

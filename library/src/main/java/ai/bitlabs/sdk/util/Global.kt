@@ -1,15 +1,18 @@
 package ai.bitlabs.sdk.util
 
+import ai.bitlabs.sdk.data.model.sentry.SentryManager
 import android.content.res.Configuration
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Color
-import android.os.Build
 import android.util.Log
 import android.util.TypedValue
 import android.widget.ImageView
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.qrcode.QRCodeWriter
+import okhttp3.OkHttpClient
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import java.math.BigDecimal
 import java.math.RoundingMode
 
@@ -21,11 +24,22 @@ internal const val BUNDLE_KEY_COLOR = "bundle-key-color"
 
 internal const val BUNDLE_KEY_URL = "bundle-key-url"
 
-internal fun locale() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-    Resources.getSystem().configuration.locales.get(0)
-} else {
-    Resources.getSystem().configuration.locale
-}
+internal fun buildHttpClientWithHeaders(vararg headers: Pair<String, String>) =
+    OkHttpClient.Builder()
+        .addInterceptor { chain ->
+            val request = chain.request().newBuilder()
+                .apply { headers.forEach { addHeader(it.first, it.second) } }
+                .build()
+            chain.proceed(request)
+        }
+        .build()
+
+internal fun buildRetrofit(baseUrl: String, okHttpClient: OkHttpClient) =
+    Retrofit.Builder()
+        .baseUrl(baseUrl)
+        .client(okHttpClient)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
 
 internal fun deviceType(): String {
     val isTablet =
@@ -73,6 +87,7 @@ internal fun String.rounded(): String {
             else stripTrailingZeros().toPlainString()
         }
     } catch (e: NumberFormatException) {
+        SentryManager.captureException(e)
         Log.e(TAG, "rounded: Tried to round non-number!", e)
         return this
     }

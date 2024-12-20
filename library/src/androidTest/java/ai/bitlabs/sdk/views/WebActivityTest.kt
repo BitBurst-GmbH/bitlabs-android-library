@@ -1,7 +1,6 @@
 package ai.bitlabs.sdk.views
 
 import ai.bitlabs.sdk.BitLabs
-import ai.bitlabs.sdk.BuildConfig
 import ai.bitlabs.sdk.R
 import ai.bitlabs.sdk.util.BUNDLE_KEY_COLOR
 import ai.bitlabs.sdk.util.BUNDLE_KEY_URL
@@ -9,18 +8,12 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
-import android.view.View
 import android.webkit.WebView
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Lifecycle
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.IdlingRegistry
-import androidx.test.espresso.IdlingResource
-import androidx.test.espresso.UiController
-import androidx.test.espresso.ViewAction
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.pressBack
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -33,17 +26,9 @@ import com.google.common.truth.Truth.assertThat
 import io.mockk.every
 import io.mockk.mockkObject
 import io.mockk.verify
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.runBlocking
-import org.hamcrest.Matcher
 import org.hamcrest.Matchers.not
 import org.junit.Test
-import org.junit.runner.RunWith
 
-private const val TOKEN = BuildConfig.APP_TOKEN
-private const val UID = "diffindocongress"
 private val surveyStartHookEventMessage = """
             {
                 "type": "hook",

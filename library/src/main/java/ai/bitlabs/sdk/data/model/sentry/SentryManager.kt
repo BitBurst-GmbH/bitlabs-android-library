@@ -9,7 +9,9 @@ import java.lang.Thread.UncaughtExceptionHandler
 import java.util.concurrent.Executors
 
 internal object SentryManager {
-    val dsn = SentryDsn(BuildConfig.SENTRY_DSN)
+    val dsn = SentryDsn(
+        "https://74f1bae2ec6ab9e73a91f2d8e92c8f08@o494432.ingest.us.sentry.io/4508375634345985"
+    )
 
     val projectId = dsn.projectId
 

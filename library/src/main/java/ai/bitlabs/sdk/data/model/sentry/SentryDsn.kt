@@ -8,7 +8,7 @@ internal class SentryDsn(private val dsn: String) {
 
     init {
         val regex = Regex("(\\w+)://(\\w+)@(.*)/(\\w+)")
-        val match = regex.find(dsn) ?: throw IllegalArgumentException("Invalid DSN")
+        val match = regex.find(dsn) ?: throw IllegalArgumentException("Invalid DSN: $dsn")
         val (protocol, publicKey, host, projectId) = match.destructured
 
         this.host = host

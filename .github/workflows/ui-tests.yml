@@ -30,7 +30,6 @@ jobs:
       - name: Create dummy local.properties
         run: |
           echo "appToken=\"ARBITRARY\"" > local.properties
-          echo "sentryDsn=\"${{ secrets.SENTRY_DSN }}\"" >> local.properties
 
       - name: Assemble test APK
         run: ./gradlew assembleAndroidTest

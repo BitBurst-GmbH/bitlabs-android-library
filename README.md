@@ -23,7 +23,7 @@ Then add the dependency in the same file:
 
 ```Groovy
 dependencies {
-    implementation 'com.github.BitBurst-GmbH.bitlabs-android-library:core:3.2.0'
+    implementation 'com.github.BitBurst-GmbH.bitlabs-android-library:core:3.2.13'
 }
 ```
 

@@ -22,6 +22,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.OnBackPressedDispatcher
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -62,7 +63,20 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                if (toolbar?.visibility == View.VISIBLE) showLeaveSurveyAlertDialog()
+                if (toolbar?.visibility == View.VISIBLE) {
+                    showLeaveSurveyAlertDialog()
+                    return
+                }
+
+                if (webView?.canGoBack() == true) {
+                    webView?.goBack()
+                    return
+                }
+
+                if (isEnabled) {
+                    isEnabled = false
+                    onBackPressedDispatcher.onBackPressed()
+                }
             }
         })
     }

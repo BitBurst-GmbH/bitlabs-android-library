@@ -30,8 +30,12 @@ android {
     flavorDimensions = ['sdk']
 
     productFlavors {
-        core {}
-        unity {}
+        core {
+            buildConfigField 'String', 'DSN', '"https://74f1bae2ec6ab9e73a91f2d8e92c8f08@o494432.ingest.us.sentry.io/4508375634345985"'
+        }
+        unity {
+            buildConfigField 'String', 'DSN', '"https://669f0df0ec50d3860eded78dad6eda63@o494432.ingest.us.sentry.io/4508652840091648"'
+        }
     }
 
     compileOptions {

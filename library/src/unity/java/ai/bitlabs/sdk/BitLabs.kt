@@ -61,6 +61,8 @@ object BitLabs {
         this.token = token
         this.uid = uid
 
+        SentryManager.init(token, uid)
+
         val userAgent =
             "BitLabs/${BuildConfig.VERSION_NAME} (Android ${Build.VERSION.SDK_INT}; ${Build.MODEL}; ${deviceType()})"
 

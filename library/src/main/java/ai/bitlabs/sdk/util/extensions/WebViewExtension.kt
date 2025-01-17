@@ -13,6 +13,7 @@ import ai.bitlabs.sdk.views.BitLabsOfferwallActivity
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.AlertDialog
+import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
@@ -40,9 +41,10 @@ fun WebView.setup(
     var tempFile: File? = null
     var uriResult: ValueCallback<Array<Uri>>? = null
 
-    val chooser = (context as BitLabsOfferwallActivity).registerForActivityResult(GetMultipleContents()) {
-        uriResult?.onReceiveValue(it?.toTypedArray())
-    }
+    val chooser =
+        (context as BitLabsOfferwallActivity).registerForActivityResult(GetMultipleContents()) {
+            uriResult?.onReceiveValue(it?.toTypedArray())
+        }
 
     val camera = (context as BitLabsOfferwallActivity).registerForActivityResult(TakePicture()) {
         if (tempFile == null) uriResult?.onReceiveValue(null)
@@ -92,12 +94,28 @@ fun WebView.setup(
             resultMsg.sendToTarget()
 
             newWebView.webViewClient = object : WebViewClient() {
-                override fun doUpdateVisitedHistory(
-                    view: WebView?, url: String?, isReload: Boolean
-                ) {
-                    if (!url.isNullOrEmpty()) CustomTabsIntent.Builder().build()
-                        .launchUrl(context, Uri.parse(url))
-                    super.doUpdateVisitedHistory(view, url, isReload)
+                @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+                override fun shouldOverrideUrlLoading(
+                    view: WebView?,
+                    request: WebResourceRequest?
+                ): Boolean {
+                    val url = request?.url?.toString()
+                    if (!url.isNullOrEmpty()) {
+                        CustomTabsIntent.Builder().build()
+                            .launchUrl(context, Uri.parse(url))
+                        return true
+                    }
+                    return false
+                }
+
+                @Deprecated("Deprecated in Java")
+                override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
+                    if (!url.isNullOrEmpty()) {
+                        CustomTabsIntent.Builder().build()
+                            .launchUrl(context, Uri.parse(url))
+                        return true
+                    }
+                    return false
                 }
             }
 

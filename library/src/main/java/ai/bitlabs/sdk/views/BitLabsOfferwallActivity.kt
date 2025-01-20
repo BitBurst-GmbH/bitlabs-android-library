@@ -183,7 +183,7 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
     private fun leaveSurvey(reason: String) {
         findViewById<LinearLayout>(R.id.ll_qr_code_bitlabs)?.visibility = View.GONE
         toggleToolbar(true)
-        webView?.loadUrl(url)
+        webView?.evaluateJavascript(" window.history.go(-window.history.length + 1);", null);
 
         if (clickId != null) BitLabs.leaveSurvey(clickId!!, reason)
     }

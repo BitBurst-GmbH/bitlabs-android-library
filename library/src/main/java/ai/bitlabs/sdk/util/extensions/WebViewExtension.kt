@@ -13,7 +13,6 @@ import ai.bitlabs.sdk.views.BitLabsOfferwallActivity
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.AlertDialog
-import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
@@ -35,7 +34,7 @@ import java.io.File
 fun WebView.setup(
     addReward: (reward: Float) -> Unit,
     setClickId: (clickId: String?) -> Unit,
-    onDoUpdateVisitedHistory: (isPageOfferWall: Boolean) -> Unit,
+    toggleToolbar: (shouldShowToolbar: Boolean) -> Unit,
     onError: (error: WebViewError?, date: String, url: String) -> Unit,
 ) {
     var tempFile: File? = null
@@ -59,8 +58,7 @@ fun WebView.setup(
                 File.createTempFile("temp_photo", ".jpg", this)
             }
             if (tempFile == null) throw Exception("Could not create tmp photo")
-            val uri =
-                FileProvider.getUriForFile(context, BitLabs.fileProviderAuthority, tempFile!!)
+            val uri = FileProvider.getUriForFile(context, BitLabs.fileProviderAuthority, tempFile!!)
             camera.launch(uri)
         } catch (e: Exception) {
             SentryManager.captureException(e)
@@ -71,12 +69,10 @@ fun WebView.setup(
     val permission =
         (context as BitLabsOfferwallActivity).registerForActivityResult(RequestPermission()) { granted ->
             if (granted) takePhoto()
-            else AlertDialog.Builder(context)
-                .setTitle("Permission required")
+            else AlertDialog.Builder(context).setTitle("Permission required")
                 .setMessage("Camera permission is required to take a photo. Please enable it in the app settings.")
                 .setPositiveButton("OK") { _, _ -> }
-                .setOnDismissListener { uriResult?.onReceiveValue(null) }
-                .show()
+                .setOnDismissListener { uriResult?.onReceiveValue(null) }.show()
         }
 
     if (Build.VERSION.SDK_INT >= 21) CookieManager.getInstance()
@@ -96,13 +92,11 @@ fun WebView.setup(
             newWebView.webViewClient = object : WebViewClient() {
                 @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
                 override fun shouldOverrideUrlLoading(
-                    view: WebView?,
-                    request: WebResourceRequest?
+                    view: WebView?, request: WebResourceRequest?
                 ): Boolean {
                     val url = request?.url?.toString()
                     if (!url.isNullOrEmpty()) {
-                        CustomTabsIntent.Builder().build()
-                            .launchUrl(context, Uri.parse(url))
+                        CustomTabsIntent.Builder().build().launchUrl(context, Uri.parse(url))
                         return true
                     }
                     return false
@@ -111,8 +105,7 @@ fun WebView.setup(
                 @Deprecated("Deprecated in Java")
                 override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
                     if (!url.isNullOrEmpty()) {
-                        CustomTabsIntent.Builder().build()
-                            .launchUrl(context, Uri.parse(url))
+                        CustomTabsIntent.Builder().build().launchUrl(context, Uri.parse(url))
                         return true
                     }
                     return false
@@ -130,8 +123,7 @@ fun WebView.setup(
             uriResult = filePathCallback
 
             AlertDialog.Builder(context)
-                .setTitle(context.resources.getString(R.string.file_chooser_title))
-                .setItems(
+                .setTitle(context.resources.getString(R.string.file_chooser_title)).setItems(
                     arrayOf(
                         context.resources.getString(R.string.file_chooser_camera),
                         context.resources.getString(R.string.file_chooser_gallery)
@@ -139,22 +131,13 @@ fun WebView.setup(
                 ) { _, which ->
                     if (which == 0) permission.launch(Manifest.permission.CAMERA)
                     else chooser.launch("image/*")
-                }
-                .setOnCancelListener { uriResult?.onReceiveValue(null) }
-                .show()
+                }.setOnCancelListener { uriResult?.onReceiveValue(null) }.show()
 
             return true
         }
     }
 
     this.webViewClient = object : WebViewClient() {
-        override fun doUpdateVisitedHistory(view: WebView?, url: String?, isReload: Boolean) {
-            onDoUpdateVisitedHistory(
-                url?.startsWith("https://web.bitlabs.ai") ?: true
-            )
-            super.doUpdateVisitedHistory(view, url, isReload)
-        }
-
         override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
             super.onPageStarted(view, url, favicon)
             view?.evaluateJavascript(
@@ -210,29 +193,33 @@ fun WebView.setup(
                 }
 
                 HookName.SURVEY_START -> {
-                    val clickId =
-                        hookMessage.args.filterIsInstance<SurveyStartArgs>().firstOrNull()?.clickId
+                    val surveyStartArgs = hookMessage.args
+                        .filterIsInstance<SurveyStartArgs>()
+                        .firstOrNull()
+                    val clickId = surveyStartArgs?.clickId
                     setClickId(clickId)
+                    (context as BitLabsOfferwallActivity)
+                        .runOnUiThread { toggleToolbar(true) }
                     Log.i(TAG, "Caught Survey Start event with clickId: $clickId")
                 }
 
                 HookName.SURVEY_COMPLETE -> {
-                    val reward =
-                        hookMessage.args.filterIsInstance<RewardArgs>().firstOrNull()?.reward ?: 0f
+                    val rewardArgs = hookMessage.args.filterIsInstance<RewardArgs>().firstOrNull()
+                    val reward = rewardArgs?.reward ?: 0f
                     addReward(reward)
                     Log.i(TAG, "Caught Survey Complete event with reward: $reward")
                 }
 
                 HookName.SURVEY_SCREENOUT -> {
-                    val reward =
-                        hookMessage.args.filterIsInstance<RewardArgs>().firstOrNull()?.reward ?: 0f
+                    val rewardArgs = hookMessage.args.filterIsInstance<RewardArgs>().firstOrNull()
+                    val reward = rewardArgs?.reward ?: 0f
                     addReward(reward)
                     Log.i(TAG, "Caught Survey Screenout with reward: $reward")
                 }
 
                 HookName.SURVEY_START_BONUS -> {
-                    val reward =
-                        hookMessage.args.filterIsInstance<RewardArgs>().firstOrNull()?.reward ?: 0f
+                    val rewardArgs = hookMessage.args.filterIsInstance<RewardArgs>().firstOrNull()
+                    val reward = rewardArgs?.reward ?: 0f
                     addReward(reward)
                     Log.i(TAG, "Caught Survey Start Bonus event with reward: $reward")
                 }

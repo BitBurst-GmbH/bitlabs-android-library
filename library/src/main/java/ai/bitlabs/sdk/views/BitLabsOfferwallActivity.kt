@@ -22,7 +22,6 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
-import androidx.activity.OnBackPressedDispatcher
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -128,7 +127,7 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
 
-        toggleToolbar(true)
+        toggleToolbar(false)
 
         webView = findViewById(R.id.wv_bitlabs)
         webView?.scrollBarStyle = WebView.SCROLLBARS_OUTSIDE_OVERLAY
@@ -136,7 +135,7 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
         webView?.setup(
             { reward -> totalReward += reward },
             { clk -> clickId = clk },
-            { isPageOfferWall -> toggleToolbar(isPageOfferWall) }
+            { shouldShowToolbar -> toggleToolbar(shouldShowToolbar) }
         ) { error, date, errUrl ->
             val errorInfo =
                 "code: ${error?.getStatusCode()}, description: ${error?.getDescription()}"
@@ -153,14 +152,14 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
         }
     }
 
-    /** Shows or hides some UI elements according to whether [isPageOfferWall] is `true` or `false`. */
-    private fun toggleToolbar(isPageOfferWall: Boolean) {
-        toolbar?.visibility = if (isPageOfferWall) View.GONE else View.VISIBLE
+    /** Shows or hides some UI elements according to whether [shouldShowToolbar] is `true` or `false`. */
+    private fun toggleToolbar(shouldShowToolbar: Boolean) {
+        toolbar?.visibility = if (shouldShowToolbar) View.VISIBLE else View.GONE
 
-        webView?.isScrollbarFadingEnabled = !isPageOfferWall
+        webView?.isScrollbarFadingEnabled = shouldShowToolbar
         webView?.settings?.run {
-            setSupportZoom(!isPageOfferWall)
-            builtInZoomControls = !isPageOfferWall
+            setSupportZoom(shouldShowToolbar)
+            builtInZoomControls = shouldShowToolbar
         }
     }
 
@@ -182,7 +181,7 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
     /** Loads the OfferWall page and sends the [reason] to the API */
     private fun leaveSurvey(reason: String) {
         findViewById<LinearLayout>(R.id.ll_qr_code_bitlabs)?.visibility = View.GONE
-        toggleToolbar(true)
+        toggleToolbar(false)
         webView?.evaluateJavascript(" window.history.go(-window.history.length + 1);", null);
 
         if (clickId != null) BitLabs.leaveSurvey(clickId!!, reason)

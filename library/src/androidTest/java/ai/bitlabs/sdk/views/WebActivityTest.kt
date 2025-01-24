@@ -14,6 +14,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.pressBack
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -151,33 +152,34 @@ class WebActivityTest {
     }
 
     @Test
-    fun toolbar_PageIsBitlabsOfferwall_IsNotDisplayed() {
-        val url = "https://web.bitlabs.ai"
-        val intent = TestUtils.createWebActivityIntent(url)
-
-        ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
-            Thread.sleep(1000)
-            onView(withId(R.id.toolbar_bitlabs)).check(matches(not(isDisplayed())))
-        }
-    }
-
-    @Test
-    fun toolbar_PageIsNotOfferwall_IsDisplayed() {
+    fun toolbar_SurveyStartEvent_IsDisplayed() {
         val url = "https://www.google.com"
         val intent = TestUtils.createWebActivityIntent(url)
 
         ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
+            Thread.sleep(500)
+
+            it.onActivity { activity ->
+                activity.findViewById<WebView>(R.id.wv_bitlabs).evaluateJavascript(jsCode) {}
+            }
+
             Thread.sleep(1000)
             onView(withId(R.id.toolbar_bitlabs)).check(matches(isDisplayed()))
         }
     }
 
     @Test
-    fun onBackPressed_PageIsNotOfferwall_ShowLeaveSurveyDialog() {
+    fun onBackPressed_SurveyStartEvent_ShowLeaveSurveyDialog() {
         val url = "https://www.google.com"
         val intent = TestUtils.createWebActivityIntent(url)
 
         ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
+            Thread.sleep(500)
+
+            it.onActivity { activity ->
+                activity.findViewById<WebView>(R.id.wv_bitlabs).evaluateJavascript(jsCode) {}
+            }
+
             Thread.sleep(500)
             onView(isRoot()).perform(pressBack())
 

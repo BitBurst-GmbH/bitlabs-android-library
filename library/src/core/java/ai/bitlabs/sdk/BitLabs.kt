@@ -18,6 +18,7 @@ import ai.bitlabs.sdk.util.buildHttpClientWithHeaders
 import ai.bitlabs.sdk.util.buildRetrofit
 import ai.bitlabs.sdk.util.deviceType
 import ai.bitlabs.sdk.util.extractColors
+import ai.bitlabs.sdk.util.getColorScheme
 import ai.bitlabs.sdk.views.BitLabsOfferwallActivity
 import ai.bitlabs.sdk.views.BitLabsWidgetFragment
 import ai.bitlabs.sdk.views.LeaderboardFragment
@@ -220,7 +221,7 @@ object BitLabs {
     /**
      * Gets the required settings from the BitLabs API.
      */
-    private fun getAppSettings() = bitLabsRepo?.getAppSettings({ app ->
+    private fun getAppSettings() = bitLabsRepo?.getAppSettings(getColorScheme(), { app ->
         app.visual.run {
             widgetColors = extractColors(surveyIconColor).takeIf { it.isNotEmpty() } ?: widgetColors
             headerColor = extractColors(navigationColor).takeIf { it.isNotEmpty() } ?: headerColor

@@ -1,6 +1,7 @@
 package ai.bitlabs.sdk.data.repositories
 
 import ai.bitlabs.sdk.BitLabs
+import ai.bitlabs.sdk.data.api.BitLabsAPI
 import ai.bitlabs.sdk.data.model.bitlabs.BitLabsResponse
 import ai.bitlabs.sdk.data.model.bitlabs.GetAppSettingsResponse
 import ai.bitlabs.sdk.data.model.bitlabs.GetLeaderboardResponse
@@ -8,13 +9,11 @@ import ai.bitlabs.sdk.data.model.bitlabs.GetSurveysResponse
 import ai.bitlabs.sdk.data.model.bitlabs.LeaveReason
 import ai.bitlabs.sdk.data.model.bitlabs.Survey
 import ai.bitlabs.sdk.data.model.bitlabs.UpdateClickBody
-import ai.bitlabs.sdk.data.api.BitLabsAPI
 import ai.bitlabs.sdk.data.model.sentry.SentryManager
 import ai.bitlabs.sdk.util.OnExceptionListener
 import ai.bitlabs.sdk.util.OnResponseListener
 import ai.bitlabs.sdk.util.TAG
 import ai.bitlabs.sdk.util.extensions.body
-import ai.bitlabs.sdk.util.getColorScheme
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -88,9 +87,10 @@ internal class BitLabsRepository(private val bitLabsAPI: BitLabsAPI) {
     })
 
     internal fun getAppSettings(
+        colorScheme: String,
         onResponseListener: OnResponseListener<GetAppSettingsResponse>,
         onExceptionListener: OnExceptionListener
-    ) = bitLabsAPI.getAppSettings(getColorScheme())
+    ) = bitLabsAPI.getAppSettings(colorScheme)
         .enqueue(object : Callback<BitLabsResponse<GetAppSettingsResponse>> {
             override fun onResponse(
                 call: Call<BitLabsResponse<GetAppSettingsResponse>>,

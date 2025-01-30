@@ -164,14 +164,14 @@ class BitLabsRepositoryTest {
 
     @Test
     fun getAppSettings_Failure() {
-        every { bitLabsAPI.getAppSettings() } returns object :
+        every { bitLabsAPI.getAppSettings(any()) } returns object :
             BitLabsCall<BitLabsResponse<GetAppSettingsResponse>>() {
             override fun enqueue(callback: Callback<BitLabsResponse<GetAppSettingsResponse>>) {
                 callback.onFailure(this, Throwable())
             }
         }
 
-        bitLabsRepository.getAppSettings({}, onExceptionListener)
+        bitLabsRepository.getAppSettings("", {}, onExceptionListener)
 
         verify { onExceptionListener.onException(any()) }
     }
@@ -183,14 +183,14 @@ class BitLabsRepositoryTest {
             "{error:{details:{http:400,msg:\"Any Request\"}}, status:\"\"}"
         )
 
-        every { bitLabsAPI.getAppSettings() } returns object :
+        every { bitLabsAPI.getAppSettings(any()) } returns object :
             BitLabsCall<BitLabsResponse<GetAppSettingsResponse>>() {
             override fun enqueue(callback: Callback<BitLabsResponse<GetAppSettingsResponse>>) {
                 callback.onResponse(this, Response.error(400, errorResponseBody))
             }
         }
 
-        bitLabsRepository.getAppSettings({}, onExceptionListener)
+        bitLabsRepository.getAppSettings("", {}, onExceptionListener)
 
         verify { onExceptionListener.onException(any()) }
     }
@@ -199,14 +199,14 @@ class BitLabsRepositoryTest {
     fun getAppSettings_Response_Success() {
         val onResponseListener = mockk<OnResponseListener<GetAppSettingsResponse>>(relaxed = true)
 
-        every { bitLabsAPI.getAppSettings() } returns object :
+        every { bitLabsAPI.getAppSettings(any()) } returns object :
             BitLabsCall<BitLabsResponse<GetAppSettingsResponse>>() {
             override fun enqueue(callback: Callback<BitLabsResponse<GetAppSettingsResponse>>) {
                 callback.onResponse(this, Response.success(getWorkingResponseBody()))
             }
         }
 
-        bitLabsRepository.getAppSettings(onResponseListener) {}
+        bitLabsRepository.getAppSettings("", onResponseListener) {}
 
         verify { onResponseListener.onResponse(any()) }
     }

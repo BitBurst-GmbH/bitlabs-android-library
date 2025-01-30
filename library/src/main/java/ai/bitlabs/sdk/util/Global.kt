@@ -24,6 +24,14 @@ internal const val BUNDLE_KEY_COLOR = "bundle-key-color"
 
 internal const val BUNDLE_KEY_URL = "bundle-key-url"
 
+internal fun getColorScheme(): String {
+    val darkModeFlags =
+        Resources.getSystem().configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+    val isDarkMode = darkModeFlags == Configuration.UI_MODE_NIGHT_YES
+
+    return if (isDarkMode) "DARK" else "LIGHT"
+}
+
 internal fun buildHttpClientWithHeaders(vararg headers: Pair<String, String>) =
     OkHttpClient.Builder()
         .addInterceptor { chain ->

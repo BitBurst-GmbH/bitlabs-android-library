@@ -23,7 +23,7 @@ internal interface BitLabsAPI {
     fun getSurveys(@Query("sdk") sdk: String): Call<BitLabsResponse<GetSurveysResponse>>
 
     @GET("v1/client/settings/v2")
-    fun getAppSettings(): Call<BitLabsResponse<GetAppSettingsResponse>>
+    fun getAppSettings(@Query("color_scheme") colorScheme: String): Call<BitLabsResponse<GetAppSettingsResponse>>
 
     @GET("v1/client/leaderboard")
     fun getLeaderboard(): Call<BitLabsResponse<GetLeaderboardResponse>>

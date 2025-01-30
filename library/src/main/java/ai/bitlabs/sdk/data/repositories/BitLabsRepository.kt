@@ -14,6 +14,7 @@ import ai.bitlabs.sdk.util.OnExceptionListener
 import ai.bitlabs.sdk.util.OnResponseListener
 import ai.bitlabs.sdk.util.TAG
 import ai.bitlabs.sdk.util.extensions.body
+import ai.bitlabs.sdk.util.getColorScheme
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -89,7 +90,7 @@ internal class BitLabsRepository(private val bitLabsAPI: BitLabsAPI) {
     internal fun getAppSettings(
         onResponseListener: OnResponseListener<GetAppSettingsResponse>,
         onExceptionListener: OnExceptionListener
-    ) = bitLabsAPI.getAppSettings()
+    ) = bitLabsAPI.getAppSettings(getColorScheme())
         .enqueue(object : Callback<BitLabsResponse<GetAppSettingsResponse>> {
             override fun onResponse(
                 call: Call<BitLabsResponse<GetAppSettingsResponse>>,

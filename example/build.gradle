@@ -14,7 +14,7 @@ android {
         applicationId 'ai.bitlabs.example'
 
         minSdk 19
-        targetSdk 34
+        targetSdk 35
         versionCode 59
         versionName '3.2.6'
 

@@ -17,7 +17,7 @@ android {
 
     defaultConfig {
         minSdk 19
-        targetSdk 34
+        targetSdk 35
         multiDexEnabled true
 
         buildConfigField 'String', 'APP_TOKEN', keystore.getProperty('appToken', '"APP_TOKEN"')

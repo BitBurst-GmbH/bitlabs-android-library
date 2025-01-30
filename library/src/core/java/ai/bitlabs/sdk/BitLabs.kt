@@ -7,7 +7,8 @@ import ai.bitlabs.sdk.data.model.bitlabs.WidgetType
 import ai.bitlabs.sdk.data.model.sentry.SentryManager
 import ai.bitlabs.sdk.data.repositories.BitLabsRepository
 import ai.bitlabs.sdk.util.BASE_URL
-import ai.bitlabs.sdk.util.BUNDLE_KEY_COLOR
+import ai.bitlabs.sdk.util.BUNDLE_KEY_BACKGROUND_COLOR
+import ai.bitlabs.sdk.util.BUNDLE_KEY_HEADER_COLOR
 import ai.bitlabs.sdk.util.BUNDLE_KEY_URL
 import ai.bitlabs.sdk.util.OnExceptionListener
 import ai.bitlabs.sdk.util.OnResponseListener
@@ -17,6 +18,7 @@ import ai.bitlabs.sdk.util.buildHttpClientWithHeaders
 import ai.bitlabs.sdk.util.buildRetrofit
 import ai.bitlabs.sdk.util.deviceType
 import ai.bitlabs.sdk.util.extractColors
+import ai.bitlabs.sdk.util.getColorScheme
 import ai.bitlabs.sdk.views.BitLabsOfferwallActivity
 import ai.bitlabs.sdk.views.BitLabsWidgetFragment
 import ai.bitlabs.sdk.views.LeaderboardFragment
@@ -26,8 +28,6 @@ import android.content.Intent
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.os.Build
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -52,6 +52,7 @@ object BitLabs {
     internal var fileProviderAuthority = ""
     private var headerColor = intArrayOf(0, 0)
     private var widgetColors = intArrayOf(0, 0)
+    private var backgroundColors = intArrayOf(0, 0)
 
     /** These will be added as query parameters to the OfferWall Link */
     var tags = mutableMapOf<String, Any>()
@@ -162,7 +163,8 @@ object BitLabs {
             putExtra(
                 BUNDLE_KEY_URL, WebActivityParams(token, uid, "NATIVE", adId, tags).url
             )
-            putExtra(BUNDLE_KEY_COLOR, headerColor)
+            putExtra(BUNDLE_KEY_HEADER_COLOR, headerColor)
+            putExtra(BUNDLE_KEY_BACKGROUND_COLOR, backgroundColors)
             context.startActivity(this)
         }
     }
@@ -219,10 +221,12 @@ object BitLabs {
     /**
      * Gets the required settings from the BitLabs API.
      */
-    private fun getAppSettings() = bitLabsRepo?.getAppSettings({ app ->
+    private fun getAppSettings() = bitLabsRepo?.getAppSettings(getColorScheme(), { app ->
         app.visual.run {
             widgetColors = extractColors(surveyIconColor).takeIf { it.isNotEmpty() } ?: widgetColors
             headerColor = extractColors(navigationColor).takeIf { it.isNotEmpty() } ?: headerColor
+            backgroundColors =
+                extractColors(backgroundColor).takeIf { it.isNotEmpty() } ?: backgroundColors
         }
 
         app.currency.symbol.run { currencyIconUrl = content.takeIf { isImage } ?: "" }

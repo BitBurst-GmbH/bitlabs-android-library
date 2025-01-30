@@ -5,13 +5,15 @@ import ai.bitlabs.sdk.data.model.bitlabs.WebActivityParams
 import ai.bitlabs.sdk.data.model.sentry.SentryManager
 import ai.bitlabs.sdk.data.repositories.BitLabsRepository
 import ai.bitlabs.sdk.util.BASE_URL
-import ai.bitlabs.sdk.util.BUNDLE_KEY_COLOR
+import ai.bitlabs.sdk.util.BUNDLE_KEY_BACKGROUND_COLOR
+import ai.bitlabs.sdk.util.BUNDLE_KEY_HEADER_COLOR
 import ai.bitlabs.sdk.util.BUNDLE_KEY_URL
 import ai.bitlabs.sdk.util.OnRewardListener
 import ai.bitlabs.sdk.util.TAG
 import ai.bitlabs.sdk.util.convertKeysToCamelCase
 import ai.bitlabs.sdk.util.deviceType
 import ai.bitlabs.sdk.util.extractColors
+import ai.bitlabs.sdk.util.getColorScheme
 import ai.bitlabs.sdk.views.BitLabsOfferwallActivity
 import android.content.Context
 import android.content.Intent
@@ -41,6 +43,7 @@ object BitLabs {
     internal var fileProviderAuthority = ""
     private var widgetColor = intArrayOf(0, 0)
     private var headerColor = intArrayOf(0, 0)
+    private var backgroundColors = intArrayOf(0, 0)
 
     /** These will be added as query parameters to the OfferWall Link */
     var tags = mutableMapOf<String, Any>()
@@ -105,10 +108,11 @@ object BitLabs {
     /**
      * Gets the app settings from the BitLabs API.
      */
-    private fun getAppSettings() = bitLabsRepo?.getAppSettings({
+    private fun getAppSettings() = bitLabsRepo?.getAppSettings(getColorScheme(), {
         it.visual.run {
             widgetColor = extractColors(surveyIconColor)
             headerColor = extractColors(navigationColor)
+            backgroundColors = extractColors(backgroundColor)
         }
 
         it.currency.symbol.run { currencyIconUrl = content.takeIf { isImage } ?: "" }
@@ -210,7 +214,8 @@ object BitLabs {
                 BUNDLE_KEY_URL,
                 WebActivityParams(token, uid, "UNITY", adId, tags).url
             )
-            putExtra(BUNDLE_KEY_COLOR, headerColor)
+            putExtra(BUNDLE_KEY_HEADER_COLOR, headerColor)
+            putExtra(BUNDLE_KEY_BACKGROUND_COLOR, backgroundColors)
             context.startActivity(this)
         }
     }

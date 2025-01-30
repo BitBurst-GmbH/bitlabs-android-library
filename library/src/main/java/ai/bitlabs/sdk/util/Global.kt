@@ -20,7 +20,9 @@ internal const val TAG = "BitLabs"
 
 internal const val BASE_URL = "https://api.bitlabs.ai/"
 
-internal const val BUNDLE_KEY_COLOR = "bundle-key-color"
+internal const val BUNDLE_KEY_HEADER_COLOR = "bundle-key-header-color"
+
+internal const val BUNDLE_KEY_BACKGROUND_COLOR = "bundle-key-background-color"
 
 internal const val BUNDLE_KEY_URL = "bundle-key-url"
 

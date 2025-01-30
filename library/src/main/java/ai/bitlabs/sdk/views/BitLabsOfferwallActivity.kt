@@ -3,7 +3,8 @@ package ai.bitlabs.sdk.views
 import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.R
 import ai.bitlabs.sdk.data.model.sentry.SentryManager
-import ai.bitlabs.sdk.util.BUNDLE_KEY_COLOR
+import ai.bitlabs.sdk.util.BUNDLE_KEY_BACKGROUND_COLOR
+import ai.bitlabs.sdk.util.BUNDLE_KEY_HEADER_COLOR
 import ai.bitlabs.sdk.util.BUNDLE_KEY_URL
 import ai.bitlabs.sdk.util.TAG
 import ai.bitlabs.sdk.util.extensions.setup
@@ -44,6 +45,7 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
     private var totalReward: Float = 0.0F
     private var clickId: String? = null
     private var headerColors = intArrayOf(Color.WHITE, Color.WHITE)
+    private var backgroundColors = intArrayOf(Color.WHITE, Color.WHITE)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -103,12 +105,15 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
     }
 
     private fun getDataFromIntent() {
-        url = intent.getStringExtra(BUNDLE_KEY_URL)
-            .takeIf { URLUtil.isValidUrl(it) } ?: run {
+        url = intent.getStringExtra(BUNDLE_KEY_URL).takeIf { URLUtil.isValidUrl(it) } ?: run {
             throw IllegalArgumentException("WebActivity - Invalid url!")
         }
 
-        headerColors = intent.getIntArrayExtra(BUNDLE_KEY_COLOR)?.takeIf { it.isNotEmpty() } ?: headerColors
+        headerColors = intent.getIntArrayExtra(BUNDLE_KEY_HEADER_COLOR)?.takeIf { it.isNotEmpty() }
+            ?: headerColors
+        backgroundColors =
+            intent.getIntArrayExtra(BUNDLE_KEY_BACKGROUND_COLOR)?.takeIf { it.size > 1 }
+                ?: backgroundColors
     }
 
     private fun bindUI() {
@@ -136,11 +141,9 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
         webView?.scrollBarStyle = WebView.SCROLLBARS_OUTSIDE_OVERLAY
 
 
-        webView?.setup(
-            { reward -> totalReward += reward },
+        webView?.setup({ reward -> totalReward += reward },
             { clk -> clickId = clk },
-            { shouldShowToolbar -> toggleToolbar(shouldShowToolbar) }
-        ) { error, date, errUrl ->
+            { shouldShowToolbar -> toggleToolbar(shouldShowToolbar) }) { error, date, errUrl ->
             val errorInfo =
                 "code: ${error?.getStatusCode()}, description: ${error?.getDescription()}"
 
@@ -204,7 +207,13 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
                 }
 
                 v.setPadding(0, statusBarInsets.top, 0, 0)
-                findViewById<View>(R.id.view_nav_bar_bl).layoutParams.height = navigationBarInsets.bottom
+                findViewById<View>(R.id.view_nav_bar_bl).apply {
+                    layoutParams.height = navigationBarInsets.bottom
+                    (background.mutate() as? GradientDrawable)?.apply {
+                        colors = backgroundColors
+                        cornerRadius = 0F
+                    }
+                }
                 insets
             }
         }

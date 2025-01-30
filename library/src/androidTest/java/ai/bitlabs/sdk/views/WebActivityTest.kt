@@ -2,7 +2,7 @@ package ai.bitlabs.sdk.views
 
 import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.R
-import ai.bitlabs.sdk.util.BUNDLE_KEY_COLOR
+import ai.bitlabs.sdk.util.BUNDLE_KEY_HEADER_COLOR
 import ai.bitlabs.sdk.util.BUNDLE_KEY_URL
 import android.content.Context
 import android.content.Intent
@@ -14,7 +14,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.pressBack
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -27,7 +26,6 @@ import com.google.common.truth.Truth.assertThat
 import io.mockk.every
 import io.mockk.mockkObject
 import io.mockk.verify
-import org.hamcrest.Matchers.not
 import org.junit.Test
 
 private val surveyStartHookEventMessage = """
@@ -122,7 +120,7 @@ class WebActivityTest {
         val url = "https://www.google.com"
         val intent = Intent(context, BitLabsOfferwallActivity::class.java).apply {
             putExtra(BUNDLE_KEY_URL, url)
-            putExtra(BUNDLE_KEY_COLOR, 123)
+            putExtra(BUNDLE_KEY_HEADER_COLOR, 123)
         }
 
         ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
@@ -336,6 +334,6 @@ object TestUtils {
     fun createWebActivityIntent(url: String, color: IntArray? = null): Intent =
         Intent(ApplicationProvider.getApplicationContext(), BitLabsOfferwallActivity::class.java).apply {
             putExtra(BUNDLE_KEY_URL, url)
-            if (color != null) putExtra(BUNDLE_KEY_COLOR, color)
+            if (color != null) putExtra(BUNDLE_KEY_HEADER_COLOR, color)
         }
 }

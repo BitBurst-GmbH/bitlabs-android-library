@@ -6,16 +6,18 @@ import ai.bitlabs.sdk.data.model.sentry.SentryManager
 import ai.bitlabs.sdk.util.BUNDLE_KEY_COLOR
 import ai.bitlabs.sdk.util.BUNDLE_KEY_URL
 import ai.bitlabs.sdk.util.TAG
+import ai.bitlabs.sdk.util.extensions.setup
 import ai.bitlabs.sdk.util.getLuminance
 import ai.bitlabs.sdk.util.setQRCodeBitmap
-import ai.bitlabs.sdk.util.extensions.setup
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
+import android.os.Build
 import android.os.Bundle
 import android.util.Base64
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
+import android.view.WindowInsets
 import android.webkit.URLUtil
 import android.webkit.WebView
 import android.widget.ImageView
@@ -41,7 +43,7 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
 
     private var totalReward: Float = 0.0F
     private var clickId: String? = null
-    private var colors = intArrayOf(Color.WHITE, Color.WHITE)
+    private var headerColors = intArrayOf(Color.WHITE, Color.WHITE)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -106,16 +108,17 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
             throw IllegalArgumentException("WebActivity - Invalid url!")
         }
 
-        colors = intent.getIntArrayExtra(BUNDLE_KEY_COLOR)?.takeIf { it.isNotEmpty() } ?: colors
+        headerColors = intent.getIntArrayExtra(BUNDLE_KEY_COLOR)?.takeIf { it.isNotEmpty() } ?: headerColors
     }
 
     private fun bindUI() {
         val isColorBright =
-            getLuminance(colors.first()) > 0.729 * 255 || getLuminance(colors.last()) > 0.729 * 255
+            getLuminance(headerColors.first()) > 0.729 * 255 || getLuminance(headerColors.last()) > 0.729 * 255
+
 
         toolbar = findViewById(R.id.toolbar_bitlabs)
         (toolbar?.background?.mutate() as? GradientDrawable)?.let {
-            it.colors = colors
+            it.colors = headerColors
             it.cornerRadius = 0F
         }
 
@@ -131,6 +134,7 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
 
         webView = findViewById(R.id.wv_bitlabs)
         webView?.scrollBarStyle = WebView.SCROLLBARS_OUTSIDE_OVERLAY
+
 
         webView?.setup(
             { reward -> totalReward += reward },
@@ -150,6 +154,8 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
                 (it.children.first() as? ImageView)?.setQRCodeBitmap(errorStr)
             }
         }
+
+        supportEdgeToEdge()
     }
 
     /** Shows or hides some UI elements according to whether [shouldShowToolbar] is `true` or `false`. */
@@ -185,5 +191,22 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
         webView?.evaluateJavascript(" window.history.go(-window.history.length + 1);", null);
 
         if (clickId != null) BitLabs.leaveSurvey(clickId!!, reason)
+    }
+
+    private fun supportEdgeToEdge() {
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            window.decorView.setOnApplyWindowInsetsListener { v, insets ->
+                val statusBarInsets = insets.getInsets(WindowInsets.Type.statusBars())
+                val navigationBarInsets = insets.getInsets(WindowInsets.Type.navigationBars())
+
+                v.background = (toolbar?.background?.mutate() as? GradientDrawable)?.apply {
+                    colors = headerColors
+                }
+
+                v.setPadding(0, statusBarInsets.top, 0, 0)
+                findViewById<View>(R.id.view_nav_bar_bl).layoutParams.height = navigationBarInsets.bottom
+                insets
+            }
+        }
     }
 }

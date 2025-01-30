@@ -6,6 +6,8 @@
     android:layout_height="match_parent"
     tools:context=".views.BitLabsOfferwallActivity">
 
+
+
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar_bitlabs"
         android:layout_width="match_parent"
@@ -21,7 +23,16 @@
         android:id="@+id/wv_bitlabs"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/toolbar_bitlabs" />
+        android:layout_above="@+id/view_nav_bar_bl"
+        android:layout_below="@id/toolbar_bitlabs"
+        />
+
+    <View
+        android:id="@+id/view_nav_bar_bl"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/background_card_gradient" />
 
     <LinearLayout
         android:id="@+id/ll_qr_code_bitlabs"

@@ -198,8 +198,7 @@ fun WebView.setup(
                         .firstOrNull()
                     val clickId = surveyStartArgs?.clickId
                     setClickId(clickId)
-                    (context as BitLabsOfferwallActivity)
-                        .runOnUiThread { toggleToolbar(true) }
+                    (context as BitLabsOfferwallActivity).runOnUiThread { toggleToolbar(true) }
                     Log.i(TAG, "Caught Survey Start event with clickId: $clickId")
                 }
 
@@ -225,6 +224,7 @@ fun WebView.setup(
                 }
 
                 HookName.INIT -> {
+                    (context as BitLabsOfferwallActivity).runOnUiThread { toggleToolbar(false) }
                     Handler(Looper.getMainLooper()).postDelayed(
                         {
                             this@setup.evaluateJavascript(

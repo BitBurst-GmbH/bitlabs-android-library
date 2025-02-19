@@ -10,6 +10,7 @@ import ai.bitlabs.sdk.util.TAG
 import ai.bitlabs.sdk.util.extensions.setup
 import ai.bitlabs.sdk.util.getLuminance
 import ai.bitlabs.sdk.util.setQRCodeBitmap
+import android.content.pm.ActivityInfo
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.os.Build
@@ -135,7 +136,7 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
 
-        toggleToolbar(false)
+        toggleUIChange(false)
 
         webView = findViewById(R.id.wv_bitlabs)
         webView?.scrollBarStyle = WebView.SCROLLBARS_OUTSIDE_OVERLAY
@@ -143,7 +144,7 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
 
         webView?.setup({ reward -> totalReward += reward },
             { clk -> clickId = clk },
-            { shouldShowToolbar -> toggleToolbar(shouldShowToolbar) }) { error, date, errUrl ->
+            { shouldShowToolbar -> toggleUIChange(shouldShowToolbar) }) { error, date, errUrl ->
             val errorInfo =
                 "code: ${error?.getStatusCode()}, description: ${error?.getDescription()}"
 
@@ -161,15 +162,18 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
         supportEdgeToEdge()
     }
 
-    /** Shows or hides some UI elements according to whether [shouldShowToolbar] is `true` or `false`. */
-    private fun toggleToolbar(shouldShowToolbar: Boolean) {
-        toolbar?.visibility = if (shouldShowToolbar) View.VISIBLE else View.GONE
+    /** Shows or hides some UI elements according to whether [isPageSurvey] is `true` or `false`. */
+    private fun toggleUIChange(isPageSurvey: Boolean) {
+        toolbar?.visibility = if (isPageSurvey) View.VISIBLE else View.GONE
 
-        webView?.isScrollbarFadingEnabled = shouldShowToolbar
+        webView?.isScrollbarFadingEnabled = isPageSurvey
         webView?.settings?.run {
-            setSupportZoom(shouldShowToolbar)
-            builtInZoomControls = shouldShowToolbar
+            setSupportZoom(isPageSurvey)
+            builtInZoomControls = isPageSurvey
         }
+        requestedOrientation =
+            if (isPageSurvey) ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+            else ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
     }
 
     /** Shows the Alert Dialog that lets the user choose a reason why they want to leave the survey. */
@@ -190,7 +194,7 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
     /** Loads the OfferWall page and sends the [reason] to the API */
     private fun leaveSurvey(reason: String) {
         findViewById<LinearLayout>(R.id.ll_qr_code_bitlabs)?.visibility = View.GONE
-        toggleToolbar(false)
+        toggleUIChange(false)
         webView?.evaluateJavascript(" window.history.go(-window.history.length + 1);", null);
 
         if (clickId != null) BitLabs.leaveSurvey(clickId!!, reason)

@@ -19,7 +19,7 @@
                 android:value="true" />
         </activity>
         <provider
-            android:name="androidx.core.content.FileProvider"
+            android:name="ai.bitlabs.sdk.util.BitLabsFileProvider"
             android:authorities="${applicationId}.provider.bitlabs"
             android:exported="false"
             android:grantUriPermissions="true">
@@ -27,6 +27,5 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/bitlabs_file_paths" />
         </provider>
-
     </application>
 </manifest>

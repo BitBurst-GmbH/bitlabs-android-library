@@ -20,6 +20,7 @@ import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.view.WindowInsets
+import android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
 import android.webkit.URLUtil
 import android.webkit.WebView
 import android.widget.ImageView
@@ -47,6 +48,7 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
     private var clickId: String? = null
     private var headerColors = intArrayOf(Color.WHITE, Color.WHITE)
     private var backgroundColors = intArrayOf(Color.WHITE, Color.WHITE)
+    private var isColorBright = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -118,7 +120,7 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
     }
 
     private fun bindUI() {
-        val isColorBright =
+        isColorBright =
             getLuminance(headerColors.first()) > 0.729 * 255 || getLuminance(headerColors.last()) > 0.729 * 255
 
 
@@ -209,6 +211,12 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
                 v.background = (toolbar?.background?.mutate() as? GradientDrawable)?.apply {
                     colors = headerColors
                 }
+
+                v.getWindowInsetsController()?.setSystemBarsAppearance(
+                    if (isColorBright) APPEARANCE_LIGHT_STATUS_BARS else 0,
+                    APPEARANCE_LIGHT_STATUS_BARS
+                );
+
 
                 v.setPadding(0, statusBarInsets.top, 0, 0)
                 findViewById<View>(R.id.view_nav_bar_bl).apply {

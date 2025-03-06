@@ -161,7 +161,7 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
             }
         }
 
-        supportEdgeToEdge()
+        if (BitLabs.shouldSupportEdgeToEdge) supportEdgeToEdge()
     }
 
     /** Shows or hides some UI elements according to whether [isPageSurvey] is `true` or `false`. */

@@ -34,6 +34,7 @@ import retrofit2.converter.gson.GsonConverterFactory
  */
 object BitLabs {
     var debugMode = false
+    var shouldSupportEdgeToEdge = true
 
     private var uid = ""
     private var adId = ""

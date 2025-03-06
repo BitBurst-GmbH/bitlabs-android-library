@@ -43,6 +43,7 @@ import com.google.android.gms.ads.identifier.AdvertisingIdClient
  */
 object BitLabs {
     var debugMode = false
+    var shouldSupportEdgeToEdge = true
 
     private var uid = ""
     private var adId = ""

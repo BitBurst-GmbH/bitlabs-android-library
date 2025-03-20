@@ -2,6 +2,7 @@ package ai.bitlabs.sdk.views
 
 import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.R
+import ai.bitlabs.sdk.TestUtils
 import ai.bitlabs.sdk.util.BUNDLE_KEY_HEADER_COLOR
 import ai.bitlabs.sdk.util.BUNDLE_KEY_URL
 import android.content.Context
@@ -321,19 +322,4 @@ class WebActivityTest {
             }
         }
     }
-}
-
-/**
- * Utility object for creating common Intents and Bundles for tests.
- */
-object TestUtils {
-
-    /**
-     * Creates a WebActivityIntent Intent with the given [url] and [color].
-     */
-    fun createWebActivityIntent(url: String, color: IntArray? = null): Intent =
-        Intent(ApplicationProvider.getApplicationContext(), BitLabsOfferwallActivity::class.java).apply {
-            putExtra(BUNDLE_KEY_URL, url)
-            if (color != null) putExtra(BUNDLE_KEY_HEADER_COLOR, color)
-        }
 }

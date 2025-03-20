@@ -52,7 +52,7 @@ class OfferwallTest {
     @Test
     fun closeButton_Clicked_ActivityDestroyed() {
         ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
-            Thread.sleep(2000)
+            Thread.sleep(3000)
 
             onWebView()
                 // TODO: use the data-testid when possible
@@ -70,7 +70,7 @@ class OfferwallTest {
     @Test
     fun newUI_ArbitraryOffersAndStoresExist() {
         ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
-            Thread.sleep(2000)
+            Thread.sleep(3000)
 
             onWebView()
                 // Apples - Any Brand
@@ -87,7 +87,7 @@ class OfferwallTest {
     @Test
     fun searchBar_WorksAndGoesToPage() {
         ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
-            Thread.sleep(2000)
+            Thread.sleep(3000)
 
             onWebView().withElement(findElementByDataTestId("magic-receipts-search"))
                 .withContextualElement(findElement(Locator.TAG_NAME, "input"))
@@ -131,7 +131,7 @@ class OfferwallTest {
     @Test
     fun storeFilter_worksAsExpected() {
         ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
-            Thread.sleep(2000)
+            Thread.sleep(3000)
 
             onWebView().withElement(findElementByDataTestId("open-all-entities-modal"))
                 .perform(webClick())
@@ -167,7 +167,7 @@ class OfferwallTest {
     @Test
     fun cart_addAndRemoveOffer() {
         ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
-            Thread.sleep(2000)
+            Thread.sleep(3000)
 
             onWebView().withElement(findElementByDataTestId("offer-144470"))
                 .withContextualElement(findElement(Locator.TAG_NAME, "button")).perform(webClick())
@@ -200,7 +200,7 @@ class OfferwallTest {
 //    @Test
 //    fun uploadImageFlow() {
 //        ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
-//            Thread.sleep(2000)
+//            Thread.sleep(3000)
 //
 //            onWebView()
 //                .withElement(findElementByDataTestId("offer-144470"))

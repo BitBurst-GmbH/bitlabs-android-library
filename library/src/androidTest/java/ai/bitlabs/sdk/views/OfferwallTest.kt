@@ -50,6 +50,24 @@ class OfferwallTest {
     }
 
     @Test
+    fun closeButton_Clicked_ActivityDestroyed() {
+        ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
+            Thread.sleep(2000)
+
+            onWebView()
+                // TODO: use the data-testid when possible
+                // .withElement(findElementByDataTestId("title-bar-button-close"))
+                .withElement(findElement(Locator.CSS_SELECTOR, "header.title-bar"))
+                .withContextualElement(findElement(Locator.TAG_NAME, "button"))
+                .perform(webClick())
+
+            Thread.sleep(1000)
+
+            assertThat(it.state).isEqualTo(Lifecycle.State.DESTROYED)
+        }
+    }
+
+    @Test
     fun newUI_ArbitraryOffersAndStoresExist() {
         ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
             Thread.sleep(2000)
@@ -69,36 +87,36 @@ class OfferwallTest {
     @Test
     fun searchBar_WorksAndGoesToPage() {
         ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
-            Thread.sleep(5000)
+            Thread.sleep(2000)
 
             onWebView().withElement(findElementByDataTestId("magic-receipts-search"))
                 .withContextualElement(findElement(Locator.TAG_NAME, "input"))
                 .perform(webKeys("walm"))
 
-            Thread.sleep(3000)
+            Thread.sleep(2000)
 
             onWebView().withElement(findElementByDataTestId("search-results"))
                 .withContextualElement(findElementByText("Walmart"))
                 .check(webMatches(getText(), containsString("Walmart")))
 
-            Thread.sleep(3000)
+            Thread.sleep(2000)
 
             onWebView().withElement(findElementByDataTestId("magic-receipts-search"))
                 .withContextualElement(findElement(Locator.TAG_NAME, "input"))
                 .perform(clearElement())
 
-            Thread.sleep(3000)
+            Thread.sleep(2000)
 
             onWebView().withElement(findElementByDataTestId("magic-receipts-search"))
                 .withContextualElement(findElement(Locator.TAG_NAME, "input"))
                 .perform(webKeys("appl"))
 
-            Thread.sleep(3000)
+            Thread.sleep(2000)
 
             onWebView().withElement(findElementByDataTestId("search-results"))
                 .withContextualElement(findElementByText("Apples - Any Brand")).perform(webClick())
 
-            Thread.sleep(3000)
+            Thread.sleep(2000)
 
             onWebView().check(
                     webMatches(
@@ -113,12 +131,12 @@ class OfferwallTest {
     @Test
     fun storeFilter_worksAsExpected() {
         ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
-            Thread.sleep(5000)
+            Thread.sleep(2000)
 
             onWebView().withElement(findElementByDataTestId("open-all-entities-modal"))
                 .perform(webClick())
 
-            Thread.sleep(3000)
+            Thread.sleep(2000)
 
             onWebView().check(webContent(containingTextInBody("Select Store")))
                 .check(webContent(hasElementWithDataTestId("Walmart-filter")))
@@ -130,12 +148,12 @@ class OfferwallTest {
                 .withContextualElement(findElement(Locator.TAG_NAME, "input"))
                 .perform(webKeys("walm"))
 
-            Thread.sleep(3000)
+            Thread.sleep(2000)
 
             onWebView().withElement(findElementByDataTestId("Walmart-filter")).perform(webClick())
 
 
-            Thread.sleep(3000)
+            Thread.sleep(2000)
 
             onWebView().check(
                     webMatches(
@@ -147,68 +165,32 @@ class OfferwallTest {
     }
 
     @Test
-    fun cart_checkEmpty() {
+    fun cart_addAndRemoveOffer() {
         ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
-            Thread.sleep(5000)
-
-            onWebView().withElement(findElementByDataTestId("cart-icon-counter"))
-                .check(webMatches(getText(), equalTo("0")))
-                .withElement(findElementByDataTestId("cart-icon")).perform(webClick())
-
-            Thread.sleep(3000)
-
-            onWebView().check(webContent(containingTextInBody("Your list is empty")))
-                .withElement(findElementByDataTestId("cart-upload-receipt-button", "disabled"))
-        }
-    }
-
-    @Test
-    fun cart_addOffer() {
-        ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
-            Thread.sleep(5000)
+            Thread.sleep(2000)
 
             onWebView().withElement(findElementByDataTestId("offer-144470"))
                 .withContextualElement(findElement(Locator.TAG_NAME, "button")).perform(webClick())
 
-            Thread.sleep(3000)
+            Thread.sleep(2000)
 
             onWebView().withElement(findElementByDataTestId("cart-icon-counter"))
                 .check(webMatches(getText(), equalTo("1")))
                 .withElement(findElementByDataTestId("cart-icon")).perform(webClick())
 
-            Thread.sleep(3000)
-
-            onWebView().withElement(findElementByDataTestId("cart-item-144470"))
-        }
-    }
-
-    @Test
-    fun cart_removeOffer() {
-        ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
-            Thread.sleep(5000)
-
-            onWebView().withElement(findElementByDataTestId("offer-144470"))
-                .withContextualElement(findElement(Locator.TAG_NAME, "button")).perform(webClick())
-
-            Thread.sleep(3000)
-
-            onWebView().withElement(findElementByDataTestId("cart-icon-counter"))
-                .check(webMatches(getText(), equalTo("1")))
-                .withElement(findElementByDataTestId("cart-icon")).perform(webClick())
-
-            Thread.sleep(3000)
+            Thread.sleep(2000)
 
             onWebView().withElement(findElementByDataTestId("cart-item-144470"))
                 .withContextualElement(findElementByDataTestId("remove-offer-button"))
                 .perform(script("arguments[0].click();"))// For some reason, webClick is failing. Use this instead
 
-            Thread.sleep(5000)
+            Thread.sleep(2000)
 
             onWebView().withElement(findElementByDataTestId("cart-icon-counter"))
                 .check(webMatches(getText(), equalTo("0")))
                 .withElement(findElementByDataTestId("cart-icon")).perform(webClick())
 
-            Thread.sleep(3000)
+            Thread.sleep(2000)
 
             onWebView().check(webContent(containingTextInBody("Your list is empty")))
                 .withElement(findElementByDataTestId("cart-upload-receipt-button", "disabled"))
@@ -218,20 +200,20 @@ class OfferwallTest {
 //    @Test
 //    fun uploadImageFlow() {
 //        ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
-//            Thread.sleep(5000)
+//            Thread.sleep(2000)
 //
 //            onWebView()
 //                .withElement(findElementByDataTestId("offer-144470"))
 //                .withContextualElement(findElement(Locator.TAG_NAME, "button"))
 //                .perform(webClick())
 //
-//            Thread.sleep(3000)
+//            Thread.sleep(2000)
 //
 //            onWebView()
 //                .withElement(findElementByDataTestId("cart-icon"))
 //                .perform(webClick())
 //
-//            Thread.sleep(3000)
+//            Thread.sleep(2000)
 //
 //            onWebView()
 //                .withElement(findElementByDataTestId("cart-upload-receipt-button"))
@@ -239,19 +221,19 @@ class OfferwallTest {
 //                .withElement(findElementByDataTestId("cart-upload-receipt-button"))
 //                .perform(script("arguments[0].click();"))// For some reason, webClick is failing. Use this instead
 //
-//            Thread.sleep(3000)
+//            Thread.sleep(2000)
 //
 //            onWebView()
 //                .withElement(findElementByText("Continue"))
 //                .perform(webClick())
 //
-//            Thread.sleep(3000)
+//            Thread.sleep(2000)
 //
 //            onWebView()
 //                .withElement(findElementByText("Submit Receipt"))
 //                .perform(webClick())
 //
-//            Thread.sleep(3000)
+//            Thread.sleep(2000)
 //
 //            onWebView()
 //                .withElement(findElement(Locator.TAG_NAME, "button"))
@@ -259,30 +241,11 @@ class OfferwallTest {
 ////                .perform(webClick())
 //                .perform(script("arguments[0].style.backgroundColor = 'green';"))
 //
-//            Thread.sleep(3000)
+//            Thread.sleep(2000)
 //
 //            onView(withText("Gallery")).perform(click())
 //        }
 //    }
-
-
-    @Test
-    fun closeButton_Clicked_ActivityDestroyed() {
-        ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
-            Thread.sleep(3000)
-
-            onWebView()
-                // TODO: use the data-testid when possible
-                // .withElement(findElementByDataTestId("title-bar-button-close"))
-                .withElement(findElement(Locator.CSS_SELECTOR, "header.title-bar"))
-                .withContextualElement(findElement(Locator.TAG_NAME, "button"))
-                .perform(webClick())
-
-            Thread.sleep(1000)
-
-            assertThat(it.state).isEqualTo(Lifecycle.State.DESTROYED)
-        }
-    }
 }
 
 private fun hasElementWithDataTestId(dataTestId: String) =

@@ -1,17 +1,14 @@
 package ai.bitlabs.sdk.views
 
-import ai.bitlabs.sdk.BuildConfig
 import ai.bitlabs.sdk.TestUtils
-import ai.bitlabs.sdk.data.model.bitlabs.WebActivityParams
+import ai.bitlabs.sdk.findElementByDataTestId
+import ai.bitlabs.sdk.findElementByText
+import ai.bitlabs.sdk.hasElementWithDataTestId
 import ai.bitlabs.sdk.util.TAG
 import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.Lifecycle
 import androidx.test.core.app.ActivityScenario
-import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.matcher.ViewMatchers.isEnabled
-import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.espresso.web.assertion.WebViewAssertions.webContent
 import androidx.test.espresso.web.assertion.WebViewAssertions.webMatches
 import androidx.test.espresso.web.matcher.DomMatchers.containingTextInBody
@@ -21,7 +18,6 @@ import androidx.test.espresso.web.model.Atoms.getCurrentUrl
 import androidx.test.espresso.web.model.Atoms.script
 import androidx.test.espresso.web.model.ElementReference
 import androidx.test.espresso.web.sugar.Web.onWebView
-import androidx.test.espresso.web.webdriver.DriverAtoms
 import androidx.test.espresso.web.webdriver.DriverAtoms.clearElement
 import androidx.test.espresso.web.webdriver.DriverAtoms.findElement
 import androidx.test.espresso.web.webdriver.DriverAtoms.getText
@@ -31,40 +27,16 @@ import androidx.test.espresso.web.webdriver.Locator
 import com.google.common.truth.Truth.assertThat
 import org.hamcrest.CoreMatchers.containsString
 import org.hamcrest.CoreMatchers.equalTo
-import org.hamcrest.CoreMatchers.`is`
-import org.hamcrest.Matchers
 import org.junit.Before
 import org.junit.Test
-import java.nio.file.Files.getAttribute
-import kotlin.math.log
 
-class OfferwallTest {
+class MagicReceiptsTests {
 
-    private lateinit var url: String
     private lateinit var intent: Intent
 
     @Before
     fun setUp() {
-        url = WebActivityParams(BuildConfig.APP_TOKEN, "f", "", "").url
-        intent = TestUtils.createWebActivityIntent(url)
-    }
-
-    @Test
-    fun closeButton_Clicked_ActivityDestroyed() {
-        ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
-            Thread.sleep(3000)
-
-            onWebView()
-                // TODO: use the data-testid when possible
-                // .withElement(findElementByDataTestId("title-bar-button-close"))
-                .withElement(findElement(Locator.CSS_SELECTOR, "header.title-bar"))
-                .withContextualElement(findElement(Locator.TAG_NAME, "button"))
-                .perform(webClick())
-
-            Thread.sleep(1000)
-
-            assertThat(it.state).isEqualTo(Lifecycle.State.DESTROYED)
-        }
+        intent = TestUtils.getIntentFor("magic_receipts")
     }
 
     @Test
@@ -237,8 +209,8 @@ class OfferwallTest {
 //
 //            onWebView()
 //                .withElement(findElement(Locator.TAG_NAME, "button"))
-////                .withContextualElement(findElementByText("Add Receipt"))
-////                .perform(webClick())
+//                .withContextualElement(findElementByText("Add Receipt"))
+//                .perform(webClick())
 //                .perform(script("arguments[0].style.backgroundColor = 'green';"))
 //
 //            Thread.sleep(2000)
@@ -247,20 +219,3 @@ class OfferwallTest {
 //        }
 //    }
 }
-
-private fun hasElementWithDataTestId(dataTestId: String) =
-    hasElementWithXpath("//*[@data-testid='$dataTestId']")
-
-private fun findElementByDataTestId(
-    dataTestId: String, selectors: String = ""
-): Atom<ElementReference?>? {
-    var cssSelector = "[data-testid='$dataTestId']"
-
-    if (selectors.isNotEmpty()) cssSelector += "[$selectors]"
-
-    Log.i(TAG, "findElementByDataTestId: $cssSelector")
-    return findElement(Locator.CSS_SELECTOR, cssSelector)
-}
-
-
-private fun findElementByText(text: String) = findElement(Locator.XPATH, "//*[text()='$text']")

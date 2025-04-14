@@ -21,7 +21,7 @@ object TestUtils {
 
     fun getIntentFor(displayMode: String, color: IntArray? = null): Intent {
         val url = WebActivityParams(
-            BuildConfig.APP_TOKEN, "f", "", "", mapOf(Pair("display_mode", displayMode))
+            BuildConfig.APP_TOKEN, "", "", "", mapOf(Pair("display_mode", displayMode))
         ).url
 
         return createWebActivityIntent(url, color)

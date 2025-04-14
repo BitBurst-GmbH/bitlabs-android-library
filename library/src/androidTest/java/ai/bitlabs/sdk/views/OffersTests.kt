@@ -33,12 +33,9 @@ class OffersTests {
                 .withElement(findElementByDataTestId("offer-tile"))
                 .perform(webClick())
 
-            try {
-                onWebView()
-                    .withElement(findElementByDataTestId("offer-privacy-accept-button"))
-                    .perform(webClick())
-            } catch (e: Exception) {
-            }
+            onWebView()
+                .withElement(findElementByDataTestId("offer-privacy-accept-button"))
+                .perform(webClick())
 
             Thread.sleep(2000)
 

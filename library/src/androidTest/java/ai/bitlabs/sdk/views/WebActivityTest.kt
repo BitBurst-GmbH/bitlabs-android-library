@@ -2,6 +2,8 @@ package ai.bitlabs.sdk.views
 
 import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.R
+import ai.bitlabs.sdk.TestUtils
+import ai.bitlabs.sdk.findElementByDataTestId
 import ai.bitlabs.sdk.util.BUNDLE_KEY_HEADER_COLOR
 import ai.bitlabs.sdk.util.BUNDLE_KEY_URL
 import android.content.Context
@@ -22,6 +24,8 @@ import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.isRoot
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
+import androidx.test.espresso.web.sugar.Web.onWebView
+import androidx.test.espresso.web.webdriver.DriverAtoms.webClick
 import com.google.common.truth.Truth.assertThat
 import io.mockk.every
 import io.mockk.mockkObject
@@ -321,19 +325,21 @@ class WebActivityTest {
             }
         }
     }
-}
 
-/**
- * Utility object for creating common Intents and Bundles for tests.
- */
-object TestUtils {
+    @Test
+    fun closeButton_Clicked_ActivityDestroyed() {
+        val intent = TestUtils.getIntentFor("offers")
 
-    /**
-     * Creates a WebActivityIntent Intent with the given [url] and [color].
-     */
-    fun createWebActivityIntent(url: String, color: IntArray? = null): Intent =
-        Intent(ApplicationProvider.getApplicationContext(), BitLabsOfferwallActivity::class.java).apply {
-            putExtra(BUNDLE_KEY_URL, url)
-            if (color != null) putExtra(BUNDLE_KEY_HEADER_COLOR, color)
+        ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
+            Thread.sleep(3000)
+
+            onWebView()
+                .withElement(findElementByDataTestId("title-bar-button-close"))
+                .perform(webClick())
+
+            Thread.sleep(1000)
+
+            assertThat(it.state).isEqualTo(Lifecycle.State.DESTROYED)
         }
+    }
 }

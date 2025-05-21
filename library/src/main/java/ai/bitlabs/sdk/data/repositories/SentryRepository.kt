@@ -17,10 +17,6 @@ import ai.bitlabs.sdk.util.TAG
 import android.util.Log
 import com.google.gson.Gson
 import okhttp3.RequestBody
-import okhttp3.ResponseBody
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import java.lang.Thread.UncaughtExceptionHandler
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -28,7 +24,6 @@ import java.util.Locale
 import java.util.TimeZone
 import java.util.UUID
 import java.util.concurrent.Executor
-import java.util.concurrent.Executors
 
 
 internal class SentryRepository(
@@ -66,7 +61,7 @@ internal class SentryRepository(
     }
 
     private fun createEnvelopeJson(throwable: Throwable, isHandled: Boolean): RequestBody {
-        val gson = Gson()
+        Gson()
 
         val evenId = UUID.randomUUID().toString().replace("-", "")
         val now = with(SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZZZ", Locale.US)) {

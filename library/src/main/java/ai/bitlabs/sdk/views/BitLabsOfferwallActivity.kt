@@ -197,7 +197,7 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
     private fun leaveSurvey(reason: String) {
         findViewById<LinearLayout>(R.id.ll_qr_code_bitlabs)?.visibility = View.GONE
         toggleUIChange(false)
-        webView?.evaluateJavascript(" window.history.go(-window.history.length + 1);", null);
+        webView?.evaluateJavascript(" window.history.go(-window.history.length + 1);", null)
 
         if (clickId != null) BitLabs.leaveSurvey(clickId!!, reason)
     }
@@ -215,7 +215,7 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
                 v.getWindowInsetsController()?.setSystemBarsAppearance(
                     if (isColorBright) APPEARANCE_LIGHT_STATUS_BARS else 0,
                     APPEARANCE_LIGHT_STATUS_BARS
-                );
+                )
 
 
                 v.setPadding(0, statusBarInsets.top, 0, 0)

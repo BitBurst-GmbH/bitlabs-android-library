@@ -96,7 +96,7 @@ fun WebView.setup(
                 ): Boolean {
                     val url = request?.url?.toString()
                     if (!url.isNullOrEmpty()) {
-                        CustomTabsIntent.Builder().build().launchUrl(context, Uri.parse(url))
+                        CustomTabsIntent.Builder().build().launchUrl(context, url.toUri())
                         return true
                     }
                     return false
@@ -105,7 +105,7 @@ fun WebView.setup(
                 @Deprecated("Deprecated in Java")
                 override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
                     if (!url.isNullOrEmpty()) {
-                        CustomTabsIntent.Builder().build().launchUrl(context, Uri.parse(url))
+                        CustomTabsIntent.Builder().build().launchUrl(context, url.toUri())
                         return true
                     }
                     return false

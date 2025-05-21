@@ -6,8 +6,10 @@ import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.util.Log
-import android.util.TypedValue
 import android.widget.ImageView
+import androidx.core.graphics.createBitmap
+import androidx.core.graphics.set
+import androidx.core.graphics.toColorInt
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.qrcode.QRCodeWriter
 import okhttp3.OkHttpClient
@@ -70,10 +72,10 @@ internal fun extractColors(color: String) =
     Regex("""linear-gradient\((\d+)deg,\s*(.+)\)""").find(color)?.run {
         groupValues[2].replace("([0-9]+)%".toRegex(), "")
             .split(",\\s".toRegex())
-            .map { Color.parseColor(it.trim()) }
+            .map { it.trim().toColorInt() }
             .toIntArray()
     } ?: Regex("""#([0-9a-fA-F]{6})""").find(color)?.run {
-        intArrayOf(Color.parseColor(groupValues[0]), Color.parseColor(groupValues[0]))
+        intArrayOf(groupValues[0].toColorInt(), groupValues[0].toColorInt())
     } ?: intArrayOf()
 
 internal fun String.snakeToCamelCase() = lowercase()
@@ -84,11 +86,11 @@ internal fun String.snakeToCamelCase() = lowercase()
 internal fun String.convertKeysToCamelCase() = Regex("\"([a-z]+(?:_[a-z]+)+)\":")
     .replace(this) { match -> match.groupValues[1].snakeToCamelCase().let { "\"$it\":" } }
 
-internal fun Number.toPx() = TypedValue.applyDimension(
-    TypedValue.COMPLEX_UNIT_DIP,
-    this.toFloat(),
-    Resources.getSystem().displayMetrics
-)
+//internal fun Number.toPx() = TypedValue.applyDimension(
+//    TypedValue.COMPLEX_UNIT_DIP,
+//    this.toFloat(),
+//    Resources.getSystem().displayMetrics
+//)
 
 internal fun String.rounded(): String {
     try {
@@ -103,11 +105,11 @@ internal fun String.rounded(): String {
     }
 }
 
-internal fun ImageView.setQRCodeBitmap(value: String) = Bitmap
-    .createBitmap(512, 512, Bitmap.Config.RGB_565)
-    .apply {
-        val bitMtx = QRCodeWriter().encode(value, BarcodeFormat.QR_CODE, 512, 512)
-        for (x in 0 until 512)
-            for (y in 0 until 512)
-                setPixel(x, y, if (bitMtx.get(x, y)) Color.BLACK else Color.WHITE)
-    }.let { setImageBitmap(it) }
+internal fun ImageView.setQRCodeBitmap(value: String) =
+    createBitmap(512, 512, Bitmap.Config.RGB_565)
+        .apply {
+            val bitMtx = QRCodeWriter().encode(value, BarcodeFormat.QR_CODE, 512, 512)
+            for (x in 0 until 512)
+                for (y in 0 until 512)
+                    set(x, y, if (bitMtx.get(x, y)) Color.BLACK else Color.WHITE)
+        }.let { setImageBitmap(it) }

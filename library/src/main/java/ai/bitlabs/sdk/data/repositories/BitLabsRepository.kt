@@ -14,14 +14,7 @@ import ai.bitlabs.sdk.util.OnExceptionListener
 import ai.bitlabs.sdk.util.OnResponseListener
 import ai.bitlabs.sdk.util.TAG
 import ai.bitlabs.sdk.util.extensions.body
-import android.content.res.Resources
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
 import android.util.Log
-import com.caverock.androidsvg.SVG
-import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -150,49 +143,4 @@ internal class BitLabsRepository(private val bitLabsAPI: BitLabsAPI) {
                 }
             }
         })
-
-    internal fun getCurrencyIcon(
-        url: String, resources: Resources, onResponseListener: OnResponseListener<Drawable?>
-    ) = bitLabsAPI.getCurrencyIcon(url).enqueue(object : Callback<ResponseBody> {
-        override fun onResponse(
-            call: Call<ResponseBody>, response: Response<ResponseBody>
-        ) {
-            if (response.isSuccessful) {
-                response.body()?.let {
-                    val drawable = if (it.contentType()
-                            ?.subtype() == "svg+xml"
-                    ) with(SVG.getFromString(it.string())) {
-                        val bitmap = Bitmap.createBitmap(
-                            documentWidth.toInt(),
-                            documentHeight.toInt(),
-                            Bitmap.Config.ARGB_8888
-                        )
-
-                        val canvas = Canvas(bitmap)
-                        canvas.drawRGB(255, 255, 255)
-
-                        renderToCanvas(canvas)
-
-                        BitmapDrawable(resources, bitmap)
-                    }
-                    else BitmapDrawable(resources, it.byteStream())
-
-                    onResponseListener.onResponse(drawable)
-                }
-                return
-            }
-
-            val errMessage =
-                "GetCurrencyIcon Error: ${response.errorBody()?.string() ?: "Unknown Error"}"
-
-            SentryManager.captureException(Exception(errMessage))
-            Log.e(TAG, errMessage)
-            onResponseListener.onResponse(null)
-        }
-
-        override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-            SentryManager.captureException(t)
-            Log.e(TAG, "GetCurrencyIcon Failure: ${t.message ?: "Unknown Error"}")
-        }
-    })
 }

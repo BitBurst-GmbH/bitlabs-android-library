@@ -21,18 +21,11 @@ import ai.bitlabs.sdk.util.extractColors
 import ai.bitlabs.sdk.util.getColorScheme
 import ai.bitlabs.sdk.views.BitLabsOfferwallActivity
 import ai.bitlabs.sdk.views.BitLabsWidgetFragment
-import ai.bitlabs.sdk.views.LeaderboardFragment
-import ai.bitlabs.sdk.views.SurveysAdapter
 import android.content.Context
 import android.content.Intent
-import android.content.res.Resources
-import android.graphics.drawable.Drawable
 import android.os.Build
 import android.util.Log
 import androidx.fragment.app.FragmentActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.ads.identifier.AdvertisingIdClient
 
 /**
@@ -48,8 +41,6 @@ object BitLabs {
     private var uid = ""
     private var adId = ""
     private var token = ""
-    private var currencyIconUrl = ""
-    private var bonusPercentage = 0.0
     internal var fileProviderAuthority = ""
     private var headerColor = intArrayOf(0, 0)
     private var widgetColors = intArrayOf(0, 0)
@@ -180,21 +171,6 @@ object BitLabs {
             .replace(containerId, BitLabsWidgetFragment(uid, token, type)).commit()
     }
 
-
-    /**
-     * Returns a RecyclerView populated with the [surveys].
-     */
-    @JvmOverloads
-    @Deprecated("Use showSurvey instead")
-    fun getSurveyWidgets(
-        context: Context, surveys: List<Survey>, type: WidgetType = WidgetType.COMPACT
-    ) = RecyclerView(context).apply {
-        layoutManager = LinearLayoutManager(context, HORIZONTAL, false)
-        getCurrencyIcon(currencyIconUrl, context.resources) {
-            adapter = SurveysAdapter(context, surveys, type, it, widgetColors, bonusPercentage)
-        }
-    }
-
     /**
      * Shows a Leaderboard Fragment in the [activity] with the [containerId] as its container.
      */
@@ -204,20 +180,8 @@ object BitLabs {
             .commit()
     }
 
-    @Deprecated("Use showLeaderboard instead")
-    fun getLeaderboard(onResponseListener: OnResponseListener<LeaderboardFragment?>) =
-        bitLabsRepo?.getLeaderboard({ leaderboard ->
-            onResponseListener.onResponse(leaderboard.topUsers?.takeUnless { it.isEmpty() }?.run {
-                LeaderboardFragment(this, leaderboard.ownUser, currencyIconUrl, widgetColors)
-            })
-        }, { Log.e(TAG, "$it") })
-
     internal fun leaveSurvey(clickId: String, reason: String) =
         bitLabsRepo?.leaveSurvey(clickId, reason)
-
-    internal fun getCurrencyIcon(
-        url: String, resources: Resources, onResponseListener: OnResponseListener<Drawable?>
-    ) = bitLabsRepo?.getCurrencyIcon(url, resources, onResponseListener)
 
     /**
      * Gets the required settings from the BitLabs API.
@@ -228,14 +192,6 @@ object BitLabs {
             headerColor = extractColors(navigationColor).takeIf { it.isNotEmpty() } ?: headerColor
             backgroundColors =
                 extractColors(backgroundColor).takeIf { it.isNotEmpty() } ?: backgroundColors
-        }
-
-        app.currency.symbol.run { currencyIconUrl = content.takeIf { isImage } ?: "" }
-        bonusPercentage = app.currency.bonusPercentage / 100.0
-
-
-        app.promotion?.bonusPercentage?.run {
-            bonusPercentage += this / 100.0 + this * bonusPercentage / 100.0
         }
     }, { Log.e(TAG, "$it") })
 

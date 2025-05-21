@@ -1,8 +1,8 @@
 package ai.bitlabs.sdk.data.model.bitlabs
 
 import ai.bitlabs.sdk.views.BitLabsOfferwallActivity
-import android.net.Uri
 import androidx.annotation.Keep
+import androidx.core.net.toUri
 
 /**
  * This class holds the parameters of the [BitLabsOfferwallActivity] responsible to launch the OfferWall.
@@ -22,8 +22,7 @@ internal data class WebActivityParams(
         private set
 
     /** Returns a string representation of the URL with all necessary parameters. */
-    private fun buildUrl() = Uri
-        .parse("https://web.bitlabs.ai").buildUpon()
+    private fun buildUrl() = "https://web.bitlabs.ai".toUri().buildUpon()
         .appendQueryParameter("os", "ANDROID")
         .appendQueryParameter("token", token)
         .appendQueryParameter("uid", uid)

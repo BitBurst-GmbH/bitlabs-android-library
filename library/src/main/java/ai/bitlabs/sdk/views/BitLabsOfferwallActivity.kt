@@ -109,7 +109,7 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
 
     private fun getDataFromIntent() {
         url = intent.getStringExtra(BUNDLE_KEY_URL).takeIf { URLUtil.isValidUrl(it) } ?: run {
-            throw IllegalArgumentException("WebActivity - Invalid url!")
+            throw IllegalArgumentException("BitLabsOfferwallActivity - Invalid url!")
         }
 
         headerColors = intent.getIntArrayExtra(BUNDLE_KEY_HEADER_COLOR)?.takeIf { it.isNotEmpty() }

@@ -1,6 +1,7 @@
 package ai.bitlabs.sdk
 
 import ai.bitlabs.sdk.data.api.BitLabsAPI
+import ai.bitlabs.sdk.data.model.bitlabs.Offerwall
 import ai.bitlabs.sdk.data.model.bitlabs.Survey
 import ai.bitlabs.sdk.data.model.bitlabs.WebActivityParams
 import ai.bitlabs.sdk.data.model.bitlabs.WidgetType
@@ -43,13 +44,12 @@ object BitLabs {
     private var token = ""
     internal var fileProviderAuthority = ""
     private var headerColor = intArrayOf(0, 0)
-    private var widgetColors = intArrayOf(0, 0)
     private var backgroundColors = intArrayOf(0, 0)
 
     /** These will be added as query parameters to the OfferWall Link */
     var tags = mutableMapOf<String, Any>()
 
-    private var bitLabsRepo: BitLabsRepository? = null
+    internal var bitLabsRepo: BitLabsRepository? = null
     internal var onRewardListener: OnRewardListener? = null
 
     /**
@@ -183,12 +183,9 @@ object BitLabs {
     internal fun leaveSurvey(clickId: String, reason: String) =
         bitLabsRepo?.leaveSurvey(clickId, reason)
 
-    /**
-     * Gets the required settings from the BitLabs API.
-     */
+
     private fun getAppSettings() = bitLabsRepo?.getAppSettings(getColorScheme(), { app ->
         app.visual.run {
-            widgetColors = extractColors(surveyIconColor).takeIf { it.isNotEmpty() } ?: widgetColors
             headerColor = extractColors(navigationColor).takeIf { it.isNotEmpty() } ?: headerColor
             backgroundColors =
                 extractColors(backgroundColor).takeIf { it.isNotEmpty() } ?: backgroundColors
@@ -214,5 +211,10 @@ object BitLabs {
 
         if (isInitialised) block()
         else Log.e(TAG, "You should initialise BitLabs first! Call BitLabs::init()")
+    }
+
+    object OFFERWALL {
+        @JvmStatic
+        fun create(token: String, uid: String) = Offerwall(token, uid)
     }
 }

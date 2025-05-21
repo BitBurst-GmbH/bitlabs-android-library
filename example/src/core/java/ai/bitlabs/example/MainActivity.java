@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import ai.bitlabs.sdk.BitLabs;
+import ai.bitlabs.sdk.data.model.bitlabs.Offerwall;
 import ai.bitlabs.sdk.data.model.bitlabs.Survey;
 import ai.bitlabs.sdk.data.model.bitlabs.WidgetType;
 
@@ -25,6 +26,8 @@ public class MainActivity extends AppCompatActivity {
         bitLabs.init(this, BuildConfig.APP_TOKEN, "oblivatevariegata");
 
         // bitLabs.setDebugMode(true);
+
+        Offerwall offerwall = BitLabs.OFFERWALL.create(BuildConfig.APP_TOKEN, "oblivatevariegata");
 
         // optionally add custom tags to your users
         Map<String, Object> tags = new HashMap<>();
@@ -56,7 +59,8 @@ public class MainActivity extends AppCompatActivity {
                 bitLabs.showSurvey(this, R.id.container_survey_widget, WidgetType.COMPACT)
         );
 
-        findViewById(R.id.btn_launch_offerwall).setOnClickListener(view -> bitLabs.launchOfferWall(this));
+//        findViewById(R.id.btn_launch_offerwall).setOnClickListener(view -> bitLabs.launchOfferWall(this));
+        findViewById(R.id.btn_launch_offerwall).setOnClickListener(view -> offerwall.launch(this));
 
         findViewById(R.id.btn_show_leaderboard).setOnClickListener(view ->
                 bitLabs.showLeaderboard(this, R.id.container_leaderboard)

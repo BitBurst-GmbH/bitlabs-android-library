@@ -1,6 +1,5 @@
-package ai.bitlabs.sdk.data.model.bitlabs
+package ai.bitlabs.sdk.offerwall
 
-import ai.bitlabs.sdk.views.BitLabsOfferwallActivity
 import androidx.annotation.Keep
 import androidx.core.net.toUri
 

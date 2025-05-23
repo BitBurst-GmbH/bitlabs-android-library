@@ -2,6 +2,7 @@ package ai.bitlabs.sdk.views
 
 import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.R
+import ai.bitlabs.sdk.offerwall.BitLabsOfferwallActivity
 import ai.bitlabs.sdk.util.BUNDLE_KEY_HEADER_COLOR
 import ai.bitlabs.sdk.util.BUNDLE_KEY_URL
 import android.content.Context

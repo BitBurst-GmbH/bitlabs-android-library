@@ -26,6 +26,8 @@ internal const val BUNDLE_KEY_HEADER_COLOR = "bundle-key-header-color"
 
 internal const val BUNDLE_KEY_BACKGROUND_COLOR = "bundle-key-background-color"
 
+internal const val BUNDLE_KEY_LISTENER_ID = "bundle-key-listener-id"
+
 internal const val BUNDLE_KEY_URL = "bundle-key-url"
 
 internal fun getColorScheme(): String {

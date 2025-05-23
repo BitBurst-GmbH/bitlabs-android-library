@@ -1,11 +1,14 @@
-package ai.bitlabs.sdk.views
+package ai.bitlabs.sdk.offerwall
 
 import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.R
 import ai.bitlabs.sdk.data.model.sentry.SentryManager
 import ai.bitlabs.sdk.util.BUNDLE_KEY_BACKGROUND_COLOR
 import ai.bitlabs.sdk.util.BUNDLE_KEY_HEADER_COLOR
+import ai.bitlabs.sdk.util.BUNDLE_KEY_LISTENER_ID
 import ai.bitlabs.sdk.util.BUNDLE_KEY_URL
+import ai.bitlabs.sdk.util.OnOfferwallClosedListener
+import ai.bitlabs.sdk.util.OnSurveyRewardListener
 import ai.bitlabs.sdk.util.TAG
 import ai.bitlabs.sdk.util.extensions.setup
 import ai.bitlabs.sdk.util.getLuminance
@@ -20,7 +23,7 @@ import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.view.WindowInsets
-import android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+import android.view.WindowInsetsController
 import android.webkit.URLUtil
 import android.webkit.WebView
 import android.widget.ImageView
@@ -33,9 +36,8 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.children
 
-
 /**
- * The [Activity][AppCompatActivity] that will provide a [WebView] to launch the OfferWall.
+ * The [Activity][androidx.appcompat.app.AppCompatActivity] that will provide a [android.webkit.WebView] to launch the OfferWall.
  */
 internal class BitLabsOfferwallActivity : AppCompatActivity() {
 
@@ -44,11 +46,14 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
 
     private lateinit var url: String
 
-    private var totalReward: Float = 0.0F
+    private var totalReward: Double = 0.0
     private var clickId: String? = null
     private var headerColors = intArrayOf(Color.WHITE, Color.WHITE)
     private var backgroundColors = intArrayOf(Color.WHITE, Color.WHITE)
     private var isColorBright = false
+
+    private var onSurveyRewardListener: OnSurveyRewardListener? = null
+    private var onOfferwallClosedListener: OnOfferwallClosedListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -103,8 +108,16 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
     }
 
     override fun onStop() {
-        BitLabs.onRewardListener?.onReward(totalReward)
+        BitLabs.onRewardListener?.onSurveyReward(totalReward)
+        onOfferwallClosedListener?.onOfferwallClosed(totalReward)
         super.onStop()
+    }
+
+    override fun onDestroy() {
+        OfferwallListenerManager.unregisterListeners(
+            intent.getIntExtra(BUNDLE_KEY_LISTENER_ID, -1)
+        )
+        super.onDestroy()
     }
 
     private fun getDataFromIntent() {
@@ -117,6 +130,13 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
         backgroundColors =
             intent.getIntArrayExtra(BUNDLE_KEY_BACKGROUND_COLOR)?.takeIf { it.size > 1 }
                 ?: backgroundColors
+
+        val listenerId = intent.getIntExtra(BUNDLE_KEY_LISTENER_ID, -1)
+        onSurveyRewardListener =
+            OfferwallListenerManager.getOnSurveyRewardListener(listenerId)
+
+        onOfferwallClosedListener =
+            OfferwallListenerManager.getOnOfferwallClosedListener(listenerId)
     }
 
     private fun bindUI() {
@@ -144,7 +164,11 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
         webView?.scrollBarStyle = WebView.SCROLLBARS_OUTSIDE_OVERLAY
 
 
-        webView?.setup({ reward -> totalReward += reward },
+        webView?.setup(
+            { reward ->
+                onSurveyRewardListener?.onSurveyReward(reward)
+                totalReward += reward
+            },
             { clk -> clickId = clk },
             { shouldShowToolbar -> toggleUIChange(shouldShowToolbar) }) { error, date, errUrl ->
             val errorInfo =
@@ -213,8 +237,8 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
                 }
 
                 v.getWindowInsetsController()?.setSystemBarsAppearance(
-                    if (isColorBright) APPEARANCE_LIGHT_STATUS_BARS else 0,
-                    APPEARANCE_LIGHT_STATUS_BARS
+                    if (isColorBright) WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS else 0,
+                    WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
                 )
 
 

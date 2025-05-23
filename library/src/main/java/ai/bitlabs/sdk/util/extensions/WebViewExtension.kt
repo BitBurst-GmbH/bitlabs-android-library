@@ -9,7 +9,7 @@ import ai.bitlabs.sdk.util.RewardArgs
 import ai.bitlabs.sdk.util.SurveyStartArgs
 import ai.bitlabs.sdk.util.TAG
 import ai.bitlabs.sdk.util.asHookMessage
-import ai.bitlabs.sdk.views.BitLabsOfferwallActivity
+import ai.bitlabs.sdk.offerwall.BitLabsOfferwallActivity
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.AlertDialog
@@ -32,7 +32,7 @@ import java.io.File
 /** Adds all necessary configurations for its receiver [BitLabsOfferwallActivity.webView] */
 @SuppressLint("SetJavaScriptEnabled")
 fun WebView.setup(
-    addReward: (reward: Float) -> Unit,
+    addReward: (reward: Double) -> Unit,
     setClickId: (clickId: String?) -> Unit,
     toggleToolbar: (shouldShowToolbar: Boolean) -> Unit,
     onError: (error: WebViewError?, date: String, url: String) -> Unit,
@@ -83,7 +83,7 @@ fun WebView.setup(
 
     this.webChromeClient = object : WebChromeClient() {
         override fun onCreateWindow(
-            view: WebView, dialog: Boolean, userGesture: Boolean, resultMsg: Message
+            view: WebView, dialog: Boolean, userGesture: Boolean, resultMsg: Message,
         ): Boolean {
             val newWebView = WebView(view.context)
             with(resultMsg.obj as WebView.WebViewTransport) { webView = newWebView }
@@ -92,7 +92,7 @@ fun WebView.setup(
             newWebView.webViewClient = object : WebViewClient() {
                 @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
                 override fun shouldOverrideUrlLoading(
-                    view: WebView?, request: WebResourceRequest?
+                    view: WebView?, request: WebResourceRequest?,
                 ): Boolean {
                     val url = request?.url?.toString()
                     if (!url.isNullOrEmpty()) {
@@ -118,7 +118,7 @@ fun WebView.setup(
         override fun onShowFileChooser(
             webView: WebView?,
             filePathCallback: ValueCallback<Array<Uri>>?,
-            fileChooserParams: FileChooserParams?
+            fileChooserParams: FileChooserParams?,
         ): Boolean {
             uriResult = filePathCallback
 
@@ -156,7 +156,7 @@ fun WebView.setup(
 
         @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
         override fun onReceivedHttpError(
-            view: WebView?, request: WebResourceRequest?, errorResponse: WebResourceResponse?
+            view: WebView?, request: WebResourceRequest?, errorResponse: WebResourceResponse?,
         ) {
             if (BitLabs.debugMode) onError(
                 WebViewError(errorResponse = errorResponse),
@@ -169,7 +169,7 @@ fun WebView.setup(
 
         @RequiresApi(Build.VERSION_CODES.M)
         override fun onReceivedError(
-            view: WebView?, request: WebResourceRequest?, error: WebResourceError?
+            view: WebView?, request: WebResourceRequest?, error: WebResourceError?,
         ) {
             if (BitLabs.debugMode || error?.description?.contains("ERR_CLEARTEXT_NOT_PERMITTED") == true) onError(
                 WebViewError(error = error),
@@ -205,21 +205,21 @@ fun WebView.setup(
                 HookName.SURVEY_COMPLETE -> {
                     val rewardArgs = hookMessage.args.filterIsInstance<RewardArgs>().firstOrNull()
                     val reward = rewardArgs?.reward ?: 0f
-                    addReward(reward)
+                    addReward(reward.toDouble())
                     Log.i(TAG, "Caught Survey Complete event with reward: $reward")
                 }
 
                 HookName.SURVEY_SCREENOUT -> {
                     val rewardArgs = hookMessage.args.filterIsInstance<RewardArgs>().firstOrNull()
                     val reward = rewardArgs?.reward ?: 0f
-                    addReward(reward)
+                    addReward(reward.toDouble())
                     Log.i(TAG, "Caught Survey Screenout with reward: $reward")
                 }
 
                 HookName.SURVEY_START_BONUS -> {
                     val rewardArgs = hookMessage.args.filterIsInstance<RewardArgs>().firstOrNull()
                     val reward = rewardArgs?.reward ?: 0f
-                    addReward(reward)
+                    addReward(reward.toDouble())
                     Log.i(TAG, "Caught Survey Start Bonus event with reward: $reward")
                 }
 

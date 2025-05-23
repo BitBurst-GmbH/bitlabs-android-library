@@ -1,26 +1,27 @@
 package ai.bitlabs.sdk
 
 import ai.bitlabs.sdk.data.api.BitLabsAPI
-import ai.bitlabs.sdk.data.model.bitlabs.Offerwall
+import ai.bitlabs.sdk.offerwall.Offerwall
 import ai.bitlabs.sdk.data.model.bitlabs.Survey
-import ai.bitlabs.sdk.data.model.bitlabs.WebActivityParams
 import ai.bitlabs.sdk.data.model.bitlabs.WidgetType
 import ai.bitlabs.sdk.data.model.sentry.SentryManager
 import ai.bitlabs.sdk.data.repositories.BitLabsRepository
+import ai.bitlabs.sdk.offerwall.BitLabsOfferwallActivity
+import ai.bitlabs.sdk.offerwall.WebActivityParams
 import ai.bitlabs.sdk.util.BASE_URL
 import ai.bitlabs.sdk.util.BUNDLE_KEY_BACKGROUND_COLOR
 import ai.bitlabs.sdk.util.BUNDLE_KEY_HEADER_COLOR
 import ai.bitlabs.sdk.util.BUNDLE_KEY_URL
 import ai.bitlabs.sdk.util.OnExceptionListener
+import ai.bitlabs.sdk.util.OnOfferwallClosedListener
 import ai.bitlabs.sdk.util.OnResponseListener
-import ai.bitlabs.sdk.util.OnRewardListener
+import ai.bitlabs.sdk.util.OnSurveyRewardListener
 import ai.bitlabs.sdk.util.TAG
 import ai.bitlabs.sdk.util.buildHttpClientWithHeaders
 import ai.bitlabs.sdk.util.buildRetrofit
 import ai.bitlabs.sdk.util.deviceType
 import ai.bitlabs.sdk.util.extractColors
 import ai.bitlabs.sdk.util.getColorScheme
-import ai.bitlabs.sdk.views.BitLabsOfferwallActivity
 import ai.bitlabs.sdk.views.BitLabsWidgetFragment
 import android.content.Context
 import android.content.Intent
@@ -43,14 +44,19 @@ object BitLabs {
     private var adId = ""
     private var token = ""
     internal var fileProviderAuthority = ""
+
+    @Deprecated("Use OFFERWALL MODULE instead")
     private var headerColor = intArrayOf(0, 0)
+
+    @Deprecated("Use OFFERWALL MODULE instead")
     private var backgroundColors = intArrayOf(0, 0)
 
     /** These will be added as query parameters to the OfferWall Link */
+    @Deprecated("Use OFFERWALL MODULE instead")
     var tags = mutableMapOf<String, Any>()
 
     internal var bitLabsRepo: BitLabsRepository? = null
-    internal var onRewardListener: OnRewardListener? = null
+    internal var onRewardListener: OnSurveyRewardListener? = null
 
     /**
      * Initialises the connection with BitLabs API using your app [token] and [uid]
@@ -91,7 +97,6 @@ object BitLabs {
 
         val okHttpClient = buildHttpClientWithHeaders(
             "User-Agent" to userAgent,
-            "X-Api-Token" to token,
             "X-User-Id" to uid
         )
 
@@ -112,9 +117,9 @@ object BitLabs {
      * then there has been an internal error which is most probably logged with 'BitLabs' as a tag.
      */
     fun checkSurveys(
-        onResponseListener: OnResponseListener<Boolean>, onExceptionListener: OnExceptionListener
+        onResponseListener: OnResponseListener<Boolean>, onExceptionListener: OnExceptionListener,
     ) = ifInitialised {
-        bitLabsRepo?.getSurveys("NATIVE", { surveys ->
+        bitLabsRepo?.getSurveys(token, "NATIVE", { surveys ->
             onResponseListener.onResponse(surveys.isNotEmpty())
         }, onExceptionListener)
     }
@@ -128,17 +133,18 @@ object BitLabs {
      */
     fun getSurveys(
         onResponseListener: OnResponseListener<List<Survey>>,
-        onExceptionListener: OnExceptionListener
+        onExceptionListener: OnExceptionListener,
     ) = ifInitialised {
-        bitLabsRepo?.getSurveys("NATIVE", onResponseListener, onExceptionListener)
+        bitLabsRepo?.getSurveys(token, "NATIVE", onResponseListener, onExceptionListener)
     }
 
-    /** Registers an [OnRewardListener] callback to be invoked when the OfferWall is exited by the user. */
-    fun setOnRewardListener(onRewardListener: OnRewardListener) {
-        this.onRewardListener = onRewardListener
+    /** Registers an [OnSurveyRewardListener] callback to be invoked when the OfferWall is exited by the user. */
+    fun setOnRewardListener(onSurveyRewardListener: OnSurveyRewardListener) {
+        this.onRewardListener = onSurveyRewardListener
     }
 
     /** Adds a new ([key]:[value]) pair to [BitLabs.tags] */
+    @Deprecated("Use OFFERWALL MODULE instead")
     fun addTag(key: String, value: Any) {
         tags[key] = value
     }
@@ -149,6 +155,7 @@ object BitLabs {
      * It's recommended that that you use a context you know the lifecycle of
      * in order to avoid memory leaks and other issues associated with Activities.
      */
+    @Deprecated("Use OFFERWALL MODULE instead")
     fun launchOfferWall(context: Context) = ifInitialised {
         with(Intent(context, BitLabsOfferwallActivity::class.java)) {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
@@ -165,7 +172,7 @@ object BitLabs {
      * Shows a Survey Fragment in the [activity] with the [containerId] as its container.
      */
     fun showSurvey(
-        activity: FragmentActivity, containerId: Int, type: WidgetType = WidgetType.SIMPLE
+        activity: FragmentActivity, containerId: Int, type: WidgetType = WidgetType.SIMPLE,
     ) = ifInitialised {
         activity.supportFragmentManager.beginTransaction()
             .replace(containerId, BitLabsWidgetFragment(uid, token, type)).commit()
@@ -181,10 +188,11 @@ object BitLabs {
     }
 
     internal fun leaveSurvey(clickId: String, reason: String) =
-        bitLabsRepo?.leaveSurvey(clickId, reason)
+        bitLabsRepo?.leaveSurvey(token, clickId, reason)
 
 
-    private fun getAppSettings() = bitLabsRepo?.getAppSettings(getColorScheme(), { app ->
+    @Deprecated("Use OFFERWALL MODULE instead")
+    private fun getAppSettings() = bitLabsRepo?.getAppSettings(token, getColorScheme(), { app ->
         app.visual.run {
             headerColor = extractColors(navigationColor).takeIf { it.isNotEmpty() } ?: headerColor
             backgroundColors =

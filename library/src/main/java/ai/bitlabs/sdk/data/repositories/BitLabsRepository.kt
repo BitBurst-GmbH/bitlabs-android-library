@@ -4,7 +4,6 @@ import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.data.api.BitLabsAPI
 import ai.bitlabs.sdk.data.model.bitlabs.BitLabsResponse
 import ai.bitlabs.sdk.data.model.bitlabs.GetAppSettingsResponse
-import ai.bitlabs.sdk.data.model.bitlabs.GetLeaderboardResponse
 import ai.bitlabs.sdk.data.model.bitlabs.GetSurveysResponse
 import ai.bitlabs.sdk.data.model.bitlabs.LeaveReason
 import ai.bitlabs.sdk.data.model.bitlabs.Survey
@@ -21,8 +20,8 @@ import retrofit2.Response
 
 /** This class is the point of communication between the data and [BitLabs] */
 internal class BitLabsRepository(private val bitLabsAPI: BitLabsAPI) {
-    internal fun leaveSurvey(clickId: String, reason: String) =
-        bitLabsAPI.updateClick(clickId, UpdateClickBody(LeaveReason(reason)))
+    internal fun leaveSurvey(token: String, clickId: String, reason: String) =
+        bitLabsAPI.updateClick(token, clickId, UpdateClickBody(LeaveReason(reason)))
             .enqueue(object : Callback<BitLabsResponse<Unit>> {
                 override fun onResponse(
                     call: Call<BitLabsResponse<Unit>>, response: Response<BitLabsResponse<Unit>>
@@ -42,48 +41,51 @@ internal class BitLabsRepository(private val bitLabsAPI: BitLabsAPI) {
             })
 
     internal fun getSurveys(
+        token: String,
         sdk: String,
         onResponseListener: OnResponseListener<List<Survey>>,
         onExceptionListener: OnExceptionListener
-    ) = bitLabsAPI.getSurveys(sdk).enqueue(object : Callback<BitLabsResponse<GetSurveysResponse>> {
-        override fun onResponse(
-            call: Call<BitLabsResponse<GetSurveysResponse>>,
-            response: Response<BitLabsResponse<GetSurveysResponse>>
-        ) {
-            val restrictionReason = response.body()?.data?.restrictionReason
-            if (restrictionReason != null) {
-                with(Exception("GetSurveys Error: ${restrictionReason.prettyPrint()}")) {
-                    SentryManager.captureException(this)
-                    onExceptionListener.onException(this)
+    ) = bitLabsAPI.getSurveys(token, sdk)
+        .enqueue(object : Callback<BitLabsResponse<GetSurveysResponse>> {
+            override fun onResponse(
+                call: Call<BitLabsResponse<GetSurveysResponse>>,
+                response: Response<BitLabsResponse<GetSurveysResponse>>
+            ) {
+                val restrictionReason = response.body()?.data?.restrictionReason
+                if (restrictionReason != null) {
+                    with(Exception("GetSurveys Error: ${restrictionReason.prettyPrint()}")) {
+                        SentryManager.captureException(this)
+                        onExceptionListener.onException(this)
+                    }
+                    return
                 }
-                return
-            }
 
-            val surveys = response.body()?.data?.surveys ?: emptyList()
-            if (surveys.isNotEmpty()) {
-                onResponseListener.onResponse(surveys)
-                return
-            }
+                val surveys = response.body()?.data?.surveys ?: emptyList()
+                if (surveys.isNotEmpty()) {
+                    onResponseListener.onResponse(surveys)
+                    return
+                }
 
-            response.errorBody()?.body<GetSurveysResponse>()?.error?.details?.run {
-                with(Exception("GetSurveys Error: $http - $msg")) {
-                    SentryManager.captureException(this)
-                    onExceptionListener.onException(this)
+                response.errorBody()?.body<GetSurveysResponse>()?.error?.details?.run {
+                    with(Exception("GetSurveys Error: $http - $msg")) {
+                        SentryManager.captureException(this)
+                        onExceptionListener.onException(this)
+                    }
                 }
             }
-        }
 
-        override fun onFailure(call: Call<BitLabsResponse<GetSurveysResponse>>, t: Throwable) {
-            SentryManager.captureException(t)
-            onExceptionListener.onException(Exception(t))
-        }
-    })
+            override fun onFailure(call: Call<BitLabsResponse<GetSurveysResponse>>, t: Throwable) {
+                SentryManager.captureException(t)
+                onExceptionListener.onException(Exception(t))
+            }
+        })
 
     internal fun getAppSettings(
+        token: String,
         colorScheme: String,
         onResponseListener: OnResponseListener<GetAppSettingsResponse>,
         onExceptionListener: OnExceptionListener
-    ) = bitLabsAPI.getAppSettings(colorScheme)
+    ) = bitLabsAPI.getAppSettings(token, colorScheme)
         .enqueue(object : Callback<BitLabsResponse<GetAppSettingsResponse>> {
             override fun onResponse(
                 call: Call<BitLabsResponse<GetAppSettingsResponse>>,
@@ -104,38 +106,6 @@ internal class BitLabsRepository(private val bitLabsAPI: BitLabsAPI) {
 
             override fun onFailure(
                 call: Call<BitLabsResponse<GetAppSettingsResponse>>, t: Throwable
-            ) {
-                with(Exception(t)) {
-                    SentryManager.captureException(this)
-                    onExceptionListener.onException(this)
-                }
-            }
-        })
-
-    internal fun getLeaderboard(
-        onResponseListener: OnResponseListener<GetLeaderboardResponse>,
-        onExceptionListener: OnExceptionListener
-    ) = bitLabsAPI.getLeaderboard()
-        .enqueue(object : Callback<BitLabsResponse<GetLeaderboardResponse>> {
-            override fun onResponse(
-                call: Call<BitLabsResponse<GetLeaderboardResponse>>,
-                response: Response<BitLabsResponse<GetLeaderboardResponse>>
-            ) {
-                if (response.isSuccessful) {
-                    response.body()?.data?.let { onResponseListener.onResponse(it) }
-                    return
-                }
-
-                response.errorBody()?.body<GetLeaderboardResponse>()?.error?.details?.run {
-                    with(Exception("GetLeaderboard Error: $http - $msg")) {
-                        SentryManager.captureException(this)
-                        onExceptionListener.onException(this)
-                    }
-                }
-            }
-
-            override fun onFailure(
-                call: Call<BitLabsResponse<GetLeaderboardResponse>>, t: Throwable
             ) {
                 with(Exception(t)) {
                     SentryManager.captureException(this)

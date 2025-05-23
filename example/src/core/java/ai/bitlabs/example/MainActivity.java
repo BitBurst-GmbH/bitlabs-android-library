@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import ai.bitlabs.sdk.BitLabs;
-import ai.bitlabs.sdk.data.model.bitlabs.Offerwall;
+import ai.bitlabs.sdk.offerwall.Offerwall;
 import ai.bitlabs.sdk.data.model.bitlabs.Survey;
 import ai.bitlabs.sdk.data.model.bitlabs.WidgetType;
 
@@ -32,11 +32,14 @@ public class MainActivity extends AppCompatActivity {
         // optionally add custom tags to your users
         Map<String, Object> tags = new HashMap<>();
         tags.put("my_tag", "new_user");
-        bitLabs.setTags(tags);
-        bitLabs.addTag("is_premium", true);
+        offerwall.getTags().putAll(tags);
+
+        offerwall.getTags().put("is_premium", true);
 
         // Get client-side callbacks to reward the user (We highly recommend using server-to-server callbacks!)
-        bitLabs.setOnRewardListener(payout -> Log.i(TAG, "Reward payout: " + payout));
+        offerwall.setOnSurveyRewardListener(surveyReward -> Log.i(TAG, "Survey Reward: " + surveyReward));
+
+        offerwall.setOnOfferwallClosedListener(totalSurveyReward -> Log.i(TAG, "Offerwall closed. Total survey reward: " + totalSurveyReward));
 
         findViewById(R.id.btn_check_surveys).setOnClickListener(view -> bitLabs.checkSurveys(
                 hasSurveys -> Log.i(TAG, hasSurveys ? "Found Surveys" : "No Surveys"),
@@ -59,7 +62,6 @@ public class MainActivity extends AppCompatActivity {
                 bitLabs.showSurvey(this, R.id.container_survey_widget, WidgetType.COMPACT)
         );
 
-//        findViewById(R.id.btn_launch_offerwall).setOnClickListener(view -> bitLabs.launchOfferWall(this));
         findViewById(R.id.btn_launch_offerwall).setOnClickListener(view -> offerwall.launch(this));
 
         findViewById(R.id.btn_show_leaderboard).setOnClickListener(view ->

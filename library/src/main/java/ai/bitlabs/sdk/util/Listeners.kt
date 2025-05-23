@@ -2,9 +2,13 @@ package ai.bitlabs.sdk.util
 
 import ai.bitlabs.sdk.data.api.BitLabsAPI
 
-/** Interface definition for a callback to be invoked when a reward is earned by the user. */
-fun interface OnRewardListener {
-    fun onReward(payout: Float)
+/** Interface definition for a callback to be invoked when a survey reward is earned by the user. */
+fun interface OnSurveyRewardListener {
+    fun onSurveyReward(reward: Double)
+}
+
+fun interface OnOfferwallClosedListener {
+    fun onOfferwallClosed(totalReward: Double)
 }
 
 /** Interface definition for a callback to be invoked when a response is received from [BitLabsAPI]. */

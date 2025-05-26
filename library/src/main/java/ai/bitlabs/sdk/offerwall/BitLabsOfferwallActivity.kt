@@ -33,6 +33,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.compose.ui.platform.ComposeView
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.children
 
@@ -58,6 +59,9 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_offerwall_bitlabs)
+//        findViewById<ComposeView>(R.id.toolbar_bitlabs_compose).setContent {
+//            BLTopBar()
+//        }
 
         try {
             getDataFromIntent()
@@ -190,7 +194,7 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
 
     /** Shows or hides some UI elements according to whether [isPageSurvey] is `true` or `false`. */
     private fun toggleUIChange(isPageSurvey: Boolean) {
-        toolbar?.visibility = if (isPageSurvey) View.VISIBLE else View.GONE
+//        toolbar?.visibility = if (isPageSurvey) View.VISIBLE else View.GONE
 
         webView?.isScrollbarFadingEnabled = isPageSurvey
         webView?.settings?.run {

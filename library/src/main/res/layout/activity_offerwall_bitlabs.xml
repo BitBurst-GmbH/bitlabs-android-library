@@ -7,6 +7,11 @@
     tools:context=".offerwall.BitLabsOfferwallActivity">
 
 
+<!--    <androidx.compose.ui.platform.ComposeView-->
+<!--        android:id="@+id/toolbar_bitlabs_compose"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        />-->
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar_bitlabs"

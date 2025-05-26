@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,24 +24,23 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-@Preview
 @Composable
-fun BLTopBar() {
+fun BLTopBar(token: String) {
     val backPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
-    val headerColors: IntArray = intArrayOf(0xFF6200EE.toInt(), 0xFF3700B3.toInt())
+    val viewModel = remember { OfferwallViewModel(token) }
+
+    val headerColors = viewModel.headerColors.value
     val isColorBright = getLuminance(headerColors.first()) > 0.729 * 255 ||
             getLuminance(headerColors.last()) > 0.729 * 255
-
 
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(56.dp)
-            .background(BLColors.Primary)
+            .background(Color(headerColors.first()))
             .padding(horizontal = 16.dp)
     ) {
         Row(
@@ -53,7 +53,7 @@ fun BLTopBar() {
                 modifier = Modifier
                     .clickable { backPressedDispatcher?.onBackPressed() }
                     .size(24.dp),
-                colorFilter = ColorFilter.tint(Color.White)
+                colorFilter = ColorFilter.tint(if (isColorBright) Color.Black else Color.White)
             )
             BasicText(
                 text = "Offerwall",
@@ -62,7 +62,7 @@ fun BLTopBar() {
                     .padding(start = 16.dp)
                     .align(alignment = Alignment.CenterVertically),
                 style = TextStyle(
-                    color = Color.White,
+                    color = if (isColorBright) Color.Black else Color.White,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )

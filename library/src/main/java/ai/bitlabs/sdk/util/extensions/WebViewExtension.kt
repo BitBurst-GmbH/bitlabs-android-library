@@ -75,9 +75,8 @@ fun WebView.setup(
                 .setOnDismissListener { uriResult?.onReceiveValue(null) }.show()
         }
 
-    if (Build.VERSION.SDK_INT >= 21) CookieManager.getInstance()
+    CookieManager.getInstance()
         .setAcceptThirdPartyCookies(this, true)
-    else CookieManager.getInstance().setAcceptCookie(true)
 
     this.setLayerType(View.LAYER_TYPE_HARDWARE, null)
 
@@ -251,3 +250,95 @@ fun WebView.setup(
         javaScriptCanOpenWindowsAutomatically = true
     }
 }
+
+@SuppressLint("SetJavaScriptEnabled")
+fun WebView.setupSettings() = this.settings.run {
+    databaseEnabled = true
+    allowFileAccess = true
+    javaScriptEnabled = true
+    domStorageEnabled = true
+    displayZoomControls = false
+    cacheMode = WebSettings.LOAD_NO_CACHE
+    setSupportMultipleWindows(true)
+    mediaPlaybackRequiresUserGesture = false
+    javaScriptCanOpenWindowsAutomatically = true
+    setLayerType(View.LAYER_TYPE_HARDWARE, null)
+}
+
+fun WebView.setupClient() {
+    this.webViewClient = object : WebViewClient() {
+        override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+            super.onPageStarted(view, url, favicon)
+            view?.evaluateJavascript(
+                """
+            window.addEventListener('message', (event) => {
+                window.AndroidWebView.postMessage(JSON.stringify(event.data));
+            });
+            """.trimIndent()
+            ) {}
+        }
+    }
+}
+
+fun WebView.setupPostMessageHandler(
+    addReward: (reward: Double) -> Unit,
+    setClickId: (clickId: String?) -> Unit,
+    toggleTopBar: (Boolean) -> Unit,
+) = addJavascriptInterface(object {
+    @JavascriptInterface
+    fun postMessage(message: String) {
+        val hookMessage = message.asHookMessage() ?: return
+
+        if (hookMessage.type != "hook") return
+
+        when (hookMessage.name) {
+            HookName.SDK_CLOSE -> {
+                (context as BitLabsOfferwallActivity).finish()
+            }
+
+            HookName.SURVEY_START -> {
+                val surveyStartArgs = hookMessage.args
+                    .filterIsInstance<SurveyStartArgs>()
+                    .firstOrNull()
+                val clickId = surveyStartArgs?.clickId
+                setClickId(clickId)
+                (context as BitLabsOfferwallActivity).runOnUiThread { toggleTopBar(true) }
+                Log.i(TAG, "Caught Survey Start event with clickId: $clickId")
+            }
+
+            HookName.SURVEY_COMPLETE -> {
+                val rewardArgs = hookMessage.args.filterIsInstance<RewardArgs>().firstOrNull()
+                val reward = rewardArgs?.reward ?: 0f
+                addReward(reward.toDouble())
+                Log.i(TAG, "Caught Survey Complete event with reward: $reward")
+            }
+
+            HookName.SURVEY_SCREENOUT -> {
+                val rewardArgs = hookMessage.args.filterIsInstance<RewardArgs>().firstOrNull()
+                val reward = rewardArgs?.reward ?: 0f
+                addReward(reward.toDouble())
+                Log.i(TAG, "Caught Survey Screenout with reward: $reward")
+            }
+
+            HookName.SURVEY_START_BONUS -> {
+                val rewardArgs = hookMessage.args.filterIsInstance<RewardArgs>().firstOrNull()
+                val reward = rewardArgs?.reward ?: 0f
+                addReward(reward.toDouble())
+                Log.i(TAG, "Caught Survey Start Bonus event with reward: $reward")
+            }
+
+            HookName.INIT -> {
+                (context as BitLabsOfferwallActivity).runOnUiThread { toggleTopBar(false) }
+                Handler(Looper.getMainLooper()).postDelayed(
+                    {
+                        this@setupPostMessageHandler.evaluateJavascript(
+                            """
+                                window.parent.postMessage({ target: 'app.behaviour.close_button_visible', value: true });
+                                """.trimIndent()
+                        ) {}
+                    }, 1000
+                )
+            }
+        }
+    }
+}, "AndroidWebView")

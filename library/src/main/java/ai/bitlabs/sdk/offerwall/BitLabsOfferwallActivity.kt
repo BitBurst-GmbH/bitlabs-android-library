@@ -43,7 +43,7 @@ import androidx.core.view.children
 internal class BitLabsOfferwallActivity : AppCompatActivity() {
 
     private var webView: WebView? = null
-    private var toolbar: Toolbar? = null
+//    private var toolbar: Toolbar? = null
 
     private lateinit var url: String
 
@@ -59,9 +59,6 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_offerwall_bitlabs)
-//        findViewById<ComposeView>(R.id.toolbar_bitlabs_compose).setContent {
-//            BLTopBar()
-//        }
 
         try {
             getDataFromIntent()
@@ -72,16 +69,20 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
             return
         }
 
+        findViewById<ComposeView>(R.id.toolbar_bitlabs_compose).setContent {
+            BLWebView(url)
+        }
+
         bindUI()
 
         if (savedInstanceState == null) webView?.loadUrl(url)
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                if (toolbar?.visibility == View.VISIBLE) {
-                    showLeaveSurveyAlertDialog()
-                    return
-                }
+//                if (toolbar?.visibility == View.VISIBLE) {
+//                    showLeaveSurveyAlertDialog()
+//                    return
+//                }
 
                 if (webView?.canGoBack() == true) {
                     webView?.goBack()
@@ -148,23 +149,23 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
             getLuminance(headerColors.first()) > 0.729 * 255 || getLuminance(headerColors.last()) > 0.729 * 255
 
 
-        toolbar = findViewById(R.id.toolbar_bitlabs)
-        (toolbar?.background?.mutate() as? GradientDrawable)?.let {
-            it.colors = headerColors
-            it.cornerRadius = 0F
-        }
+//        toolbar = findViewById(R.id.toolbar_bitlabs)
+//        (toolbar?.background?.mutate() as? GradientDrawable)?.let {
+//            it.colors = headerColors
+//            it.cornerRadius = 0F
+//        }
+//
+//        toolbar?.setTitleTextColor(if (isColorBright) Color.BLACK else Color.WHITE)
+//        toolbar?.navigationIcon?.let {
+//            DrawableCompat.setTint(it, if (isColorBright) Color.BLACK else Color.WHITE)
+//        }
+//        setSupportActionBar(toolbar)
+//        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+//        supportActionBar?.setDisplayShowHomeEnabled(true)
 
-        toolbar?.setTitleTextColor(if (isColorBright) Color.BLACK else Color.WHITE)
-        toolbar?.navigationIcon?.let {
-            DrawableCompat.setTint(it, if (isColorBright) Color.BLACK else Color.WHITE)
-        }
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setDisplayShowHomeEnabled(true)
+//        toggleUIChange(false)
 
-        toggleUIChange(false)
-
-        webView = findViewById(R.id.wv_bitlabs)
+//        webView = findViewById(R.id.wv_bitlabs)
         webView?.scrollBarStyle = WebView.SCROLLBARS_OUTSIDE_OVERLAY
 
 
@@ -174,7 +175,9 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
                 totalReward += reward
             },
             { clk -> clickId = clk },
-            { shouldShowToolbar -> toggleUIChange(shouldShowToolbar) }) { error, date, errUrl ->
+            { shouldShowToolbar ->
+//                toggleUIChange(shouldShowToolbar)
+            }) { error, date, errUrl ->
             val errorInfo =
                 "code: ${error?.getStatusCode()}, description: ${error?.getDescription()}"
 
@@ -193,18 +196,18 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
     }
 
     /** Shows or hides some UI elements according to whether [isPageSurvey] is `true` or `false`. */
-    private fun toggleUIChange(isPageSurvey: Boolean) {
+//    private fun toggleUIChange(isPageSurvey: Boolean) {
 //        toolbar?.visibility = if (isPageSurvey) View.VISIBLE else View.GONE
 
-        webView?.isScrollbarFadingEnabled = isPageSurvey
-        webView?.settings?.run {
-            setSupportZoom(isPageSurvey)
-            builtInZoomControls = isPageSurvey
-        }
-        requestedOrientation =
-            if (isPageSurvey) ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-            else ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-    }
+//        webView?.isScrollbarFadingEnabled = isPageSurvey
+//        webView?.settings?.run {
+//            setSupportZoom(isPageSurvey)
+//            builtInZoomControls = isPageSurvey
+//        }
+//        requestedOrientation =
+//            if (isPageSurvey) ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+//            else ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+//    }
 
     /** Shows the Alert Dialog that lets the user choose a reason why they want to leave the survey. */
     private fun showLeaveSurveyAlertDialog() {
@@ -224,7 +227,7 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
     /** Loads the OfferWall page and sends the [reason] to the API */
     private fun leaveSurvey(reason: String) {
         findViewById<LinearLayout>(R.id.ll_qr_code_bitlabs)?.visibility = View.GONE
-        toggleUIChange(false)
+//        toggleUIChange(false)
         webView?.evaluateJavascript(" window.history.go(-window.history.length + 1);", null)
 
         if (clickId != null) BitLabs.leaveSurvey(clickId!!, reason)
@@ -236,9 +239,9 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
                 val statusBarInsets = insets.getInsets(WindowInsets.Type.statusBars())
                 val navigationBarInsets = insets.getInsets(WindowInsets.Type.navigationBars())
 
-                v.background = (toolbar?.background?.mutate() as? GradientDrawable)?.apply {
-                    colors = headerColors
-                }
+//                v.background = (toolbar?.background?.mutate() as? GradientDrawable)?.apply {
+//                    colors = headerColors
+//                }
 
                 v.getWindowInsetsController()?.setSystemBarsAppearance(
                     if (isColorBright) WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS else 0,

@@ -75,26 +75,26 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
 
         bindUI()
 
-        if (savedInstanceState == null) webView?.loadUrl(url)
+//        if (savedInstanceState == null) webView?.loadUrl(url)
 
-        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-//                if (toolbar?.visibility == View.VISIBLE) {
-//                    showLeaveSurveyAlertDialog()
+//        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+//            override fun handleOnBackPressed() {
+////                if (toolbar?.visibility == View.VISIBLE) {
+////                    showLeaveSurveyAlertDialog()
+////                    return
+////                }
+//
+//                if (webView?.canGoBack() == true) {
+//                    webView?.goBack()
 //                    return
 //                }
-
-                if (webView?.canGoBack() == true) {
-                    webView?.goBack()
-                    return
-                }
-
-                if (isEnabled) {
-                    isEnabled = false
-                    onBackPressedDispatcher.onBackPressed()
-                }
-            }
-        })
+//
+//                if (isEnabled) {
+//                    isEnabled = false
+//                    onBackPressedDispatcher.onBackPressed()
+//                }
+//            }
+//        })
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

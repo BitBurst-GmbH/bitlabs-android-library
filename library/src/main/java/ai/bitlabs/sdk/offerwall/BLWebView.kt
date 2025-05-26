@@ -9,6 +9,8 @@ import android.app.Activity
 import android.content.pm.ActivityInfo
 import android.util.Log
 import android.webkit.WebView
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -24,6 +26,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 @Composable
 fun BLWebView(url: String) {
     val context = LocalContext.current
+    val backPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     val shouldShowTopBar = remember { mutableStateOf(false) }
 
     val webView = remember {
@@ -34,14 +37,27 @@ fun BLWebView(url: String) {
             setupPostMessageHandler(
                 addReward = {},
                 setClickId = {},
-                toggleTopBar = {
-                    shouldShowTopBar.value = it
-                    Log.i(TAG, "BLWebView: WE SHOULD SHOW $it")
-                },
+                toggleTopBar = { shouldShowTopBar.value = it },
             )
             loadUrl(url)
         }
     }
+
+    fun onBackPressed() {
+        if (shouldShowTopBar.value) {
+//                    showLeaveSurveyAlertDialog()
+            return
+        }
+
+        if (webView.canGoBack() == true) {
+            webView.goBack()
+            return
+        }
+
+        (context as? Activity)?.finish()
+    }
+
+    BackHandler { onBackPressed() }
 
     LaunchedEffect(shouldShowTopBar.value) {
         val activity = context as? Activity
@@ -58,7 +74,7 @@ fun BLWebView(url: String) {
     }
 
     Column(Modifier.fillMaxSize()) {
-        if (shouldShowTopBar.value) BLTopBar(BuildConfig.APP_TOKEN)
+        if (shouldShowTopBar.value) BLTopBar(BuildConfig.APP_TOKEN, ::onBackPressed)
         AndroidView(factory = { webView }, modifier = Modifier.fillMaxSize())
     }
 }

@@ -28,8 +28,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun BLTopBar(token: String) {
-    val backPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+fun BLTopBar(token: String, onBackPressed: (() -> Unit)) {
+
     val viewModel = remember { OfferwallViewModel(token) }
 
     val headerColors = viewModel.headerColors.value
@@ -51,7 +51,7 @@ fun BLTopBar(token: String) {
                 imageVector = ImageVector.vectorResource(R.drawable.ic_circle_chevron_left_regular),
                 contentDescription = "Back Button",
                 modifier = Modifier
-                    .clickable { backPressedDispatcher?.onBackPressed() }
+                    .clickable { onBackPressed() }
                     .size(24.dp),
                 colorFilter = ColorFilter.tint(if (isColorBright) Color.Black else Color.White)
             )

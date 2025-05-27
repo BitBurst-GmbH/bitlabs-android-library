@@ -1,9 +1,6 @@
 package ai.bitlabs.sdk.offerwall
 
 import ai.bitlabs.sdk.BitLabs
-import ai.bitlabs.sdk.offerwall.WebActivityParams
-import ai.bitlabs.sdk.util.BUNDLE_KEY_BACKGROUND_COLOR
-import ai.bitlabs.sdk.util.BUNDLE_KEY_HEADER_COLOR
 import ai.bitlabs.sdk.util.BUNDLE_KEY_LISTENER_ID
 import ai.bitlabs.sdk.util.BUNDLE_KEY_URL
 import ai.bitlabs.sdk.util.OnOfferwallClosedListener
@@ -46,8 +43,6 @@ data class Offerwall(
         val intent = Intent(context, BitLabsOfferwallActivity::class.java).apply {
             putExtra(BUNDLE_KEY_URL, url)
             putExtra(BUNDLE_KEY_LISTENER_ID, listenerId)
-            putExtra(BUNDLE_KEY_HEADER_COLOR, headerColor)
-            putExtra(BUNDLE_KEY_BACKGROUND_COLOR, backgroundColors)
         }
 
         OfferwallListenerManager.registerListeners(

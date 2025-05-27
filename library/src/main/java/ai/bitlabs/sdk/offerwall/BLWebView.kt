@@ -1,23 +1,41 @@
 package ai.bitlabs.sdk.offerwall
 
-import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.util.extensions.setupClient
 import ai.bitlabs.sdk.util.extensions.setupPostMessageHandler
 import ai.bitlabs.sdk.util.extensions.setupSettings
 import android.app.Activity
 import android.content.pm.ActivityInfo
+import android.view.View
 import android.webkit.WebView
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.view.WindowCompat
 
 @Composable
 fun BLWebView(token: String, url: String, listenerId: Int = 0) {
@@ -44,6 +62,20 @@ fun BLWebView(token: String, url: String, listenerId: Int = 0) {
 
     DisposableEffect(Unit) {
         onDispose { viewModel.onOfferwallClosed() }
+    }
+
+    LaunchedEffect(isTopBarShown.value) {
+        val activity = context as? Activity
+
+        activity?.requestedOrientation =
+            if (isTopBarShown.value) ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+            else ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+
+        webView.apply {
+            isScrollbarFadingEnabled = isTopBarShown.value
+            settings.setSupportZoom(isTopBarShown.value)
+            settings.builtInZoomControls = isTopBarShown.value
+        }
     }
 
     fun onBackPressed() {
@@ -77,25 +109,32 @@ fun BLWebView(token: String, url: String, listenerId: Int = 0) {
 
     BackHandler { onBackPressed() }
 
-    LaunchedEffect(isTopBarShown.value) {
-        val activity = context as? Activity
-
-        activity?.requestedOrientation =
-            if (isTopBarShown.value) ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-            else ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-
-        webView.apply {
-            isScrollbarFadingEnabled = isTopBarShown.value
-            settings.setSupportZoom(isTopBarShown.value)
-            settings.builtInZoomControls = isTopBarShown.value
+    val window = (LocalView.current.context as Activity).window
+    SideEffect {
+        WindowCompat.getInsetsController(window, window.decorView).apply {
+            isAppearanceLightNavigationBars = viewModel.isColorBright
+            isAppearanceLightStatusBars = viewModel.isColorBright
         }
     }
 
     Column(Modifier.fillMaxSize()) {
+        Spacer(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(color = Color(viewModel.headerColors.value.first()))
+                .statusBarsPadding()
+        )
         if (isTopBarShown.value) BLTopBar(
             viewModel.headerColors.value,
+            viewModel.isColorBright,
             ::onBackPressed
         )
-        AndroidView(factory = { webView }, modifier = Modifier.fillMaxSize())
+        AndroidView(factory = { webView }, modifier = Modifier.weight(1f))
+        Spacer(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(color = Color(viewModel.backgroundColors.value.first()))
+                .navigationBarsPadding()
+        )
     }
 }

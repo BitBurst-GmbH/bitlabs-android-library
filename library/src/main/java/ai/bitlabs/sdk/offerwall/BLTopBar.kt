@@ -1,8 +1,6 @@
 package ai.bitlabs.sdk.offerwall
 
 import ai.bitlabs.sdk.R
-import ai.bitlabs.sdk.util.getLuminance
-import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -15,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,14 +25,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun BLTopBar(headerColors: IntArray, onBackPressed: () -> Unit) {
-    val isColorBright = getLuminance(headerColors.first()) > 0.729 * 255 ||
-            getLuminance(headerColors.last()) > 0.729 * 255
-
+fun BLTopBar(headerColors: IntArray, isColorBright: Boolean, onBackPressed: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(56.dp)
+            // TODO: Support gradient backgrounds
             .background(Color(headerColors.first()))
             .padding(horizontal = 16.dp)
     ) {

@@ -1,27 +1,25 @@
 package ai.bitlabs.sdk
 
+import ai.bitlabs.sdk.BitLabs.bitLabsRepo
+import ai.bitlabs.sdk.BitLabs.token
+import ai.bitlabs.sdk.BitLabs.uid
 import ai.bitlabs.sdk.data.api.BitLabsAPI
-import ai.bitlabs.sdk.offerwall.Offerwall
 import ai.bitlabs.sdk.data.model.bitlabs.Survey
 import ai.bitlabs.sdk.data.model.bitlabs.WidgetType
 import ai.bitlabs.sdk.data.model.sentry.SentryManager
 import ai.bitlabs.sdk.data.repositories.BitLabsRepository
 import ai.bitlabs.sdk.offerwall.BitLabsOfferwallActivity
+import ai.bitlabs.sdk.offerwall.Offerwall
 import ai.bitlabs.sdk.offerwall.WebActivityParams
 import ai.bitlabs.sdk.util.BASE_URL
-import ai.bitlabs.sdk.util.BUNDLE_KEY_BACKGROUND_COLOR
-import ai.bitlabs.sdk.util.BUNDLE_KEY_HEADER_COLOR
 import ai.bitlabs.sdk.util.BUNDLE_KEY_URL
 import ai.bitlabs.sdk.util.OnExceptionListener
-import ai.bitlabs.sdk.util.OnOfferwallClosedListener
 import ai.bitlabs.sdk.util.OnResponseListener
 import ai.bitlabs.sdk.util.OnSurveyRewardListener
 import ai.bitlabs.sdk.util.TAG
 import ai.bitlabs.sdk.util.buildHttpClientWithHeaders
 import ai.bitlabs.sdk.util.buildRetrofit
 import ai.bitlabs.sdk.util.deviceType
-import ai.bitlabs.sdk.util.extractColors
-import ai.bitlabs.sdk.util.getColorScheme
 import ai.bitlabs.sdk.views.BitLabsWidgetFragment
 import android.content.Context
 import android.content.Intent
@@ -38,18 +36,17 @@ import com.google.android.gms.ads.identifier.AdvertisingIdClient
  */
 object BitLabs {
     var debugMode = false
-    var shouldSupportEdgeToEdge = true
 
     private var uid = ""
     private var adId = ""
     private var token = ""
     internal var fileProviderAuthority = ""
 
-    @Deprecated("Use OFFERWALL MODULE instead")
-    private var headerColor = intArrayOf(0, 0)
-
-    @Deprecated("Use OFFERWALL MODULE instead")
-    private var backgroundColors = intArrayOf(0, 0)
+//    @Deprecated("Use OFFERWALL MODULE instead")
+//    private var headerColor = intArrayOf(0, 0)
+//
+//    @Deprecated("Use OFFERWALL MODULE instead")
+//    private var backgroundColors = intArrayOf(0, 0)
 
     /** These will be added as query parameters to the OfferWall Link */
     @Deprecated("Use OFFERWALL MODULE instead")
@@ -79,7 +76,7 @@ object BitLabs {
 
         fileProviderAuthority = "${context.packageName}.provider.bitlabs"
 
-        getAppSettings()
+//        getAppSettings()
 
         val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
         Thread.setDefaultUncaughtExceptionHandler { _, throwable ->
@@ -139,6 +136,7 @@ object BitLabs {
     }
 
     /** Registers an [OnSurveyRewardListener] callback to be invoked when the OfferWall is exited by the user. */
+    @Deprecated("Use OFFERWALL MODULE instead")
     fun setOnRewardListener(onSurveyRewardListener: OnSurveyRewardListener) {
         this.onRewardListener = onSurveyRewardListener
     }
@@ -160,10 +158,10 @@ object BitLabs {
         with(Intent(context, BitLabsOfferwallActivity::class.java)) {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
             putExtra(
-                BUNDLE_KEY_URL, WebActivityParams(token, uid, "NATIVE", adId, tags).url
+                BUNDLE_KEY_URL,
+                WebActivityParams(token, uid, "NATIVE", adId, tags).url
             )
-            putExtra(BUNDLE_KEY_HEADER_COLOR, headerColor)
-            putExtra(BUNDLE_KEY_BACKGROUND_COLOR, backgroundColors)
+
             context.startActivity(this)
         }
     }
@@ -191,14 +189,14 @@ object BitLabs {
         bitLabsRepo?.leaveSurvey(token, clickId, reason)
 
 
-    @Deprecated("Use OFFERWALL MODULE instead")
-    private fun getAppSettings() = bitLabsRepo?.getAppSettings(token, getColorScheme(), { app ->
-        app.visual.run {
-            headerColor = extractColors(navigationColor).takeIf { it.isNotEmpty() } ?: headerColor
-            backgroundColors =
-                extractColors(backgroundColor).takeIf { it.isNotEmpty() } ?: backgroundColors
-        }
-    }, { Log.e(TAG, "$it") })
+//    @Deprecated("Use< OFFERWALL MODULE instead")
+//    private fun getAppSettings() = bitLabsRepo?.getAppSettings(token, getColorScheme(), { app ->
+//        app.visual.run {
+//            headerColor = extractColors(navigationColor).takeIf { it.isNotEmpty() } ?: headerColor
+//            backgroundColors =
+//                extractColors(backgroundColor).takeIf { it.isNotEmpty() } ?: backgroundColors
+//        }
+//    }, { Log.e(TAG, "$it") })>
 
     private fun determineAdvertisingInfo(context: Context) = Thread {
         try {

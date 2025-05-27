@@ -22,10 +22,6 @@ internal const val TAG = "BitLabs"
 
 internal const val BASE_URL = "https://api.bitlabs.ai/"
 
-internal const val BUNDLE_KEY_HEADER_COLOR = "bundle-key-header-color"
-
-internal const val BUNDLE_KEY_BACKGROUND_COLOR = "bundle-key-background-color"
-
 internal const val BUNDLE_KEY_LISTENER_ID = "bundle-key-listener-id"
 
 internal const val BUNDLE_KEY_URL = "bundle-key-url"
@@ -87,12 +83,6 @@ internal fun String.snakeToCamelCase() = lowercase()
 
 internal fun String.convertKeysToCamelCase() = Regex("\"([a-z]+(?:_[a-z]+)+)\":")
     .replace(this) { match -> match.groupValues[1].snakeToCamelCase().let { "\"$it\":" } }
-
-//internal fun Number.toPx() = TypedValue.applyDimension(
-//    TypedValue.COMPLEX_UNIT_DIP,
-//    this.toFloat(),
-//    Resources.getSystem().displayMetrics
-//)
 
 internal fun String.rounded(): String {
     try {

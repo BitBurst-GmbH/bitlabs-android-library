@@ -1,5 +1,6 @@
 package ai.bitlabs.sdk.offerwall
 
+import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.BuildConfig
 import ai.bitlabs.sdk.util.TAG
 import ai.bitlabs.sdk.util.extensions.setupClient
@@ -25,8 +26,10 @@ import androidx.compose.ui.viewinterop.AndroidView
 fun BLWebView(url: String) {
     val context = LocalContext.current
     val backPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+
+    var clickId = remember { "" }
     val isTopBarShown = remember { mutableStateOf(false) }
-    val shouldShowLeaveSurveyDialog = remember { mutableStateOf(true) }
+    val shouldShowLeaveSurveyDialog = remember { mutableStateOf(false) }
 
     val webView = remember {
         WebView(context).apply {
@@ -35,7 +38,7 @@ fun BLWebView(url: String) {
             setupSettings()
             setupPostMessageHandler(
                 addReward = {},
-                setClickId = {},
+                setClickId = { clickId = it ?: "" },
                 toggleTopBar = { isTopBarShown.value = it },
             )
             loadUrl(url)
@@ -63,6 +66,14 @@ fun BLWebView(url: String) {
                 Log.i(TAG, "BLWebView: LEFT WITH REASON $reason")
                 shouldShowLeaveSurveyDialog.value = false
                 isTopBarShown.value = false
+
+                webView.evaluateJavascript(
+                    " window.history.go(-window.history.length + 1);",
+                    null
+                );
+
+                // TODO: Handle leaveSurvey properly
+                if (clickId.isNotEmpty()) BitLabs.leaveSurvey(clickId, reason)
             }
         )
     }
@@ -87,4 +98,6 @@ fun BLWebView(url: String) {
         if (isTopBarShown.value) BLTopBar(BuildConfig.APP_TOKEN, ::onBackPressed)
         AndroidView(factory = { webView }, modifier = Modifier.fillMaxSize())
     }
+
+    Log.i(TAG, "BLWebView Click ID: $clickId")
 }

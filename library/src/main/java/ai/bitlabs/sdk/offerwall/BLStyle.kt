@@ -7,23 +7,21 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 
 object BLStyle {
-    val h3 = TextStyle(
+    val h6 = TextStyle(
         fontSize = 20.sp,
-        fontWeight = FontWeight.Bold,
+        fontWeight = FontWeight.Medium,
         color = Color.Black
     )
 
     val normal = TextStyle(
-        fontSize = 16.sp,
+        fontSize = 14.sp,
         fontWeight = FontWeight.Normal,
         color = Color.Black
     )
 
-    val bold = TextStyle(
-        fontSize = 16.sp,
-        fontWeight = FontWeight.Bold,
-        color = Color.Black,
-        textAlign = TextAlign.End
-
+    val medium = TextStyle(
+        fontSize = 14.sp,
+        fontWeight = FontWeight.Medium,
+        color = Color.Black
     )
 }

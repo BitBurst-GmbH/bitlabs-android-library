@@ -215,7 +215,8 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
             getString(R.string.leave_reason_too_long),
             getString(R.string.leave_reason_other)
         )
-        AlertDialog.Builder(this).setTitle(getString(R.string.leave_dialog_title))
+        AlertDialog.Builder(this)
+            .setTitle(getString(R.string.leave_dialog_title))
             .setItems(optionsDisplay) { _, which -> leaveSurvey(options[which]) }
             .setNegativeButton(getString(R.string.leave_dialog_continue)) { _, _ -> }.show()
     }

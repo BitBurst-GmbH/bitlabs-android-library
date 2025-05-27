@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
@@ -26,6 +27,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 
 @Composable
@@ -43,16 +45,17 @@ fun LeaveSurveyDialog(onDismiss: () -> Unit, leaveSurvey: (String) -> Unit) {
         Column(
             Modifier
                 .background(color = Color.White, shape = RoundedCornerShape(16.dp))
-                .padding(8.dp)
+                .padding(16.dp)
         ) {
             BLText(
                 text = stringResource(R.string.leave_dialog_title),
-                style = BLStyle.h3
+                style = BLStyle.h6
             )
             Spacer(modifier = Modifier.height(8.dp))
             optionsDisplay.forEachIndexed { index, option ->
                 BLText(
                     text = option,
+                    style = BLStyle.normal.copy(fontSize = 16.sp),
                     height = 48.dp,
                     onClick = { leaveSurvey(options[index]) }
                 )
@@ -60,9 +63,9 @@ fun LeaveSurveyDialog(onDismiss: () -> Unit, leaveSurvey: (String) -> Unit) {
             }
             Spacer(modifier = Modifier.height(4.dp))
             BLText(
-                text = stringResource(R.string.leave_dialog_continue),
+                text = stringResource(R.string.leave_dialog_continue).uppercase(),
                 height = 48.dp,
-                style = BLStyle.bold,
+                style = BLStyle.medium.copy(color = BLColors.Accent),
                 onClick = { onDismiss() },
                 contentAlignment = Alignment.CenterEnd,
             )

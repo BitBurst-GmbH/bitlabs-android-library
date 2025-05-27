@@ -12,6 +12,7 @@ import ai.bitlabs.sdk.offerwall.BitLabsOfferwallActivity
 import ai.bitlabs.sdk.offerwall.Offerwall
 import ai.bitlabs.sdk.offerwall.WebActivityParams
 import ai.bitlabs.sdk.util.BASE_URL
+import ai.bitlabs.sdk.util.BUNDLE_KEY_TOKEN
 import ai.bitlabs.sdk.util.BUNDLE_KEY_URL
 import ai.bitlabs.sdk.util.OnExceptionListener
 import ai.bitlabs.sdk.util.OnResponseListener
@@ -42,12 +43,6 @@ object BitLabs {
     private var token = ""
     internal var fileProviderAuthority = ""
 
-//    @Deprecated("Use OFFERWALL MODULE instead")
-//    private var headerColor = intArrayOf(0, 0)
-//
-//    @Deprecated("Use OFFERWALL MODULE instead")
-//    private var backgroundColors = intArrayOf(0, 0)
-
     /** These will be added as query parameters to the OfferWall Link */
     @Deprecated("Use OFFERWALL MODULE instead")
     var tags = mutableMapOf<String, Any>()
@@ -75,8 +70,6 @@ object BitLabs {
         determineAdvertisingInfo(context)
 
         fileProviderAuthority = "${context.packageName}.provider.bitlabs"
-
-//        getAppSettings()
 
         val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
         Thread.setDefaultUncaughtExceptionHandler { _, throwable ->
@@ -161,6 +154,7 @@ object BitLabs {
                 BUNDLE_KEY_URL,
                 WebActivityParams(token, uid, "NATIVE", adId, tags).url
             )
+            putExtra(BUNDLE_KEY_TOKEN, token)
 
             context.startActivity(this)
         }
@@ -187,16 +181,6 @@ object BitLabs {
 
     internal fun leaveSurvey(clickId: String, reason: String) =
         bitLabsRepo?.leaveSurvey(token, clickId, reason)
-
-
-//    @Deprecated("Use< OFFERWALL MODULE instead")
-//    private fun getAppSettings() = bitLabsRepo?.getAppSettings(token, getColorScheme(), { app ->
-//        app.visual.run {
-//            headerColor = extractColors(navigationColor).takeIf { it.isNotEmpty() } ?: headerColor
-//            backgroundColors =
-//                extractColors(backgroundColor).takeIf { it.isNotEmpty() } ?: backgroundColors
-//        }
-//    }, { Log.e(TAG, "$it") })>
 
     private fun determineAdvertisingInfo(context: Context) = Thread {
         try {

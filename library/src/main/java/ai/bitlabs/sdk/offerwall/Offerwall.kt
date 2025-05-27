@@ -2,6 +2,7 @@ package ai.bitlabs.sdk.offerwall
 
 import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.util.BUNDLE_KEY_LISTENER_ID
+import ai.bitlabs.sdk.util.BUNDLE_KEY_TOKEN
 import ai.bitlabs.sdk.util.BUNDLE_KEY_URL
 import ai.bitlabs.sdk.util.OnOfferwallClosedListener
 import ai.bitlabs.sdk.util.OnSurveyRewardListener
@@ -42,6 +43,7 @@ data class Offerwall(
         val url = WebActivityParams(token, uid, sdk, "", tags).url
         val intent = Intent(context, BitLabsOfferwallActivity::class.java).apply {
             putExtra(BUNDLE_KEY_URL, url)
+            putExtra(BUNDLE_KEY_TOKEN, token)
             putExtra(BUNDLE_KEY_LISTENER_ID, listenerId)
         }
 

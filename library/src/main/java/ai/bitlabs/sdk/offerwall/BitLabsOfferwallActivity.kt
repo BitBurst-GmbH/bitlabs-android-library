@@ -1,9 +1,9 @@
 package ai.bitlabs.sdk.offerwall
 
-import ai.bitlabs.sdk.BuildConfig
 import ai.bitlabs.sdk.R
 import ai.bitlabs.sdk.data.model.sentry.SentryManager
 import ai.bitlabs.sdk.util.BUNDLE_KEY_LISTENER_ID
+import ai.bitlabs.sdk.util.BUNDLE_KEY_TOKEN
 import ai.bitlabs.sdk.util.BUNDLE_KEY_URL
 import ai.bitlabs.sdk.util.TAG
 import ai.bitlabs.sdk.util.extensions.setup
@@ -28,6 +28,7 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
 
     private var webView: WebView? = null
 
+    private var token = ""
     private var listenerId = 0
     private lateinit var url: String
 
@@ -43,7 +44,7 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
             return
         }
 
-        setContent { BLWebView(BuildConfig.APP_TOKEN, url, listenerId) }
+        setContent { BLWebView(token, url, listenerId) }
 
         bindUI()
     }
@@ -56,6 +57,10 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
     private fun getDataFromIntent() {
         url = intent.getStringExtra(BUNDLE_KEY_URL).takeIf { URLUtil.isValidUrl(it) } ?: run {
             throw IllegalArgumentException("BitLabsOfferwallActivity - Invalid url!")
+        }
+
+        token = intent.getStringExtra(BUNDLE_KEY_TOKEN) ?: run {
+            throw IllegalArgumentException("BitLabsOfferwallActivity - Token is null!")
         }
 
         listenerId = intent.getIntExtra(BUNDLE_KEY_LISTENER_ID, -1)

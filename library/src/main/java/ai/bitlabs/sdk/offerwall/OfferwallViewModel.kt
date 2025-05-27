@@ -10,6 +10,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 
 class OfferwallViewModel(val token: String) : ViewModel() {
+    var clickId: String = ""
+
     private val _headerColors = mutableStateOf(intArrayOf(0, 0))
     val headerColors: State<IntArray> get() = _headerColors
 
@@ -28,5 +30,12 @@ class OfferwallViewModel(val token: String) : ViewModel() {
                     ?: backgroundColors.value
             }
         }, { Log.e(TAG, "$it") })
+    }
+
+    fun leaveSurvey(reason: String) {
+        if (clickId.isEmpty()) return
+        // TODO: Handle leaveSurvey properly
+        BitLabs.leaveSurvey(clickId, reason)
+        clickId = ""
     }
 }

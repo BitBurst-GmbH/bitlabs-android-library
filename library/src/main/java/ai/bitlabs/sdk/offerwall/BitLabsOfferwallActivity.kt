@@ -103,10 +103,10 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
         webView?.restoreState(savedInstanceState)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == android.R.id.home) showLeaveSurveyAlertDialog()
-        return super.onOptionsItemSelected(item)
-    }
+//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+//        if (item.itemId == android.R.id.home) showLeaveSurveyAlertDialog()
+//        return super.onOptionsItemSelected(item)
+//    }
 
     override fun onStop() {
         BitLabs.onRewardListener?.onSurveyReward(totalReward)
@@ -206,28 +206,28 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
 //    }
 
     /** Shows the Alert Dialog that lets the user choose a reason why they want to leave the survey. */
-    private fun showLeaveSurveyAlertDialog() {
-        val options = arrayOf("SENSITIVE", "UNINTERESTING", "TECHNICAL", "TOO_LONG", "OTHER")
-        val optionsDisplay = arrayOf(
-            getString(R.string.leave_reason_sensitive),
-            getString(R.string.leave_reason_uninteresting),
-            getString(R.string.leave_reason_technical),
-            getString(R.string.leave_reason_too_long),
-            getString(R.string.leave_reason_other)
-        )
-        AlertDialog.Builder(this)
-            .setTitle(getString(R.string.leave_dialog_title))
-            .setItems(optionsDisplay) { _, which -> leaveSurvey(options[which]) }
-            .setNegativeButton(getString(R.string.leave_dialog_continue)) { _, _ -> }.show()
-    }
-
-    /** Loads the OfferWall page and sends the [reason] to the API */
-    private fun leaveSurvey(reason: String) {
-        findViewById<LinearLayout>(R.id.ll_qr_code_bitlabs)?.visibility = View.GONE
-//        toggleUIChange(false)
-
-        if (clickId != null) BitLabs.leaveSurvey(clickId!!, reason)
-    }
+//    private fun showLeaveSurveyAlertDialog() {
+//        val options = arrayOf("SENSITIVE", "UNINTERESTING", "TECHNICAL", "TOO_LONG", "OTHER")
+//        val optionsDisplay = arrayOf(
+//            getString(R.string.leave_reason_sensitive),
+//            getString(R.string.leave_reason_uninteresting),
+//            getString(R.string.leave_reason_technical),
+//            getString(R.string.leave_reason_too_long),
+//            getString(R.string.leave_reason_other)
+//        )
+//        AlertDialog.Builder(this)
+//            .setTitle(getString(R.string.leave_dialog_title))
+//            .setItems(optionsDisplay) { _, which -> leaveSurvey(options[which]) }
+//            .setNegativeButton(getString(R.string.leave_dialog_continue)) { _, _ -> }.show()
+//    }
+//
+//    /** Loads the OfferWall page and sends the [reason] to the API */
+//    private fun leaveSurvey(reason: String) {
+//        findViewById<LinearLayout>(R.id.ll_qr_code_bitlabs)?.visibility = View.GONE
+////        toggleUIChange(false)
+//
+//        if (clickId != null) BitLabs.leaveSurvey(clickId!!, reason)
+//    }
 
     private fun supportEdgeToEdge() {
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {

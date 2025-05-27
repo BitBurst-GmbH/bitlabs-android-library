@@ -28,11 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun BLTopBar(token: String, onBackPressed: (() -> Unit)) {
-
-    val viewModel = remember { OfferwallViewModel(token) }
-
-    val headerColors = viewModel.headerColors.value
+fun BLTopBar(headerColors: IntArray, onBackPressed: () -> Unit) {
     val isColorBright = getLuminance(headerColors.first()) > 0.729 * 255 ||
             getLuminance(headerColors.last()) > 0.729 * 255
 

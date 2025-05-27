@@ -21,13 +21,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlin.math.log
 
 @Composable
 fun BLWebView(url: String) {
     val context = LocalContext.current
     val backPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
-    var clickId = remember { "" }
+    val viewModel = remember { OfferwallViewModel(BuildConfig.APP_TOKEN) }
+
     val isTopBarShown = remember { mutableStateOf(false) }
     val shouldShowLeaveSurveyDialog = remember { mutableStateOf(false) }
 
@@ -38,7 +42,7 @@ fun BLWebView(url: String) {
             setupSettings()
             setupPostMessageHandler(
                 addReward = {},
-                setClickId = { clickId = it ?: "" },
+                setClickId = { viewModel.clickId = it ?: "" },
                 toggleTopBar = { isTopBarShown.value = it },
             )
             loadUrl(url)
@@ -68,14 +72,11 @@ fun BLWebView(url: String) {
                 isTopBarShown.value = false
 
                 webView.evaluateJavascript(
-                    " window.history.go(-window.history.length + 1);",
-                    null
+                    " window.history.go(-window.history.length + 1);", null
                 );
 
-                // TODO: Handle leaveSurvey properly
-                if (clickId.isNotEmpty()) BitLabs.leaveSurvey(clickId, reason)
-            }
-        )
+                viewModel.leaveSurvey(reason)
+            })
     }
 
     BackHandler { onBackPressed() }
@@ -95,9 +96,10 @@ fun BLWebView(url: String) {
     }
 
     Column(Modifier.fillMaxSize()) {
-        if (isTopBarShown.value) BLTopBar(BuildConfig.APP_TOKEN, ::onBackPressed)
+        if (isTopBarShown.value) BLTopBar(
+            viewModel.headerColors.value,
+            ::onBackPressed
+        )
         AndroidView(factory = { webView }, modifier = Modifier.fillMaxSize())
     }
-
-    Log.i(TAG, "BLWebView Click ID: $clickId")
 }

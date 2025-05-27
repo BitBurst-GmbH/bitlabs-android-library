@@ -1,6 +1,8 @@
 package ai.bitlabs.sdk.offerwall
 
 import ai.bitlabs.sdk.BitLabs
+import ai.bitlabs.sdk.util.OnOfferwallClosedListener
+import ai.bitlabs.sdk.util.OnSurveyRewardListener
 import ai.bitlabs.sdk.util.TAG
 import ai.bitlabs.sdk.util.extractColors
 import ai.bitlabs.sdk.util.getColorScheme
@@ -9,8 +11,16 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 
-class OfferwallViewModel(val token: String) : ViewModel() {
-    var clickId: String = ""
+class OfferwallViewModel(val token: String, val listenerId: Int) : ViewModel() {
+    var clickId = ""
+    private var totalSurveyReward = 0.0
+
+    private val onSurveyRewardListener: OnSurveyRewardListener? by lazy {
+        OfferwallListenerManager.getOnSurveyRewardListener(listenerId)
+    }
+    private val onOfferwallClosedListener: OnOfferwallClosedListener? by lazy {
+        OfferwallListenerManager.getOnOfferwallClosedListener(listenerId)
+    }
 
     private val _headerColors = mutableStateOf(intArrayOf(0, 0))
     val headerColors: State<IntArray> get() = _headerColors
@@ -37,5 +47,14 @@ class OfferwallViewModel(val token: String) : ViewModel() {
         // TODO: Handle leaveSurvey properly
         BitLabs.leaveSurvey(clickId, reason)
         clickId = ""
+    }
+
+    fun onSurveyReward(reward: Double) = onSurveyRewardListener?.onSurveyReward(reward).also {
+        totalSurveyReward += reward
+    }
+
+    fun onOfferwallClosed() {
+        onOfferwallClosedListener?.onOfferwallClosed(totalSurveyReward)
+        BitLabs.onRewardListener?.onSurveyReward(totalSurveyReward)
     }
 }

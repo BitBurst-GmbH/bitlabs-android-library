@@ -1,6 +1,7 @@
 package ai.bitlabs.sdk.offerwall
 
 import ai.bitlabs.sdk.BitLabs
+import ai.bitlabs.sdk.BuildConfig
 import ai.bitlabs.sdk.R
 import ai.bitlabs.sdk.data.model.sentry.SentryManager
 import ai.bitlabs.sdk.util.BUNDLE_KEY_BACKGROUND_COLOR
@@ -41,6 +42,7 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
     private var webView: WebView? = null
 //    private var toolbar: Toolbar? = null
 
+    private var listenerId = 0
     private lateinit var url: String
 
     private var totalReward: Double = 0.0
@@ -49,8 +51,8 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
     private var backgroundColors = intArrayOf(Color.WHITE, Color.WHITE)
     private var isColorBright = false
 
-    private var onSurveyRewardListener: OnSurveyRewardListener? = null
-    private var onOfferwallClosedListener: OnOfferwallClosedListener? = null
+//    private var onSurveyRewardListener: OnSurveyRewardListener? = null
+//    private var onOfferwallClosedListener: OnOfferwallClosedListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,7 +68,7 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
         }
 
         findViewById<ComposeView>(R.id.toolbar_bitlabs_compose).setContent {
-            BLWebView(url)
+            BLWebView(BuildConfig.APP_TOKEN, url, listenerId)
         }
 
         bindUI()
@@ -110,7 +112,7 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
 
     override fun onStop() {
         BitLabs.onRewardListener?.onSurveyReward(totalReward)
-        onOfferwallClosedListener?.onOfferwallClosed(totalReward)
+//        onOfferwallClosedListener?.onOfferwallClosed(totalReward)
         super.onStop()
     }
 
@@ -132,12 +134,12 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
             intent.getIntArrayExtra(BUNDLE_KEY_BACKGROUND_COLOR)?.takeIf { it.size > 1 }
                 ?: backgroundColors
 
-        val listenerId = intent.getIntExtra(BUNDLE_KEY_LISTENER_ID, -1)
-        onSurveyRewardListener =
-            OfferwallListenerManager.getOnSurveyRewardListener(listenerId)
-
-        onOfferwallClosedListener =
-            OfferwallListenerManager.getOnOfferwallClosedListener(listenerId)
+        listenerId = intent.getIntExtra(BUNDLE_KEY_LISTENER_ID, -1)
+//        onSurveyRewardListener =
+//            OfferwallListenerManager.getOnSurveyRewardListener(listenerId)
+//
+//        onOfferwallClosedListener =
+//            OfferwallListenerManager.getOnOfferwallClosedListener(listenerId)
     }
 
     private fun bindUI() {
@@ -167,7 +169,7 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
 
         webView?.setup(
             { reward ->
-                onSurveyRewardListener?.onSurveyReward(reward)
+//                onSurveyRewardListener?.onSurveyReward(reward)
                 totalReward += reward
             },
             { clk -> clickId = clk },

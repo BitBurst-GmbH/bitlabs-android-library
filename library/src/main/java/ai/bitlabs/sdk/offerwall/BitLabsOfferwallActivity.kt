@@ -13,7 +13,6 @@ import ai.bitlabs.sdk.util.TAG
 import ai.bitlabs.sdk.util.extensions.setup
 import ai.bitlabs.sdk.util.getLuminance
 import ai.bitlabs.sdk.util.setQRCodeBitmap
-import android.content.pm.ActivityInfo
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.os.Build
@@ -29,12 +28,9 @@ import android.webkit.WebView
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.compose.ui.platform.ComposeView
-import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.children
 
 /**
@@ -195,7 +191,7 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
         if (BitLabs.shouldSupportEdgeToEdge) supportEdgeToEdge()
     }
 
-    /** Shows or hides some UI elements according to whether [isPageSurvey] is `true` or `false`. */
+//    /** Shows or hides some UI elements according to whether [isPageSurvey] is `true` or `false`. */
 //    private fun toggleUIChange(isPageSurvey: Boolean) {
 //        toolbar?.visibility = if (isPageSurvey) View.VISIBLE else View.GONE
 
@@ -228,7 +224,6 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
     private fun leaveSurvey(reason: String) {
         findViewById<LinearLayout>(R.id.ll_qr_code_bitlabs)?.visibility = View.GONE
 //        toggleUIChange(false)
-        webView?.evaluateJavascript(" window.history.go(-window.history.length + 1);", null)
 
         if (clickId != null) BitLabs.leaveSurvey(clickId!!, reason)
     }

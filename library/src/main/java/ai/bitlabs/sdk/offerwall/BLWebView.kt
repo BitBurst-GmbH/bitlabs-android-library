@@ -14,9 +14,7 @@ import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -27,7 +25,8 @@ import androidx.compose.ui.viewinterop.AndroidView
 fun BLWebView(url: String) {
     val context = LocalContext.current
     val backPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
-    val shouldShowTopBar = remember { mutableStateOf(false) }
+    val isTopBarShown = remember { mutableStateOf(false) }
+    val shouldShowLeaveSurveyDialog = remember { mutableStateOf(true) }
 
     val webView = remember {
         WebView(context).apply {
@@ -37,15 +36,15 @@ fun BLWebView(url: String) {
             setupPostMessageHandler(
                 addReward = {},
                 setClickId = {},
-                toggleTopBar = { shouldShowTopBar.value = it },
+                toggleTopBar = { isTopBarShown.value = it },
             )
             loadUrl(url)
         }
     }
 
     fun onBackPressed() {
-        if (shouldShowTopBar.value) {
-//                    showLeaveSurveyAlertDialog()
+        if (isTopBarShown.value) {
+            shouldShowLeaveSurveyDialog.value = true
             return
         }
 
@@ -57,24 +56,35 @@ fun BLWebView(url: String) {
         (context as? Activity)?.finish()
     }
 
+    if (shouldShowLeaveSurveyDialog.value) {
+        LeaveSurveyDialog(
+            onDismiss = { shouldShowLeaveSurveyDialog.value = false },
+            leaveSurvey = { reason ->
+                Log.i(TAG, "BLWebView: LEFT WITH REASON $reason")
+                shouldShowLeaveSurveyDialog.value = false
+                isTopBarShown.value = false
+            }
+        )
+    }
+
     BackHandler { onBackPressed() }
 
-    LaunchedEffect(shouldShowTopBar.value) {
+    LaunchedEffect(isTopBarShown.value) {
         val activity = context as? Activity
 
         activity?.requestedOrientation =
-            if (shouldShowTopBar.value) ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+            if (isTopBarShown.value) ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
             else ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
         webView.apply {
-            isScrollbarFadingEnabled = shouldShowTopBar.value
-            settings.setSupportZoom(shouldShowTopBar.value)
-            settings.builtInZoomControls = shouldShowTopBar.value
+            isScrollbarFadingEnabled = isTopBarShown.value
+            settings.setSupportZoom(isTopBarShown.value)
+            settings.builtInZoomControls = isTopBarShown.value
         }
     }
 
     Column(Modifier.fillMaxSize()) {
-        if (shouldShowTopBar.value) BLTopBar(BuildConfig.APP_TOKEN, ::onBackPressed)
+        if (isTopBarShown.value) BLTopBar(BuildConfig.APP_TOKEN, ::onBackPressed)
         AndroidView(factory = { webView }, modifier = Modifier.fillMaxSize())
     }
 }

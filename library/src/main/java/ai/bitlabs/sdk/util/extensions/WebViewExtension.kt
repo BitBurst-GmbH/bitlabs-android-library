@@ -4,15 +4,14 @@ import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.R
 import ai.bitlabs.sdk.data.model.bitlabs.WebViewError
 import ai.bitlabs.sdk.data.model.sentry.SentryManager
+import ai.bitlabs.sdk.offerwall.BitLabsOfferwallActivity
 import ai.bitlabs.sdk.util.HookName
 import ai.bitlabs.sdk.util.RewardArgs
 import ai.bitlabs.sdk.util.SurveyStartArgs
 import ai.bitlabs.sdk.util.TAG
 import ai.bitlabs.sdk.util.asHookMessage
-import ai.bitlabs.sdk.offerwall.BitLabsOfferwallActivity
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.AlertDialog
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
@@ -21,22 +20,29 @@ import android.os.Looper
 import android.os.Message
 import android.util.Log
 import android.view.View
-import android.webkit.*
-import androidx.activity.result.contract.ActivityResultContracts.*
+import android.view.ViewGroup
+import android.webkit.CookieManager
+import android.webkit.JavascriptInterface
+import android.webkit.ValueCallback
+import android.webkit.WebChromeClient
+import android.webkit.WebResourceError
+import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
+import android.webkit.WebSettings
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import androidx.activity.result.contract.ActivityResultContracts.GetMultipleContents
+import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
+import androidx.activity.result.contract.ActivityResultContracts.TakePicture
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AlertDialog
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import java.io.File
 
 /** Adds all necessary configurations for its receiver [BitLabsOfferwallActivity.webView] */
-@SuppressLint("SetJavaScriptEnabled")
-fun WebView.setup(
-    addReward: (reward: Double) -> Unit,
-    setClickId: (clickId: String?) -> Unit,
-    toggleToolbar: (shouldShowToolbar: Boolean) -> Unit,
-    onError: (error: WebViewError?, date: String, url: String) -> Unit,
-) {
+fun WebView.setup(onError: (error: WebViewError?, date: String, url: String) -> Unit) {
     var tempFile: File? = null
     var uriResult: ValueCallback<Array<Uri>>? = null
 
@@ -81,39 +87,6 @@ fun WebView.setup(
     this.setLayerType(View.LAYER_TYPE_HARDWARE, null)
 
     this.webChromeClient = object : WebChromeClient() {
-        override fun onCreateWindow(
-            view: WebView, dialog: Boolean, userGesture: Boolean, resultMsg: Message,
-        ): Boolean {
-            val newWebView = WebView(view.context)
-            with(resultMsg.obj as WebView.WebViewTransport) { webView = newWebView }
-            resultMsg.sendToTarget()
-
-            newWebView.webViewClient = object : WebViewClient() {
-                @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-                override fun shouldOverrideUrlLoading(
-                    view: WebView?, request: WebResourceRequest?,
-                ): Boolean {
-                    val url = request?.url?.toString()
-                    if (!url.isNullOrEmpty()) {
-                        CustomTabsIntent.Builder().build().launchUrl(context, url.toUri())
-                        return true
-                    }
-                    return false
-                }
-
-                @Deprecated("Deprecated in Java")
-                override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
-                    if (!url.isNullOrEmpty()) {
-                        CustomTabsIntent.Builder().build().launchUrl(context, url.toUri())
-                        return true
-                    }
-                    return false
-                }
-            }
-
-            return true
-        }
-
         override fun onShowFileChooser(
             webView: WebView?,
             filePathCallback: ValueCallback<Array<Uri>>?,
@@ -137,22 +110,6 @@ fun WebView.setup(
     }
 
     this.webViewClient = object : WebViewClient() {
-        override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
-            super.onPageStarted(view, url, favicon)
-            view?.evaluateJavascript(
-                """
-            window.addEventListener('message', (event) => {
-                window.AndroidWebView.postMessage(JSON.stringify(event.data));
-            });
-            """.trimIndent()
-            ) {}
-        }
-
-        @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-        override fun onPageFinished(view: WebView?, url: String?) {
-            CookieManager.getInstance().flush()
-        }
-
         @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
         override fun onReceivedHttpError(
             view: WebView?, request: WebResourceRequest?, errorResponse: WebResourceResponse?,
@@ -178,77 +135,6 @@ fun WebView.setup(
             super.onReceivedError(view, request, error)
         }
     }
-
-    this.addJavascriptInterface(object {
-        @JavascriptInterface
-        fun postMessage(message: String) {
-            val hookMessage = message.asHookMessage() ?: return
-
-            if (hookMessage.type != "hook") return
-
-            when (hookMessage.name) {
-                HookName.SDK_CLOSE -> {
-                    (context as BitLabsOfferwallActivity).finish()
-                }
-
-                HookName.SURVEY_START -> {
-                    val surveyStartArgs = hookMessage.args
-                        .filterIsInstance<SurveyStartArgs>()
-                        .firstOrNull()
-                    val clickId = surveyStartArgs?.clickId
-                    setClickId(clickId)
-                    (context as BitLabsOfferwallActivity).runOnUiThread { toggleToolbar(true) }
-                    Log.i(TAG, "Caught Survey Start event with clickId: $clickId")
-                }
-
-                HookName.SURVEY_COMPLETE -> {
-                    val rewardArgs = hookMessage.args.filterIsInstance<RewardArgs>().firstOrNull()
-                    val reward = rewardArgs?.reward ?: 0f
-                    addReward(reward.toDouble())
-                    Log.i(TAG, "Caught Survey Complete event with reward: $reward")
-                }
-
-                HookName.SURVEY_SCREENOUT -> {
-                    val rewardArgs = hookMessage.args.filterIsInstance<RewardArgs>().firstOrNull()
-                    val reward = rewardArgs?.reward ?: 0f
-                    addReward(reward.toDouble())
-                    Log.i(TAG, "Caught Survey Screenout with reward: $reward")
-                }
-
-                HookName.SURVEY_START_BONUS -> {
-                    val rewardArgs = hookMessage.args.filterIsInstance<RewardArgs>().firstOrNull()
-                    val reward = rewardArgs?.reward ?: 0f
-                    addReward(reward.toDouble())
-                    Log.i(TAG, "Caught Survey Start Bonus event with reward: $reward")
-                }
-
-                HookName.INIT -> {
-                    (context as BitLabsOfferwallActivity).runOnUiThread { toggleToolbar(false) }
-                    Handler(Looper.getMainLooper()).postDelayed(
-                        {
-                            this@setup.evaluateJavascript(
-                                """
-                                window.parent.postMessage({ target: 'app.behaviour.close_button_visible', value: true });
-                                """.trimIndent()
-                            ) {}
-                        }, 1000
-                    )
-                }
-            }
-        }
-    }, "AndroidWebView")
-
-    this.settings.run {
-        databaseEnabled = true
-        allowFileAccess = true
-        javaScriptEnabled = true
-        domStorageEnabled = true
-        displayZoomControls = false
-        setSupportMultipleWindows(true)
-        cacheMode = WebSettings.LOAD_NO_CACHE
-        mediaPlaybackRequiresUserGesture = false
-        javaScriptCanOpenWindowsAutomatically = true
-    }
 }
 
 @SuppressLint("SetJavaScriptEnabled")
@@ -266,6 +152,17 @@ fun WebView.setupSettings() = this.settings.run {
 }
 
 fun WebView.setupClient() {
+    // You're probably wondering why we set the layout params.
+    // The weird reason is that this is the only way to ensure that the Webview
+    // renders VueJS components correctly when the WebView is used in a Composable.
+    layoutParams = ViewGroup.LayoutParams(
+        ViewGroup.LayoutParams.MATCH_PARENT,
+        ViewGroup.LayoutParams.MATCH_PARENT
+    )
+
+    CookieManager.getInstance()
+        .setAcceptThirdPartyCookies(this, true)
+
     this.webViewClient = object : WebViewClient() {
         override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
             super.onPageStarted(view, url, favicon)
@@ -276,6 +173,37 @@ fun WebView.setupClient() {
             });
             """.trimIndent()
             ) {}
+        }
+
+        override fun onPageFinished(view: WebView?, url: String?) {
+            CookieManager.getInstance().flush()
+        }
+    }
+}
+
+fun WebView.setupChromeClient() {
+    webChromeClient = object : WebChromeClient() {
+        override fun onCreateWindow(
+            view: WebView, dialog: Boolean, userGesture: Boolean, resultMsg: Message,
+        ): Boolean {
+            val newWebView = WebView(view.context)
+            with(resultMsg.obj as WebView.WebViewTransport) { webView = newWebView }
+            resultMsg.sendToTarget()
+
+            newWebView.webViewClient = object : WebViewClient() {
+                override fun shouldOverrideUrlLoading(
+                    view: WebView?, request: WebResourceRequest?,
+                ): Boolean {
+                    val url = request?.url?.toString()
+                    if (!url.isNullOrEmpty()) {
+                        CustomTabsIntent.Builder().build().launchUrl(context, url.toUri())
+                        return true
+                    }
+                    return false
+                }
+            }
+
+            return true
         }
     }
 }

@@ -67,10 +67,8 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
     }
 
     private fun bindUI() {
+        // TODO: Add this to the composable
         webView?.setup(
-            { },
-            { },
-            { },
             { error, date, errUrl ->
                 val errorInfo =
                     "code: ${error?.getStatusCode()}, description: ${error?.getDescription()}"

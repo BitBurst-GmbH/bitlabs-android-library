@@ -1,37 +1,28 @@
 package ai.bitlabs.sdk.offerwall
 
+import ai.bitlabs.sdk.util.extensions.setupChromeClient
 import ai.bitlabs.sdk.util.extensions.setupClient
 import ai.bitlabs.sdk.util.extensions.setupPostMessageHandler
 import ai.bitlabs.sdk.util.extensions.setupSettings
 import android.app.Activity
 import android.content.pm.ActivityInfo
-import android.view.View
 import android.webkit.WebView
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.viewinterop.AndroidView
@@ -51,6 +42,7 @@ fun BLWebView(token: String, url: String, listenerId: Int = 0) {
             scrollBarStyle = WebView.SCROLLBARS_OUTSIDE_OVERLAY
             setupClient()
             setupSettings()
+            setupChromeClient()
             setupPostMessageHandler(
                 addReward = { viewModel.onSurveyReward(it) },
                 setClickId = { viewModel.clickId = it ?: "" },

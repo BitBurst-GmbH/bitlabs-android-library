@@ -81,11 +81,6 @@ fun WebView.setup(onError: (error: WebViewError?, date: String, url: String) -> 
                 .setOnDismissListener { uriResult?.onReceiveValue(null) }.show()
         }
 
-    CookieManager.getInstance()
-        .setAcceptThirdPartyCookies(this, true)
-
-    this.setLayerType(View.LAYER_TYPE_HARDWARE, null)
-
     this.webChromeClient = object : WebChromeClient() {
         override fun onShowFileChooser(
             webView: WebView?,
@@ -108,33 +103,6 @@ fun WebView.setup(onError: (error: WebViewError?, date: String, url: String) -> 
             return true
         }
     }
-
-    this.webViewClient = object : WebViewClient() {
-        @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-        override fun onReceivedHttpError(
-            view: WebView?, request: WebResourceRequest?, errorResponse: WebResourceResponse?,
-        ) {
-            if (BitLabs.debugMode) onError(
-                WebViewError(errorResponse = errorResponse),
-                System.currentTimeMillis().toString(),
-                request?.url.toString()
-            )
-
-            super.onReceivedHttpError(view, request, errorResponse)
-        }
-
-        @RequiresApi(Build.VERSION_CODES.M)
-        override fun onReceivedError(
-            view: WebView?, request: WebResourceRequest?, error: WebResourceError?,
-        ) {
-            if (BitLabs.debugMode || error?.description?.contains("ERR_CLEARTEXT_NOT_PERMITTED") == true) onError(
-                WebViewError(error = error),
-                System.currentTimeMillis().toString(),
-                request?.url.toString()
-            )
-            super.onReceivedError(view, request, error)
-        }
-    }
 }
 
 @SuppressLint("SetJavaScriptEnabled")
@@ -151,7 +119,7 @@ fun WebView.setupSettings() = this.settings.run {
     setLayerType(View.LAYER_TYPE_HARDWARE, null)
 }
 
-fun WebView.setupClient() {
+fun WebView.setupClient(onError: (error: WebViewError) -> Unit) {
     // You're probably wondering why we set the layout params.
     // The weird reason is that this is the only way to ensure that the Webview
     // renders VueJS components correctly when the WebView is used in a Composable.
@@ -177,6 +145,26 @@ fun WebView.setupClient() {
 
         override fun onPageFinished(view: WebView?, url: String?) {
             CookieManager.getInstance().flush()
+        }
+
+        override fun onReceivedHttpError(
+            view: WebView?, request: WebResourceRequest?, errorResponse: WebResourceResponse?,
+        ) {
+            if (BitLabs.debugMode) onError(
+                WebViewError(url = request?.url.toString(), errorResponse = errorResponse)
+            )
+
+            super.onReceivedHttpError(view, request, errorResponse)
+        }
+
+        @RequiresApi(Build.VERSION_CODES.M)
+        override fun onReceivedError(
+            view: WebView?, request: WebResourceRequest?, error: WebResourceError?,
+        ) {
+            if (BitLabs.debugMode || error?.description?.contains("ERR_CLEARTEXT_NOT_PERMITTED") == true)
+                onError(WebViewError(url = request?.url.toString(), error = error))
+
+            super.onReceivedError(view, request, error)
         }
     }
 }

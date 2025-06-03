@@ -37,23 +37,23 @@
         android:layout_alignParentBottom="true"
         android:background="@drawable/background_card_gradient" />
 
-    <LinearLayout
-        android:id="@+id/ll_qr_code_bitlabs"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_marginHorizontal="40dp"
-        android:visibility="gone">
+<!--    <LinearLayout-->
+<!--        android:id="@+id/ll_qr_code_bitlabs"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_centerVertical="true"-->
+<!--        android:layout_marginHorizontal="40dp"-->
+<!--        android:visibility="visible">-->
 
-        <ImageView
-            android:layout_width="75dp"
-            android:layout_height="75dp"
-            android:contentDescription="@string/qrcode" />
+<!--        <ImageView-->
+<!--            android:layout_width="75dp"-->
+<!--            android:layout_height="75dp"-->
+<!--            android:contentDescription="@string/qrcode" />-->
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center_vertical" />
-    </LinearLayout>
+<!--        <TextView-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:layout_weight="1"-->
+<!--            android:gravity="center_vertical" />-->
+<!--    </LinearLayout>-->
 </RelativeLayout>

@@ -1,5 +1,6 @@
 package ai.bitlabs.sdk.offerwall
 
+import ai.bitlabs.sdk.data.model.bitlabs.WebViewError
 import ai.bitlabs.sdk.util.extensions.setupChromeClient
 import ai.bitlabs.sdk.util.extensions.setupClient
 import ai.bitlabs.sdk.util.extensions.setupPostMessageHandler
@@ -34,13 +35,14 @@ fun BLWebView(token: String, url: String, listenerId: Int = 0) {
 
     val viewModel = remember { OfferwallViewModel(token, listenerId) }
 
+    val error = remember { mutableStateOf<WebViewError?>(null) }
     val isTopBarShown = remember { mutableStateOf(false) }
     val shouldShowLeaveSurveyDialog = remember { mutableStateOf(false) }
 
     val webView = remember {
         WebView(context).apply {
             scrollBarStyle = WebView.SCROLLBARS_OUTSIDE_OVERLAY
-            setupClient()
+            setupClient { error.value = it }
             setupSettings()
             setupChromeClient()
             setupPostMessageHandler(
@@ -84,21 +86,6 @@ fun BLWebView(token: String, url: String, listenerId: Int = 0) {
         (context as? Activity)?.finish()
     }
 
-    if (shouldShowLeaveSurveyDialog.value) {
-        LeaveSurveyDialog(
-            onDismiss = { shouldShowLeaveSurveyDialog.value = false },
-            leaveSurvey = { reason ->
-                shouldShowLeaveSurveyDialog.value = false
-                isTopBarShown.value = false
-
-                webView.evaluateJavascript(
-                    " window.history.go(-window.history.length + 1);", null
-                )
-
-                viewModel.leaveSurvey(reason)
-            })
-    }
-
     BackHandler { onBackPressed() }
 
     val window = (LocalView.current.context as Activity).window
@@ -128,5 +115,24 @@ fun BLWebView(token: String, url: String, listenerId: Int = 0) {
                 .background(color = Color(viewModel.backgroundColors.value.first()))
                 .navigationBarsPadding()
         )
+    }
+
+    if (shouldShowLeaveSurveyDialog.value) {
+        LeaveSurveyDialog(
+            onDismiss = { shouldShowLeaveSurveyDialog.value = false },
+            leaveSurvey = { reason ->
+                shouldShowLeaveSurveyDialog.value = false
+                isTopBarShown.value = false
+
+                webView.evaluateJavascript(
+                    " window.history.go(-window.history.length + 1);", null
+                )
+
+                viewModel.leaveSurvey(reason)
+            })
+    }
+
+    if (error.value != null) {
+        BLErrorQr(error.value!!)
     }
 }

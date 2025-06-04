@@ -26,8 +26,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -41,21 +43,21 @@ fun BLWebView(token: String, url: String, listenerId: Int = 0) {
 
     val viewModel = remember { BLWebViewViewModel(token, listenerId) }
 
-    val error = remember { mutableStateOf<WebViewError?>(null) }
-    val isTopBarShown = remember { mutableStateOf(false) }
-    val shouldShowLeaveSurveyDialog = remember { mutableStateOf(false) }
-    val uriResult = remember { mutableStateOf<ValueCallback<Array<Uri>>?>(null) }
+    var error by remember { mutableStateOf<WebViewError?>(null) }
+    var isTopBarShown by remember { mutableStateOf(false) }
+    var shouldShowLeaveSurveyDialog by remember { mutableStateOf(false) }
+    var uriResult by remember { mutableStateOf<ValueCallback<Array<Uri>>?>(null) }
 
     val webView = remember {
         WebView(context).apply {
             scrollBarStyle = WebView.SCROLLBARS_OUTSIDE_OVERLAY
             setup()
-            webViewClient = BLWebViewClient { error.value = it }
-            webChromeClient = BLWebChromeClient { uriResult.value = it }
+            webViewClient = BLWebViewClient { error = it }
+            webChromeClient = BLWebChromeClient { uriResult = it }
             setupPostMessageHandler(
                 addReward = { viewModel.onSurveyReward(it) },
                 setClickId = { viewModel.clickId = it ?: "" },
-                toggleTopBar = { isTopBarShown.value = it },
+                toggleTopBar = { isTopBarShown = it },
             )
             loadUrl(url)
         }
@@ -65,23 +67,23 @@ fun BLWebView(token: String, url: String, listenerId: Int = 0) {
         onDispose { viewModel.onOfferwallClosed() }
     }
 
-    LaunchedEffect(isTopBarShown.value) {
+    LaunchedEffect(isTopBarShown) {
         val activity = context as? Activity
 
         activity?.requestedOrientation =
-            if (isTopBarShown.value) ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+            if (isTopBarShown) ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
             else ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
         webView.apply {
-            isScrollbarFadingEnabled = isTopBarShown.value
-            settings.setSupportZoom(isTopBarShown.value)
-            settings.builtInZoomControls = isTopBarShown.value
+            isScrollbarFadingEnabled = isTopBarShown
+            settings.setSupportZoom(isTopBarShown)
+            settings.builtInZoomControls = isTopBarShown
         }
     }
 
     fun onBackPressed() {
-        if (isTopBarShown.value) {
-            shouldShowLeaveSurveyDialog.value = true
+        if (isTopBarShown) {
+            shouldShowLeaveSurveyDialog = true
             return
         }
 
@@ -110,7 +112,7 @@ fun BLWebView(token: String, url: String, listenerId: Int = 0) {
                 .background(color = Color(viewModel.headerColors.value.first()))
                 .statusBarsPadding()
         )
-        if (isTopBarShown.value) BLTopBar(
+        if (isTopBarShown) BLTopBar(
             viewModel.headerColors.value,
             viewModel.isColorBright,
             ::onBackPressed
@@ -124,12 +126,12 @@ fun BLWebView(token: String, url: String, listenerId: Int = 0) {
         )
     }
 
-    if (shouldShowLeaveSurveyDialog.value) {
+    if (shouldShowLeaveSurveyDialog) {
         BLLeaveSurveyDialog(
-            onDismiss = { shouldShowLeaveSurveyDialog.value = false },
+            onDismiss = { shouldShowLeaveSurveyDialog = false },
             leaveSurvey = { reason ->
-                shouldShowLeaveSurveyDialog.value = false
-                isTopBarShown.value = false
+                shouldShowLeaveSurveyDialog = false
+                isTopBarShown = false
 
                 webView.evaluateJavascript(
                     " window.history.go(-window.history.length + 1);", null
@@ -139,14 +141,14 @@ fun BLWebView(token: String, url: String, listenerId: Int = 0) {
             })
     }
 
-    if (error.value != null) {
-        BLErrorQr(error.value!!)
+    if (error != null) {
+        BLErrorQr(error!!)
     }
 
-    if (uriResult.value != null) {
+    if (uriResult != null) {
         BLPhotoChooser(
-            uriResult.value,
-            onDismiss = { uriResult.value = null },
+            uriResult,
+            onDismiss = { uriResult = null },
         )
     }
 }

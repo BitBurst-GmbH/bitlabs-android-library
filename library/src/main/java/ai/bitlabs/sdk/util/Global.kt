@@ -1,14 +1,10 @@
 package ai.bitlabs.sdk.util
 
-import ai.bitlabs.sdk.data.model.sentry.SentryManager
 import android.content.res.Configuration
 import android.content.res.Resources
-import android.util.Log
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.math.BigDecimal
-import java.math.RoundingMode
 
 internal fun buildHttpClientWithHeaders(vararg headers: Pair<String, String>) =
     OkHttpClient.Builder()
@@ -34,9 +30,6 @@ internal fun deviceType(): String {
     return if (isTablet) "tablet" else "phone"
 }
 
-
-
-
 internal fun String.snakeToCamelCase() = lowercase()
     .split("_")
     .joinToString("") { it.replaceFirstChar { c -> c.uppercase() } }
@@ -44,16 +37,3 @@ internal fun String.snakeToCamelCase() = lowercase()
 
 internal fun String.convertKeysToCamelCase() = Regex("\"([a-z]+(?:_[a-z]+)+)\":")
     .replace(this) { match -> match.groupValues[1].snakeToCamelCase().let { "\"$it\":" } }
-
-internal fun String.rounded(): String {
-    try {
-        with(BigDecimal(this).setScale(2, RoundingMode.DOWN)) {
-            return if (this.scale() == 0) toPlainString()
-            else stripTrailingZeros().toPlainString()
-        }
-    } catch (e: NumberFormatException) {
-        SentryManager.captureException(e)
-        Log.e(TAG, "rounded: Tried to round non-number!", e)
-        return this
-    }
-}

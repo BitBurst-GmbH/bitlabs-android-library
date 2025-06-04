@@ -1,12 +1,12 @@
-package ai.bitlabs.sdk.offerwall
+package ai.bitlabs.sdk.offerwall.util
 
 import androidx.annotation.Keep
 import androidx.core.net.toUri
 
 /**
- * This class holds the parameters of the [BitLabsOfferwallActivity] responsible to launch the OfferWall.
+ * This class holds the parameters of the [ai.bitlabs.sdk.offerwall.BitLabsOfferwallActivity] responsible to launch the OfferWall.
  * @constructor A Constructor that holds the values ([token], [uid], [tags])
- * which will be used in the [BitLabsOfferwallActivity] to launch the OfferWall correctly.
+ * which will be used in the [ai.bitlabs.sdk.offerwall.BitLabsOfferwallActivity] to launch the OfferWall correctly.
  */
 @Keep
 internal data class WebActivityParams(

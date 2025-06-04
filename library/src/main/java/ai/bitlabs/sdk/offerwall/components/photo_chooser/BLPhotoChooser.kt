@@ -1,8 +1,11 @@
-package ai.bitlabs.sdk.offerwall
+package ai.bitlabs.sdk.offerwall.components.photo_chooser
 
 import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.R
 import ai.bitlabs.sdk.data.model.sentry.SentryManager
+import ai.bitlabs.sdk.offerwall.theme.BLColors
+import ai.bitlabs.sdk.offerwall.theme.BLStyle
+import ai.bitlabs.sdk.offerwall.shared.BLText
 import ai.bitlabs.sdk.util.TAG
 import android.Manifest
 import android.net.Uri

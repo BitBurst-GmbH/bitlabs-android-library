@@ -3,36 +3,12 @@ package ai.bitlabs.sdk.util
 import ai.bitlabs.sdk.data.model.sentry.SentryManager
 import android.content.res.Configuration
 import android.content.res.Resources
-import android.graphics.Bitmap
-import android.graphics.Color
 import android.util.Log
-import android.widget.ImageView
-import androidx.core.graphics.createBitmap
-import androidx.core.graphics.set
-import androidx.core.graphics.toColorInt
-import com.google.zxing.BarcodeFormat
-import com.google.zxing.qrcode.QRCodeWriter
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.math.BigDecimal
 import java.math.RoundingMode
-
-internal const val TAG = "BitLabs"
-
-internal const val BASE_URL = "https://api.bitlabs.ai/"
-
-internal const val BUNDLE_KEY_LISTENER_ID = "bundle-key-listener-id"
-internal const val BUNDLE_KEY_TOKEN = "bundle-key-token"
-internal const val BUNDLE_KEY_URL = "bundle-key-url"
-
-internal fun getColorScheme(): String {
-    val darkModeFlags =
-        Resources.getSystem().configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
-    val isDarkMode = darkModeFlags == Configuration.UI_MODE_NIGHT_YES
-
-    return if (isDarkMode) "DARK" else "LIGHT"
-}
 
 internal fun buildHttpClientWithHeaders(vararg headers: Pair<String, String>) =
     OkHttpClient.Builder()
@@ -59,22 +35,7 @@ internal fun deviceType(): String {
 }
 
 
-internal fun getLuminance(color: Int) =
-    0.2126 * Color.red(color) + 0.7152 * Color.green(color) + 0.0722 * Color.blue(color)
 
-/**
- * @param color - Can be in the form of a css linear-gradient or a single hex color
- * @return - An array of two colors. If the input is a single color, the array will contain the same two colors
- */
-internal fun extractColors(color: String) =
-    Regex("""linear-gradient\((\d+)deg,\s*(.+)\)""").find(color)?.run {
-        groupValues[2].replace("([0-9]+)%".toRegex(), "")
-            .split(",\\s".toRegex())
-            .map { it.trim().toColorInt() }
-            .toIntArray()
-    } ?: Regex("""#([0-9a-fA-F]{6})""").find(color)?.run {
-        intArrayOf(groupValues[0].toColorInt(), groupValues[0].toColorInt())
-    } ?: intArrayOf()
 
 internal fun String.snakeToCamelCase() = lowercase()
     .split("_")
@@ -96,12 +57,3 @@ internal fun String.rounded(): String {
         return this
     }
 }
-
-internal fun ImageView.setQRCodeBitmap(value: String) =
-    createBitmap(512, 512, Bitmap.Config.RGB_565)
-        .apply {
-            val bitMtx = QRCodeWriter().encode(value, BarcodeFormat.QR_CODE, 512, 512)
-            for (x in 0 until 512)
-                for (y in 0 until 512)
-                    set(x, y, if (bitMtx.get(x, y)) Color.BLACK else Color.WHITE)
-        }.let { setImageBitmap(it) }

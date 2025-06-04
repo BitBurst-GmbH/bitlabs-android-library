@@ -10,7 +10,7 @@ import ai.bitlabs.sdk.data.model.sentry.SentryManager
 import ai.bitlabs.sdk.data.repositories.BitLabsRepository
 import ai.bitlabs.sdk.offerwall.BitLabsOfferwallActivity
 import ai.bitlabs.sdk.offerwall.Offerwall
-import ai.bitlabs.sdk.offerwall.WebActivityParams
+import ai.bitlabs.sdk.offerwall.util.WebActivityParams
 import ai.bitlabs.sdk.util.BASE_URL
 import ai.bitlabs.sdk.util.BUNDLE_KEY_TOKEN
 import ai.bitlabs.sdk.util.BUNDLE_KEY_URL

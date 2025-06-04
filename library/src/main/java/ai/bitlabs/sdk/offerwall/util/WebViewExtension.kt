@@ -1,13 +1,9 @@
-package ai.bitlabs.sdk.util.extensions
+package ai.bitlabs.sdk.offerwall.util
 
 import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.data.model.bitlabs.WebViewError
 import ai.bitlabs.sdk.offerwall.BitLabsOfferwallActivity
-import ai.bitlabs.sdk.util.HookName
-import ai.bitlabs.sdk.util.RewardArgs
-import ai.bitlabs.sdk.util.SurveyStartArgs
 import ai.bitlabs.sdk.util.TAG
-import ai.bitlabs.sdk.util.asHookMessage
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.net.Uri

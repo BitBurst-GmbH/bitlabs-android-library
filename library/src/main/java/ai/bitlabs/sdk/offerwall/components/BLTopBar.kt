@@ -1,6 +1,7 @@
-package ai.bitlabs.sdk.offerwall
+package ai.bitlabs.sdk.offerwall.components
 
 import ai.bitlabs.sdk.R
+import ai.bitlabs.sdk.offerwall.theme.BLColors
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

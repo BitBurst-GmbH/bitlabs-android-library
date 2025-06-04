@@ -1,6 +1,9 @@
-package ai.bitlabs.sdk.offerwall
+package ai.bitlabs.sdk.offerwall.components
 
 import ai.bitlabs.sdk.R
+import ai.bitlabs.sdk.offerwall.theme.BLColors
+import ai.bitlabs.sdk.offerwall.theme.BLStyle
+import ai.bitlabs.sdk.offerwall.shared.BLText
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer

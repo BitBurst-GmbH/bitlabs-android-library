@@ -1,4 +1,4 @@
-package ai.bitlabs.sdk.util.extensions
+package ai.bitlabs.sdk.data.util
 
 import ai.bitlabs.sdk.data.model.bitlabs.BitLabsResponse
 import ai.bitlabs.sdk.data.model.sentry.SentryManager

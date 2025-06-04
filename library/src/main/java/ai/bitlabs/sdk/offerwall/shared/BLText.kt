@@ -1,5 +1,6 @@
-package ai.bitlabs.sdk.offerwall
+package ai.bitlabs.sdk.offerwall.shared
 
+import ai.bitlabs.sdk.offerwall.theme.BLStyle
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth

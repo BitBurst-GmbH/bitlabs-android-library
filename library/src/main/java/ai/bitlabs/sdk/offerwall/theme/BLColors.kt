@@ -1,4 +1,4 @@
-package ai.bitlabs.sdk.offerwall
+package ai.bitlabs.sdk.offerwall.theme
 
 import ai.bitlabs.sdk.R
 import androidx.compose.runtime.Composable

@@ -1,4 +1,4 @@
-package ai.bitlabs.sdk.offerwall
+package ai.bitlabs.sdk.offerwall.util
 
 import ai.bitlabs.sdk.util.OnOfferwallClosedListener
 import ai.bitlabs.sdk.util.OnSurveyRewardListener

@@ -1,4 +1,4 @@
-package ai.bitlabs.sdk.util.extensions
+package ai.bitlabs.sdk
 
 import ai.bitlabs.sdk.util.TAG
 import android.util.Log

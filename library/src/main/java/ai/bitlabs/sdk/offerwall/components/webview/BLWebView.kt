@@ -1,10 +1,14 @@
-package ai.bitlabs.sdk.offerwall
+package ai.bitlabs.sdk.offerwall.components.webview
 
 import ai.bitlabs.sdk.data.model.bitlabs.WebViewError
-import ai.bitlabs.sdk.util.extensions.setupChromeClient
-import ai.bitlabs.sdk.util.extensions.setupClient
-import ai.bitlabs.sdk.util.extensions.setupPostMessageHandler
-import ai.bitlabs.sdk.util.extensions.setupSettings
+import ai.bitlabs.sdk.offerwall.components.BLErrorQr
+import ai.bitlabs.sdk.offerwall.components.BLLeaveSurveyDialog
+import ai.bitlabs.sdk.offerwall.components.BLTopBar
+import ai.bitlabs.sdk.offerwall.components.photo_chooser.BLPhotoChooser
+import ai.bitlabs.sdk.offerwall.util.setupChromeClient
+import ai.bitlabs.sdk.offerwall.util.setupClient
+import ai.bitlabs.sdk.offerwall.util.setupPostMessageHandler
+import ai.bitlabs.sdk.offerwall.util.setupSettings
 import android.app.Activity
 import android.content.pm.ActivityInfo
 import android.net.Uri
@@ -35,7 +39,7 @@ import androidx.core.view.WindowCompat
 fun BLWebView(token: String, url: String, listenerId: Int = 0) {
     val context = LocalContext.current
 
-    val viewModel = remember { OfferwallViewModel(token, listenerId) }
+    val viewModel = remember { BLWebViewViewModel(token, listenerId) }
 
     val error = remember { mutableStateOf<WebViewError?>(null) }
     val isTopBarShown = remember { mutableStateOf(false) }

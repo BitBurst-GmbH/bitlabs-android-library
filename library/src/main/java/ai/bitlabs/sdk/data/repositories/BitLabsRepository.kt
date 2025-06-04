@@ -12,7 +12,7 @@ import ai.bitlabs.sdk.data.model.sentry.SentryManager
 import ai.bitlabs.sdk.util.OnExceptionListener
 import ai.bitlabs.sdk.util.OnResponseListener
 import ai.bitlabs.sdk.util.TAG
-import ai.bitlabs.sdk.util.extensions.body
+import ai.bitlabs.sdk.data.util.body
 import android.util.Log
 import retrofit2.Call
 import retrofit2.Callback

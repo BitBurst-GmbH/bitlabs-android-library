@@ -1,13 +1,14 @@
-package ai.bitlabs.sdk.util
+package ai.bitlabs.sdk.offerwall.util
 
 import ai.bitlabs.sdk.data.model.sentry.SentryManager
+import ai.bitlabs.sdk.util.TAG
 import android.util.Log
+import androidx.annotation.Keep
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
 import com.google.gson.JsonParseException
-import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
 import java.lang.reflect.Type
 

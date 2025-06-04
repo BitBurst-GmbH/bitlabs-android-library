@@ -1,6 +1,8 @@
-package ai.bitlabs.sdk.offerwall
+package ai.bitlabs.sdk.offerwall.components
 
 import ai.bitlabs.sdk.data.model.bitlabs.WebViewError
+import ai.bitlabs.sdk.offerwall.theme.BLStyle
+import ai.bitlabs.sdk.offerwall.shared.BLText
 import ai.bitlabs.sdk.util.TAG
 import android.util.Log
 import androidx.compose.foundation.Image

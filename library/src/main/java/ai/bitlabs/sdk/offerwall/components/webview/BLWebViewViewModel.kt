@@ -1,20 +1,19 @@
-package ai.bitlabs.sdk.offerwall
+package ai.bitlabs.sdk.offerwall.components.webview
 
 import ai.bitlabs.sdk.BitLabs
+import ai.bitlabs.sdk.offerwall.util.OfferwallListenerManager
+import ai.bitlabs.sdk.offerwall.util.extractColors
+import ai.bitlabs.sdk.offerwall.util.getColorScheme
+import ai.bitlabs.sdk.offerwall.util.getLuminance
 import ai.bitlabs.sdk.util.OnOfferwallClosedListener
 import ai.bitlabs.sdk.util.OnSurveyRewardListener
 import ai.bitlabs.sdk.util.TAG
-import ai.bitlabs.sdk.util.extractColors
-import ai.bitlabs.sdk.util.getColorScheme
-import ai.bitlabs.sdk.util.getLuminance
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import kotlin.collections.first
-import kotlin.collections.last
 
-class OfferwallViewModel(val token: String, val listenerId: Int) : ViewModel() {
+class BLWebViewViewModel(val token: String, val listenerId: Int) : ViewModel() {
     var clickId = ""
     val isColorBright: Boolean
         get() = getLuminance(headerColors.value.first()) > 0.729 * 255

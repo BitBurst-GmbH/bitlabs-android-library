@@ -5,10 +5,10 @@ import ai.bitlabs.sdk.offerwall.components.BLErrorQr
 import ai.bitlabs.sdk.offerwall.components.BLLeaveSurveyDialog
 import ai.bitlabs.sdk.offerwall.components.BLTopBar
 import ai.bitlabs.sdk.offerwall.components.photo_chooser.BLPhotoChooser
-import ai.bitlabs.sdk.offerwall.util.setupChromeClient
-import ai.bitlabs.sdk.offerwall.util.setupClient
+import ai.bitlabs.sdk.offerwall.util.setup
 import ai.bitlabs.sdk.offerwall.util.setupPostMessageHandler
-import ai.bitlabs.sdk.offerwall.util.setupSettings
+import ai.bitlabs.sdk.util.BLWebChromeClient
+import ai.bitlabs.sdk.util.BLWebViewClient
 import android.app.Activity
 import android.content.pm.ActivityInfo
 import android.net.Uri
@@ -49,9 +49,9 @@ fun BLWebView(token: String, url: String, listenerId: Int = 0) {
     val webView = remember {
         WebView(context).apply {
             scrollBarStyle = WebView.SCROLLBARS_OUTSIDE_OVERLAY
-            setupClient { error.value = it }
-            setupSettings()
-            setupChromeClient({ uriResult.value = it })
+            setup()
+            webViewClient = BLWebViewClient { error.value = it }
+            webChromeClient = BLWebChromeClient { uriResult.value = it }
             setupPostMessageHandler(
                 addReward = { viewModel.onSurveyReward(it) },
                 setClickId = { viewModel.clickId = it ?: "" },

@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 
 @Composable
@@ -29,4 +30,10 @@ fun BLText(
     Box(contentAlignment = contentAlignment, modifier = modifier) {
         BasicText(text = text, style = style)
     }
+}
+
+@Preview
+@Composable
+fun BLTextPreview() {
+    BLText(text = "This is a preview of the BLText composable.")
 }

@@ -7,6 +7,8 @@ import ai.bitlabs.sdk.util.extensions.setupPostMessageHandler
 import ai.bitlabs.sdk.util.extensions.setupSettings
 import android.app.Activity
 import android.content.pm.ActivityInfo
+import android.net.Uri
+import android.webkit.ValueCallback
 import android.webkit.WebView
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
@@ -38,13 +40,14 @@ fun BLWebView(token: String, url: String, listenerId: Int = 0) {
     val error = remember { mutableStateOf<WebViewError?>(null) }
     val isTopBarShown = remember { mutableStateOf(false) }
     val shouldShowLeaveSurveyDialog = remember { mutableStateOf(false) }
+    val uriResult = remember { mutableStateOf<ValueCallback<Array<Uri>>?>(null) }
 
     val webView = remember {
         WebView(context).apply {
             scrollBarStyle = WebView.SCROLLBARS_OUTSIDE_OVERLAY
             setupClient { error.value = it }
             setupSettings()
-            setupChromeClient()
+            setupChromeClient({ uriResult.value = it })
             setupPostMessageHandler(
                 addReward = { viewModel.onSurveyReward(it) },
                 setClickId = { viewModel.clickId = it ?: "" },
@@ -118,7 +121,7 @@ fun BLWebView(token: String, url: String, listenerId: Int = 0) {
     }
 
     if (shouldShowLeaveSurveyDialog.value) {
-        LeaveSurveyDialog(
+        BLLeaveSurveyDialog(
             onDismiss = { shouldShowLeaveSurveyDialog.value = false },
             leaveSurvey = { reason ->
                 shouldShowLeaveSurveyDialog.value = false
@@ -134,5 +137,12 @@ fun BLWebView(token: String, url: String, listenerId: Int = 0) {
 
     if (error.value != null) {
         BLErrorQr(error.value!!)
+    }
+
+    if (uriResult.value != null) {
+        BLPhotoChooser(
+            uriResult.value,
+            onDismiss = { uriResult.value = null },
+        )
     }
 }

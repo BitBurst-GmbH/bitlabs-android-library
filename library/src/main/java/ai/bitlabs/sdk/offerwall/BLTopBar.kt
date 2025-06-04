@@ -17,10 +17,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -60,4 +62,14 @@ fun BLTopBar(headerColors: IntArray, isColorBright: Boolean, onBackPressed: () -
             )
         }
     }
+}
+
+@Preview
+@Composable
+fun BLTopBarPreview() {
+    BLTopBar(
+        headerColors = intArrayOf(BLColors.Primary.toArgb()),
+        isColorBright = false,
+        onBackPressed = {}
+    )
 }

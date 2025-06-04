@@ -1,16 +1,13 @@
 package ai.bitlabs.sdk.util.extensions
 
 import ai.bitlabs.sdk.BitLabs
-import ai.bitlabs.sdk.R
 import ai.bitlabs.sdk.data.model.bitlabs.WebViewError
-import ai.bitlabs.sdk.data.model.sentry.SentryManager
 import ai.bitlabs.sdk.offerwall.BitLabsOfferwallActivity
 import ai.bitlabs.sdk.util.HookName
 import ai.bitlabs.sdk.util.RewardArgs
 import ai.bitlabs.sdk.util.SurveyStartArgs
 import ai.bitlabs.sdk.util.TAG
 import ai.bitlabs.sdk.util.asHookMessage
-import android.Manifest
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.net.Uri
@@ -31,75 +28,42 @@ import android.webkit.WebResourceResponse
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import androidx.activity.result.contract.ActivityResultContracts.GetMultipleContents
-import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
-import androidx.activity.result.contract.ActivityResultContracts.TakePicture
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AlertDialog
 import androidx.browser.customtabs.CustomTabsIntent
-import androidx.core.content.FileProvider
 import androidx.core.net.toUri
-import java.io.File
 
 /** Adds all necessary configurations for its receiver [BitLabsOfferwallActivity.webView] */
-fun WebView.setup(onError: (error: WebViewError?, date: String, url: String) -> Unit) {
-    var tempFile: File? = null
-    var uriResult: ValueCallback<Array<Uri>>? = null
-
-    val chooser =
-        (context as BitLabsOfferwallActivity).registerForActivityResult(GetMultipleContents()) {
-            uriResult?.onReceiveValue(it?.toTypedArray())
-        }
-
-    val camera = (context as BitLabsOfferwallActivity).registerForActivityResult(TakePicture()) {
-        if (tempFile == null) uriResult?.onReceiveValue(null)
-        uriResult?.onReceiveValue(arrayOf(tempFile!!.toUri()))
-    }
-
-    fun takePhoto() {
-        try {
-            tempFile = with(File(context.cacheDir, "bitlabs")) {
-                if (exists()) delete()
-                mkdir()
-                File.createTempFile("temp_photo", ".jpg", this)
-            }
-            if (tempFile == null) throw Exception("Could not create tmp photo")
-            val uri = FileProvider.getUriForFile(context, BitLabs.fileProviderAuthority, tempFile!!)
-            camera.launch(uri)
-        } catch (e: Exception) {
-            SentryManager.captureException(e)
-            Log.e(TAG, e.message, e)
-        }
-    }
-
-    val permission =
-        (context as BitLabsOfferwallActivity).registerForActivityResult(RequestPermission()) { granted ->
-            if (granted) takePhoto()
-            else AlertDialog.Builder(context).setTitle("Permission required")
-                .setMessage("Camera permission is required to take a photo. Please enable it in the app settings.")
-                .setPositiveButton("OK") { _, _ -> }
-                .setOnDismissListener { uriResult?.onReceiveValue(null) }.show()
-        }
-
+fun WebView.setupChromeClient(onFileChosen: (ValueCallback<Array<Uri>>?) -> Unit) {
     this.webChromeClient = object : WebChromeClient() {
+        override fun onCreateWindow(
+            view: WebView, dialog: Boolean, userGesture: Boolean, resultMsg: Message,
+        ): Boolean {
+            val newWebView = WebView(view.context)
+            with(resultMsg.obj as WebView.WebViewTransport) { webView = newWebView }
+            resultMsg.sendToTarget()
+
+            newWebView.webViewClient = object : WebViewClient() {
+                override fun shouldOverrideUrlLoading(
+                    view: WebView?, request: WebResourceRequest?,
+                ): Boolean {
+                    val url = request?.url?.toString()
+                    if (!url.isNullOrEmpty()) {
+                        CustomTabsIntent.Builder().build().launchUrl(context, url.toUri())
+                        return true
+                    }
+                    return false
+                }
+            }
+
+            return true
+        }
+
         override fun onShowFileChooser(
             webView: WebView?,
             filePathCallback: ValueCallback<Array<Uri>>?,
             fileChooserParams: FileChooserParams?,
         ): Boolean {
-            uriResult = filePathCallback
-
-            AlertDialog.Builder(context)
-                .setTitle(context.resources.getString(R.string.file_chooser_title)).setItems(
-                    arrayOf(
-                        context.resources.getString(R.string.file_chooser_camera),
-                        context.resources.getString(R.string.file_chooser_gallery)
-                    )
-                ) { _, which ->
-                    if (which == 0) permission.launch(Manifest.permission.CAMERA)
-                    else chooser.launch("image/*")
-                }.setOnCancelListener { uriResult?.onReceiveValue(null) }.show()
-
+            onFileChosen(filePathCallback)
             return true
         }
     }
@@ -165,33 +129,6 @@ fun WebView.setupClient(onError: (error: WebViewError) -> Unit) {
                 onError(WebViewError(url = request?.url.toString(), error = error))
 
             super.onReceivedError(view, request, error)
-        }
-    }
-}
-
-fun WebView.setupChromeClient() {
-    webChromeClient = object : WebChromeClient() {
-        override fun onCreateWindow(
-            view: WebView, dialog: Boolean, userGesture: Boolean, resultMsg: Message,
-        ): Boolean {
-            val newWebView = WebView(view.context)
-            with(resultMsg.obj as WebView.WebViewTransport) { webView = newWebView }
-            resultMsg.sendToTarget()
-
-            newWebView.webViewClient = object : WebViewClient() {
-                override fun shouldOverrideUrlLoading(
-                    view: WebView?, request: WebResourceRequest?,
-                ): Boolean {
-                    val url = request?.url?.toString()
-                    if (!url.isNullOrEmpty()) {
-                        CustomTabsIntent.Builder().build().launchUrl(context, url.toUri())
-                        return true
-                    }
-                    return false
-                }
-            }
-
-            return true
         }
     }
 }

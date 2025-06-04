@@ -1,0 +1,129 @@
+package ai.bitlabs.sdk.offerwall
+
+import ai.bitlabs.sdk.BitLabs
+import ai.bitlabs.sdk.R
+import ai.bitlabs.sdk.data.model.sentry.SentryManager
+import ai.bitlabs.sdk.util.TAG
+import android.Manifest
+import android.net.Uri
+import android.util.Log
+import android.webkit.ValueCallback
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts.GetMultipleContents
+import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
+import androidx.activity.result.contract.ActivityResultContracts.TakePicture
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.core.content.FileProvider
+import androidx.core.net.toUri
+import java.io.File
+
+@Preview
+@Composable
+fun BLPhotoChooser(uriResult: ValueCallback<Array<Uri>>? = null, onDismiss: () -> Unit = {}) {
+    var tempFile: File? = null
+    val context = LocalContext.current
+
+    val shouldShowPermissionDialog = remember { mutableStateOf(false) }
+
+    val chooser = rememberLauncherForActivityResult(GetMultipleContents()) {
+        uriResult?.onReceiveValue(it.toTypedArray())
+        onDismiss()
+    }
+
+    val camera = rememberLauncherForActivityResult(TakePicture()) {
+        if (tempFile != null) uriResult?.onReceiveValue(arrayOf(tempFile!!.toUri()))
+        else uriResult?.onReceiveValue(null)
+        onDismiss()
+    }
+
+    fun takePhoto() {
+        try {
+            tempFile = with(File(context.cacheDir, "bitlabs")) {
+                if (exists()) delete()
+                mkdir()
+                File.createTempFile("temp_photo", ".jpg", this)
+            }
+            if (tempFile == null) throw Exception("Could not create tmp photo")
+            val uri = FileProvider.getUriForFile(context, BitLabs.fileProviderAuthority, tempFile!!)
+            camera.launch(uri)
+        } catch (e: Exception) {
+            SentryManager.captureException(e)
+            Log.e(TAG, e.message, e)
+        }
+    }
+
+    val permission = rememberLauncherForActivityResult(RequestPermission()) { granted ->
+        if (granted) takePhoto()
+        else shouldShowPermissionDialog.value = true
+    }
+
+    Dialog(onDismissRequest = { uriResult?.onReceiveValue(null); onDismiss() }) {
+        Column(
+            Modifier
+                .background(color = Color.White, shape = RoundedCornerShape(16.dp))
+                .padding(16.dp)
+        ) {
+            BLText(stringResource(R.string.file_chooser_title), style = BLStyle.h6)
+            Spacer(modifier = Modifier.height(16.dp))
+            BLText(
+                text = stringResource(R.string.file_chooser_camera),
+                style = BLStyle.normal,
+                height = 48.dp,
+                onClick = { permission.launch(Manifest.permission.CAMERA) }
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            BLText(
+                text = stringResource(R.string.file_chooser_gallery),
+                style = BLStyle.normal,
+                height = 48.dp,
+                onClick = { chooser.launch("image/*") }
+            )
+        }
+    }
+
+    if (shouldShowPermissionDialog.value) {
+        BLPermissionDialog(onDismiss = { shouldShowPermissionDialog.value = false })
+    }
+}
+
+@Preview
+@Composable
+private fun BLPermissionDialog(onDismiss: () -> Unit = {}) {
+    Dialog(onDismissRequest = onDismiss) {
+        Column(
+            Modifier
+                .background(color = Color.White, shape = RoundedCornerShape(16.dp))
+                .padding(16.dp)
+        ) {
+            BLText("Permission Required", style = BLStyle.h6)
+            Spacer(modifier = Modifier.height(16.dp))
+            BLText(
+                text = "Camera permission is required to take a photo. Please enable it in the app settings.",
+                style = BLStyle.normal,
+                height = 48.dp
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            BLText(
+                text = "OK",
+                style = BLStyle.medium.copy(color = BLColors.Accent),
+                height = 48.dp,
+                onClick = { }
+            )
+        }
+    }
+}

@@ -1,16 +1,12 @@
 package ai.bitlabs.sdk.data
 
+import ai.bitlabs.sdk.data.api.BitLabsAPI
 import ai.bitlabs.sdk.data.model.bitlabs.BitLabsResponse
 import ai.bitlabs.sdk.data.model.bitlabs.GetAppSettingsResponse
 import ai.bitlabs.sdk.data.model.bitlabs.GetLeaderboardResponse
 import ai.bitlabs.sdk.data.model.bitlabs.GetSurveysResponse
 import ai.bitlabs.sdk.data.model.bitlabs.Survey
-import ai.bitlabs.sdk.data.api.BitLabsAPI
-import ai.bitlabs.sdk.data.api.SentryAPI
-import ai.bitlabs.sdk.data.model.sentry.SentryDsn
-import ai.bitlabs.sdk.data.model.sentry.SentryManager
 import ai.bitlabs.sdk.data.repositories.BitLabsRepository
-import ai.bitlabs.sdk.data.repositories.SentryRepository
 import ai.bitlabs.sdk.util.OnExceptionListener
 import ai.bitlabs.sdk.util.OnResponseListener
 import android.util.Log
@@ -19,15 +15,12 @@ import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
-import io.mockk.mockkObject
 import io.mockk.mockkStatic
-import io.mockk.unmockkObject
 import io.mockk.verify
 import okhttp3.MediaType
 import okhttp3.Request
 import okhttp3.ResponseBody
 import okio.Timeout
-import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import retrofit2.Call
@@ -165,8 +158,8 @@ class BitLabsRepositoryTest {
     @Test
     fun getAppSettings_Failure() {
         every { bitLabsAPI.getAppSettings(any()) } returns object :
-            BitLabsCall<BitLabsResponse<GetAppSettingsResponse>>() {
-            override fun enqueue(callback: Callback<BitLabsResponse<GetAppSettingsResponse>>) {
+            BitLabsCall<GetAppSettingsResponse>() {
+            override fun enqueue(callback: Callback<GetAppSettingsResponse>) {
                 callback.onFailure(this, Throwable())
             }
         }
@@ -175,42 +168,6 @@ class BitLabsRepositoryTest {
 
         verify { onExceptionListener.onException(any()) }
     }
-
-    @Test
-    fun getAppSettings_Response_Error() {
-        val errorResponseBody = ResponseBody.create(
-            MediaType.parse("application/json"),
-            "{error:{details:{http:400,msg:\"Any Request\"}}, status:\"\"}"
-        )
-
-        every { bitLabsAPI.getAppSettings(any()) } returns object :
-            BitLabsCall<BitLabsResponse<GetAppSettingsResponse>>() {
-            override fun enqueue(callback: Callback<BitLabsResponse<GetAppSettingsResponse>>) {
-                callback.onResponse(this, Response.error(400, errorResponseBody))
-            }
-        }
-
-        bitLabsRepository.getAppSettings("", {}, onExceptionListener)
-
-        verify { onExceptionListener.onException(any()) }
-    }
-
-    @Test
-    fun getAppSettings_Response_Success() {
-        val onResponseListener = mockk<OnResponseListener<GetAppSettingsResponse>>(relaxed = true)
-
-        every { bitLabsAPI.getAppSettings(any()) } returns object :
-            BitLabsCall<BitLabsResponse<GetAppSettingsResponse>>() {
-            override fun enqueue(callback: Callback<BitLabsResponse<GetAppSettingsResponse>>) {
-                callback.onResponse(this, Response.success(getWorkingResponseBody()))
-            }
-        }
-
-        bitLabsRepository.getAppSettings("", onResponseListener) {}
-
-        verify { onResponseListener.onResponse(any()) }
-    }
-
 
     @Test
     fun getLeaderboard_Failure() {

@@ -1,5 +1,8 @@
 package ai.bitlabs.sdk
 
+import ai.bitlabs.sdk.BitLabs.bitLabsRepo
+import ai.bitlabs.sdk.BitLabs.token
+import ai.bitlabs.sdk.BitLabs.uid
 import ai.bitlabs.sdk.data.api.BitLabsAPI
 import ai.bitlabs.sdk.data.model.bitlabs.Survey
 import ai.bitlabs.sdk.data.model.bitlabs.WebActivityParams
@@ -121,7 +124,7 @@ object BitLabs {
      * then there has been an internal error which is most probably logged with 'BitLabs' as a tag.
      */
     fun checkSurveys(
-        onResponseListener: OnResponseListener<Boolean>, onExceptionListener: OnExceptionListener
+        onResponseListener: OnResponseListener<Boolean>, onExceptionListener: OnExceptionListener,
     ) = ifInitialised {
         bitLabsRepo?.getSurveys("NATIVE", { surveys ->
             onResponseListener.onResponse(surveys.isNotEmpty())
@@ -137,7 +140,7 @@ object BitLabs {
      */
     fun getSurveys(
         onResponseListener: OnResponseListener<List<Survey>>,
-        onExceptionListener: OnExceptionListener
+        onExceptionListener: OnExceptionListener,
     ) = ifInitialised {
         bitLabsRepo?.getSurveys("NATIVE", onResponseListener, onExceptionListener)
     }
@@ -174,7 +177,7 @@ object BitLabs {
      * Shows a Survey Fragment in the [activity] with the [containerId] as its container.
      */
     fun showSurvey(
-        activity: FragmentActivity, containerId: Int, type: WidgetType = WidgetType.SIMPLE
+        activity: FragmentActivity, containerId: Int, type: WidgetType = WidgetType.SIMPLE,
     ) = ifInitialised {
         activity.supportFragmentManager.beginTransaction()
             .replace(containerId, BitLabsWidgetFragment(uid, token, type)).commit()
@@ -187,7 +190,7 @@ object BitLabs {
     @JvmOverloads
     @Deprecated("Use showSurvey instead")
     fun getSurveyWidgets(
-        context: Context, surveys: List<Survey>, type: WidgetType = WidgetType.COMPACT
+        context: Context, surveys: List<Survey>, type: WidgetType = WidgetType.COMPACT,
     ) = RecyclerView(context).apply {
         layoutManager = LinearLayoutManager(context, HORIZONTAL, false)
         getCurrencyIcon(currencyIconUrl, context.resources) {
@@ -216,26 +219,35 @@ object BitLabs {
         bitLabsRepo?.leaveSurvey(clickId, reason)
 
     internal fun getCurrencyIcon(
-        url: String, resources: Resources, onResponseListener: OnResponseListener<Drawable?>
+        url: String, resources: Resources, onResponseListener: OnResponseListener<Drawable?>,
     ) = bitLabsRepo?.getCurrencyIcon(url, resources, onResponseListener)
 
     /**
      * Gets the required settings from the BitLabs API.
      */
-    private fun getAppSettings() = bitLabsRepo?.getAppSettings(getColorScheme(), { app ->
-        app.visual.run {
-            widgetColors = extractColors(surveyIconColor).takeIf { it.isNotEmpty() } ?: widgetColors
-            headerColor = extractColors(navigationColor).takeIf { it.isNotEmpty() } ?: headerColor
+    private fun getAppSettings() = bitLabsRepo?.getAppSettings(token, { app ->
+        val theme = getColorScheme()
+        app.configuration.run {
+            val navigationColor =
+                find { it.internalIdentifier == "app.visual.$theme.navigation_color" }?.value ?: ""
+            headerColor =
+                extractColors(navigationColor).takeIf { it.isNotEmpty() } ?: headerColor
+
+            val surveyIconColor =
+                find { it.internalIdentifier == "app.visual.$theme.survey_icon_color" }?.value ?: ""
+            widgetColors =
+                extractColors(surveyIconColor).takeIf { it.isNotEmpty() } ?: widgetColors
+
+            val backgroundColor =
+                find { it.internalIdentifier == "app.visual.$theme.background_color" }?.value ?: ""
             backgroundColors =
                 extractColors(backgroundColor).takeIf { it.isNotEmpty() } ?: backgroundColors
-        }
 
-        app.currency.symbol.run { currencyIconUrl = content.takeIf { isImage } ?: "" }
-        bonusPercentage = app.currency.bonusPercentage / 100.0
-
-
-        app.promotion?.bonusPercentage?.run {
-            bonusPercentage += this / 100.0 + this * bonusPercentage / 100.0
+            val isImage =
+                find { it.internalIdentifier == "general.currency.symbol.is_image" }?.value ?: "0"
+            val content =
+                find { it.internalIdentifier == "general.currency.symbol.content" }?.value ?: ""
+            currencyIconUrl = content.takeIf { isImage == "1" } ?: ""
         }
     }, { Log.e(TAG, "$it") })
 

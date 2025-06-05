@@ -32,7 +32,7 @@ internal class BitLabsRepository(private val bitLabsAPI: BitLabsAPI) {
         bitLabsAPI.updateClick(clickId, UpdateClickBody(LeaveReason(reason)))
             .enqueue(object : Callback<BitLabsResponse<Unit>> {
                 override fun onResponse(
-                    call: Call<BitLabsResponse<Unit>>, response: Response<BitLabsResponse<Unit>>
+                    call: Call<BitLabsResponse<Unit>>, response: Response<BitLabsResponse<Unit>>,
                 ) {
                     if (response.isSuccessful) Log.i(TAG, "LeaveSurvey - Success")
                     else response.errorBody()?.body<Unit>()?.error?.details?.run {
@@ -51,11 +51,11 @@ internal class BitLabsRepository(private val bitLabsAPI: BitLabsAPI) {
     internal fun getSurveys(
         sdk: String,
         onResponseListener: OnResponseListener<List<Survey>>,
-        onExceptionListener: OnExceptionListener
+        onExceptionListener: OnExceptionListener,
     ) = bitLabsAPI.getSurveys(sdk).enqueue(object : Callback<BitLabsResponse<GetSurveysResponse>> {
         override fun onResponse(
             call: Call<BitLabsResponse<GetSurveysResponse>>,
-            response: Response<BitLabsResponse<GetSurveysResponse>>
+            response: Response<BitLabsResponse<GetSurveysResponse>>,
         ) {
             val restrictionReason = response.body()?.data?.restrictionReason
             if (restrictionReason != null) {
@@ -87,46 +87,39 @@ internal class BitLabsRepository(private val bitLabsAPI: BitLabsAPI) {
     })
 
     internal fun getAppSettings(
-        colorScheme: String,
+        token: String,
         onResponseListener: OnResponseListener<GetAppSettingsResponse>,
-        onExceptionListener: OnExceptionListener
-    ) = bitLabsAPI.getAppSettings(colorScheme)
-        .enqueue(object : Callback<BitLabsResponse<GetAppSettingsResponse>> {
+        onExceptionListener: OnExceptionListener,
+    ) = bitLabsAPI.getAppSettings(
+        url = "https://dashboard.bitlabs.ai/api/public/v1/apps/$token"
+    )
+        .enqueue(object : Callback<GetAppSettingsResponse> {
             override fun onResponse(
-                call: Call<BitLabsResponse<GetAppSettingsResponse>>,
-                response: Response<BitLabsResponse<GetAppSettingsResponse>>
+                call: Call<GetAppSettingsResponse>,
+                response: Response<GetAppSettingsResponse>,
             ) {
                 if (response.isSuccessful) {
-                    response.body()?.data?.let { onResponseListener.onResponse(it) }
+                    response.body()?.let { onResponseListener.onResponse(it) }
                     return
-                }
-
-                response.errorBody()?.body<GetSurveysResponse>()?.error?.details?.run {
-                    with(Exception("GetAppSettings Error: $http - $msg")) {
-                        SentryManager.captureException(this)
-                        onExceptionListener.onException(this)
-                    }
                 }
             }
 
             override fun onFailure(
-                call: Call<BitLabsResponse<GetAppSettingsResponse>>, t: Throwable
-            ) {
-                with(Exception(t)) {
-                    SentryManager.captureException(this)
-                    onExceptionListener.onException(this)
-                }
+                call: Call<GetAppSettingsResponse>, t: Throwable,
+            ) = with(Exception(t)) {
+                SentryManager.captureException(this)
+                onExceptionListener.onException(this)
             }
         })
 
     internal fun getLeaderboard(
         onResponseListener: OnResponseListener<GetLeaderboardResponse>,
-        onExceptionListener: OnExceptionListener
+        onExceptionListener: OnExceptionListener,
     ) = bitLabsAPI.getLeaderboard()
         .enqueue(object : Callback<BitLabsResponse<GetLeaderboardResponse>> {
             override fun onResponse(
                 call: Call<BitLabsResponse<GetLeaderboardResponse>>,
-                response: Response<BitLabsResponse<GetLeaderboardResponse>>
+                response: Response<BitLabsResponse<GetLeaderboardResponse>>,
             ) {
                 if (response.isSuccessful) {
                     response.body()?.data?.let { onResponseListener.onResponse(it) }
@@ -142,7 +135,7 @@ internal class BitLabsRepository(private val bitLabsAPI: BitLabsAPI) {
             }
 
             override fun onFailure(
-                call: Call<BitLabsResponse<GetLeaderboardResponse>>, t: Throwable
+                call: Call<BitLabsResponse<GetLeaderboardResponse>>, t: Throwable,
             ) {
                 with(Exception(t)) {
                     SentryManager.captureException(this)
@@ -152,10 +145,10 @@ internal class BitLabsRepository(private val bitLabsAPI: BitLabsAPI) {
         })
 
     internal fun getCurrencyIcon(
-        url: String, resources: Resources, onResponseListener: OnResponseListener<Drawable?>
+        url: String, resources: Resources, onResponseListener: OnResponseListener<Drawable?>,
     ) = bitLabsAPI.getCurrencyIcon(url).enqueue(object : Callback<ResponseBody> {
         override fun onResponse(
-            call: Call<ResponseBody>, response: Response<ResponseBody>
+            call: Call<ResponseBody>, response: Response<ResponseBody>,
         ) {
             if (response.isSuccessful) {
                 response.body()?.let {

@@ -8,6 +8,7 @@ import android.graphics.Color
 import android.util.Log
 import android.util.TypedValue
 import android.widget.ImageView
+import androidx.core.graphics.toColorInt
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.qrcode.QRCodeWriter
 import okhttp3.OkHttpClient
@@ -31,7 +32,7 @@ internal fun getColorScheme(): String {
         Resources.getSystem().configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
     val isDarkMode = darkModeFlags == Configuration.UI_MODE_NIGHT_YES
 
-    return if (isDarkMode) "DARK" else "LIGHT"
+    return if (isDarkMode) "dark" else "light"
 }
 
 internal fun buildHttpClientWithHeaders(vararg headers: Pair<String, String>) =
@@ -70,10 +71,10 @@ internal fun extractColors(color: String) =
     Regex("""linear-gradient\((\d+)deg,\s*(.+)\)""").find(color)?.run {
         groupValues[2].replace("([0-9]+)%".toRegex(), "")
             .split(",\\s".toRegex())
-            .map { Color.parseColor(it.trim()) }
+            .map { it.trim().toColorInt() }
             .toIntArray()
     } ?: Regex("""#([0-9a-fA-F]{6})""").find(color)?.run {
-        intArrayOf(Color.parseColor(groupValues[0]), Color.parseColor(groupValues[0]))
+        intArrayOf(groupValues[0].toColorInt(), groupValues[0].toColorInt())
     } ?: intArrayOf()
 
 internal fun String.snakeToCamelCase() = lowercase()

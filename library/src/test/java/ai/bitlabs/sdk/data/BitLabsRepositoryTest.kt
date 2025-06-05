@@ -6,11 +6,7 @@ import ai.bitlabs.sdk.data.model.bitlabs.GetLeaderboardResponse
 import ai.bitlabs.sdk.data.model.bitlabs.GetSurveysResponse
 import ai.bitlabs.sdk.data.model.bitlabs.Survey
 import ai.bitlabs.sdk.data.api.BitLabsAPI
-import ai.bitlabs.sdk.data.api.SentryAPI
-import ai.bitlabs.sdk.data.model.sentry.SentryDsn
-import ai.bitlabs.sdk.data.model.sentry.SentryManager
 import ai.bitlabs.sdk.data.repositories.BitLabsRepository
-import ai.bitlabs.sdk.data.repositories.SentryRepository
 import ai.bitlabs.sdk.util.OnExceptionListener
 import ai.bitlabs.sdk.util.OnResponseListener
 import android.util.Log
@@ -19,15 +15,12 @@ import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
-import io.mockk.mockkObject
 import io.mockk.mockkStatic
-import io.mockk.unmockkObject
 import io.mockk.verify
 import okhttp3.MediaType
 import okhttp3.Request
 import okhttp3.ResponseBody
 import okio.Timeout
-import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import retrofit2.Call
@@ -171,7 +164,7 @@ class BitLabsRepositoryTest {
             }
         }
 
-        bitLabsRepository.getAppSettings("", {}, onExceptionListener)
+        bitLabsRepository.getAppSettings("", onExceptionListener)
 
         verify { onExceptionListener.onException(any()) }
     }
@@ -190,7 +183,7 @@ class BitLabsRepositoryTest {
             }
         }
 
-        bitLabsRepository.getAppSettings("", {}, onExceptionListener)
+        bitLabsRepository.getAppSettings("", onExceptionListener)
 
         verify { onExceptionListener.onException(any()) }
     }
@@ -206,7 +199,7 @@ class BitLabsRepositoryTest {
             }
         }
 
-        bitLabsRepository.getAppSettings("", onResponseListener) {}
+        bitLabsRepository.getAppSettings("") {}
 
         verify { onResponseListener.onResponse(any()) }
     }

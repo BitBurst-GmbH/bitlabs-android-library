@@ -27,9 +27,6 @@ internal interface BitLabsAPI {
     @GET("v2/client/surveys?platform=MOBILE&os=ANDROID")
     fun getSurveys(@Query("sdk") sdk: String): Call<BitLabsResponse<GetSurveysResponse>>
 
-//    @GET("v1/client/settings/v2")
-//    fun getAppSettings(@Query("color_scheme") colorScheme: String): Call<BitLabsResponse<GetAppSettingsResponse>>
-
     @GET
     fun getAppSettings(@Url url: String): Call<GetAppSettingsResponse>
 

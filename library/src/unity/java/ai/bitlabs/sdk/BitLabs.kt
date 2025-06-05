@@ -1,5 +1,7 @@
 package ai.bitlabs.sdk
 
+import ai.bitlabs.sdk.BitLabs.token
+import ai.bitlabs.sdk.BitLabs.uid
 import ai.bitlabs.sdk.data.api.BitLabsAPI
 import ai.bitlabs.sdk.data.model.bitlabs.WebActivityParams
 import ai.bitlabs.sdk.data.model.sentry.SentryManager
@@ -109,19 +111,30 @@ object BitLabs {
     /**
      * Gets the app settings from the BitLabs API.
      */
-    private fun getAppSettings() = bitLabsRepo?.getAppSettings(getColorScheme(), {
-        it.visual.run {
-            widgetColor = extractColors(surveyIconColor)
-            headerColor = extractColors(navigationColor)
-            backgroundColors = extractColors(backgroundColor)
+    private fun getAppSettings() = bitLabsRepo?.getAppSettings(token, { app ->
+        val theme = getColorScheme()
+        app.configuration.run {
+            val navigationColor =
+                find { it.internalIdentifier == "app.visual.$theme.navigation_color" }?.value ?: ""
+            headerColor =
+                extractColors(navigationColor).takeIf { it.isNotEmpty() } ?: headerColor
+
+            val surveyIconColor =
+                find { it.internalIdentifier == "app.visual.$theme.survey_icon_color" }?.value ?: ""
+            widgetColor =
+                extractColors(surveyIconColor).takeIf { it.isNotEmpty() } ?: widgetColor
+
+            val backgroundColor =
+                find { it.internalIdentifier == "app.visual.$theme.background_color" }?.value ?: ""
+            backgroundColors =
+                extractColors(backgroundColor).takeIf { it.isNotEmpty() } ?: backgroundColors
+
+            val isImage =
+                find { it.internalIdentifier == "general.currency.symbol.is_image" }?.value ?: "0"
+            val content =
+                find { it.internalIdentifier == "general.currency.symbol.content" }?.value ?: ""
+            currencyIconUrl = content.takeIf { isImage == "1" } ?: ""
         }
-
-        it.currency.symbol.run { currencyIconUrl = content.takeIf { isImage } ?: "" }
-        val bonus = it.currency.bonusPercentage / 100.0
-
-        it.promotion?.bonusPercentage?.run {
-            bonusPercentage = bonus + this / 100.0 + this * bonus / 100.0
-        } ?: run { bonusPercentage = bonus }
     }, { Log.e(TAG, "$it") })
 
     /** Determines whether the user can perform an action in the OfferWall

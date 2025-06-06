@@ -22,13 +22,13 @@ fun BLText(
     style: TextStyle = BLStyle.normal,
     contentAlignment: Alignment = Alignment.CenterStart,
 ) {
-    var modifier = modifier.then(Modifier.fillMaxWidth())
+    var mod = modifier.then(Modifier.fillMaxWidth())
 
-    if (height != null) modifier = modifier.height(height)
+    if (height != null) mod = mod.height(height)
 
-    if (onClick != null) modifier = modifier.clickable { onClick() }
+    if (onClick != null) mod = mod.clickable { onClick() }
 
-    Box(contentAlignment = contentAlignment, modifier = modifier) {
+    Box(contentAlignment = contentAlignment, modifier = mod) {
         BasicText(text = text, style = style)
     }
 }

@@ -3,20 +3,16 @@ package ai.bitlabs.sdk
 import ai.bitlabs.sdk.BitLabs.token
 import ai.bitlabs.sdk.BitLabs.uid
 import ai.bitlabs.sdk.data.api.BitLabsAPI
-import ai.bitlabs.sdk.data.model.bitlabs.WebActivityParams
 import ai.bitlabs.sdk.data.model.sentry.SentryManager
 import ai.bitlabs.sdk.data.repositories.BitLabsRepository
+import ai.bitlabs.sdk.offerwall.BitLabsOfferwallActivity
+import ai.bitlabs.sdk.offerwall.util.WebActivityParams
 import ai.bitlabs.sdk.util.BASE_URL
-import ai.bitlabs.sdk.util.BUNDLE_KEY_BACKGROUND_COLOR
-import ai.bitlabs.sdk.util.BUNDLE_KEY_HEADER_COLOR
 import ai.bitlabs.sdk.util.BUNDLE_KEY_URL
-import ai.bitlabs.sdk.util.OnRewardListener
+import ai.bitlabs.sdk.util.OnSurveyRewardListener
 import ai.bitlabs.sdk.util.TAG
 import ai.bitlabs.sdk.util.convertKeysToCamelCase
 import ai.bitlabs.sdk.util.deviceType
-import ai.bitlabs.sdk.util.extractColors
-import ai.bitlabs.sdk.util.getColorScheme
-import ai.bitlabs.sdk.views.BitLabsOfferwallActivity
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -36,23 +32,17 @@ import retrofit2.converter.gson.GsonConverterFactory
  */
 object BitLabs {
     var debugMode = false
-    var shouldSupportEdgeToEdge = true
 
     private var uid = ""
     private var adId = ""
     private var token = ""
-    private var currencyIconUrl = ""
-    private var bonusPercentage = 0.0
     internal var fileProviderAuthority = ""
-    private var widgetColor = intArrayOf(0, 0)
-    private var headerColor = intArrayOf(0, 0)
-    private var backgroundColors = intArrayOf(0, 0)
 
     /** These will be added as query parameters to the OfferWall Link */
     var tags = mutableMapOf<String, Any>()
 
-    private var bitLabsRepo: BitLabsRepository? = null
-    internal var onRewardListener: OnRewardListener? = null
+    internal var bitLabsRepo: BitLabsRepository? = null
+    internal var onRewardListener: OnSurveyRewardListener? = null
 
     /**
      * Initialises the connection with BitLabs API using your app [token] and [uid]
@@ -76,7 +66,6 @@ object BitLabs {
             .addInterceptor { chain ->
                 val request = chain.request().newBuilder()
                     .addHeader("User-Agent", userAgent)
-                    .addHeader("X-Api-Token", token)
                     .addHeader("X-User-Id", uid)
                     .build()
 
@@ -96,7 +85,6 @@ object BitLabs {
 
         fileProviderAuthority = "${UnityPlayer.currentActivity.packageName}.provider.bitlabs"
 
-        getAppSettings()
 
         val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
         Thread.setDefaultUncaughtExceptionHandler { _, throwable ->
@@ -108,35 +96,6 @@ object BitLabs {
         }
     }
 
-    /**
-     * Gets the app settings from the BitLabs API.
-     */
-    private fun getAppSettings() = bitLabsRepo?.getAppSettings(token, { app ->
-        val theme = getColorScheme()
-        app.configuration.run {
-            val navigationColor =
-                find { it.internalIdentifier == "app.visual.$theme.navigation_color" }?.value ?: ""
-            headerColor =
-                extractColors(navigationColor).takeIf { it.isNotEmpty() } ?: headerColor
-
-            val surveyIconColor =
-                find { it.internalIdentifier == "app.visual.$theme.survey_icon_color" }?.value ?: ""
-            widgetColor =
-                extractColors(surveyIconColor).takeIf { it.isNotEmpty() } ?: widgetColor
-
-            val backgroundColor =
-                find { it.internalIdentifier == "app.visual.$theme.background_color" }?.value ?: ""
-            backgroundColors =
-                extractColors(backgroundColor).takeIf { it.isNotEmpty() } ?: backgroundColors
-
-            val isImage =
-                find { it.internalIdentifier == "general.currency.symbol.is_image" }?.value ?: "0"
-            val content =
-                find { it.internalIdentifier == "general.currency.symbol.content" }?.value ?: ""
-            currencyIconUrl = content.takeIf { isImage == "1" } ?: ""
-        }
-    }, { Log.e(TAG, "$it") })
-
     /** Determines whether the user can perform an action in the OfferWall
      * (either opening a survey or answering qualifications) and then executes your implementation
      * of the checkSurveysCallback().
@@ -144,7 +103,7 @@ object BitLabs {
      * If you want to perform background checks if surveys are available, this is the best option.
      */
     fun checkSurveys(gameObject: String) = ifInitialised {
-        bitLabsRepo?.getSurveys("UNITY", { surveys ->
+        bitLabsRepo?.getSurveys(token, "UNITY", { surveys ->
             UnityPlayer.UnitySendMessage(
                 gameObject,
                 "CheckSurveysCallback",
@@ -166,7 +125,7 @@ object BitLabs {
      * then there has been an internal error which is mostly logged with 'BitLabs' as a tag.
      */
     fun getSurveys(gameObject: String) = ifInitialised {
-        bitLabsRepo?.getSurveys("UNITY", { surveys ->
+        bitLabsRepo?.getSurveys(token, "UNITY", { surveys ->
             UnityPlayer.UnitySendMessage(
                 gameObject,
                 "GetSurveysCallback",
@@ -181,26 +140,9 @@ object BitLabs {
         })
     }
 
-    /**
-     * Fetches the leaderboard.
-     * ######
-     * The getLeaderBoardCallback() is executed when a response is received.
-     * Its parameter is the String in format of JSON list of surveys in . If it's `null`,
-     * then there has been an internal error which is mostly logged with 'BitLabs' as a tag.
-     */
-    fun getLeaderboard(gameObject: String) = ifInitialised {
-        bitLabsRepo?.getLeaderboard({ leaderBoard ->
-            UnityPlayer.UnitySendMessage(
-                gameObject,
-                "GetLeaderboardCallback",
-                GsonBuilder().create().toJson(leaderBoard).convertKeysToCamelCase()
-            )
-        }, { Log.e(TAG, "$it") })
-    }
-
     /** Registers an [OnRewardListener] callback to be invoked when the OfferWall is exited by the user. */
     fun setOnRewardListener(gameObject: String) {
-        onRewardListener = OnRewardListener { payout ->
+        onRewardListener = OnSurveyRewardListener { payout ->
             UnityPlayer.UnitySendMessage(gameObject, "RewardCallback", payout.toString())
         }
     }
@@ -209,12 +151,6 @@ object BitLabs {
     fun addTag(key: String, value: Any) {
         tags[key] = value
     }
-
-    fun getColor() = widgetColor
-
-    fun getCurrencyIconUrl() = currencyIconUrl
-
-    fun getBonusPercentage() = bonusPercentage
 
     /**
      * Launches the OfferWall from the currentActivity.
@@ -228,8 +164,6 @@ object BitLabs {
                 BUNDLE_KEY_URL,
                 WebActivityParams(token, uid, "UNITY", adId, tags).url
             )
-            putExtra(BUNDLE_KEY_HEADER_COLOR, headerColor)
-            putExtra(BUNDLE_KEY_BACKGROUND_COLOR, backgroundColors)
             context.startActivity(this)
         }
     }
@@ -240,7 +174,7 @@ object BitLabs {
     internal fun launchOfferWall(context: Context) = launchOfferWall()
 
     internal fun leaveSurvey(clickId: String, reason: String) =
-        bitLabsRepo?.leaveSurvey(clickId, reason)
+        bitLabsRepo?.leaveSurvey(token, clickId, reason)
 
     private fun determineAdvertisingInfo(context: Context) = Thread {
         try {

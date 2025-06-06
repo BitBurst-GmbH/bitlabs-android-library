@@ -10,7 +10,7 @@ internal fun getColorScheme(): String {
         Resources.getSystem().configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
     val isDarkMode = darkModeFlags == Configuration.UI_MODE_NIGHT_YES
 
-    return if (isDarkMode) "DARK" else "LIGHT"
+    return if (isDarkMode) "dark" else "light"
 }
 
 internal fun getLuminance(color: Int) =

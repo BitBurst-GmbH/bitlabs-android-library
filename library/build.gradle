@@ -7,7 +7,7 @@ plugins {
 def keystore = new Properties()
 keystore.load(project.rootProject.file('local.properties').newDataInputStream())
 
-version = '3.2.27'
+version = '3.2.28'
 group = 'ai.bitlabs.sdk'
 
 android {

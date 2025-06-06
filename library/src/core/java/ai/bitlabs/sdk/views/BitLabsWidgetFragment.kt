@@ -27,18 +27,21 @@ class BitLabsWidgetFragment(
             <html lang="en">
                 <head>
                     <meta charset="utf-8" />
-                        <style>
-                          html,
-                          body,
-                          #widget {
-                            height: 100%;
-                            margin: 0;
-                          }
-                        </style>
-                    <script src="https://sdk.bitlabs.ai/bitlabs-sdk-v0.0.2.js"></script>
+                    <style>
+                      html,
+                      body,
+                      #widget {
+                        height: 100%;
+                        margin: 0;
+                      }
+                    </style>
+                    <script
+                      type="module"
+                      src="https://sdk.bitlabs.ai/bitlabs-sdk-v1.0.0.js"
+                    ></script>
                     <link
-                        rel="stylesheet"
-                        href="https://sdk.bitlabs.ai/bitlabs-sdk-v0.0.2.css"
+                      rel="stylesheet"
+                      href="https://sdk.bitlabs.ai/bitlabs-sdk-v1.0.0.css"
                     />
                     <title>BitLabs Widget</title>
                 </head>
@@ -83,7 +86,10 @@ class BitLabsWidgetFragment(
     private fun setupWebView(view: View) {
         webView = view.findViewById(R.id.widget_webview_bitlabs)
 
-        webView?.settings?.javaScriptEnabled = true
+        webView?.settings?.apply {
+            javaScriptEnabled = true
+            domStorageEnabled = true
+        }
 
         webView?.setBackgroundColor(Color.TRANSPARENT)
 

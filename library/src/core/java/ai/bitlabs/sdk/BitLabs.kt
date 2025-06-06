@@ -1,8 +1,5 @@
 package ai.bitlabs.sdk
 
-import ai.bitlabs.sdk.BitLabs.bitLabsRepo
-import ai.bitlabs.sdk.BitLabs.token
-import ai.bitlabs.sdk.BitLabs.uid
 import ai.bitlabs.sdk.data.api.BitLabsAPI
 import ai.bitlabs.sdk.data.model.bitlabs.Survey
 import ai.bitlabs.sdk.data.model.bitlabs.WidgetType

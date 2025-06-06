@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
         );
 
         findViewById(R.id.btn_show_survey_widget).setOnClickListener(view ->
-                bitLabs.showSurvey(this, R.id.container_survey_widget, WidgetType.COMPACT)
+                bitLabs.showSurvey(this, R.id.container_survey_widget, WidgetType.SIMPLE)
         );
 
         findViewById(R.id.btn_launch_offerwall).setOnClickListener(view -> offerwall.launch(this));

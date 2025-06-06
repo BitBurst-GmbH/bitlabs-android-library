@@ -35,16 +35,22 @@ class BLWebViewViewModel(val token: String, val listenerId: Int) : ViewModel() {
     val backgroundColors: State<IntArray> get() = _backgroundColors
 
     init {
-        BitLabs.bitLabsRepo?.getAppSettings(token, getColorScheme(), { app ->
-            app.visual.run {
-                _headerColors.value = extractColors(navigationColor)
-                    .takeIf { it.isNotEmpty() }
-                    ?: _headerColors.value
+        BitLabs.bitLabsRepo?.getAppSettings(token, {
+            val config = it.configuration
+            val theme = getColorScheme()
 
-                _backgroundColors.value = extractColors(backgroundColor)
-                    .takeIf { it.isNotEmpty() }
-                    ?: backgroundColors.value
-            }
+            val navigationColor =
+                config.find { it.internalIdentifier == "app.visual.$theme.navigation_color" }?.value
+                    ?: ""
+            _headerColors.value =
+                extractColors(navigationColor).takeIf { it.isNotEmpty() } ?: _headerColors.value
+
+            val backgroundColor =
+                config.find { it.internalIdentifier == "app.visual.$theme.background_color" }?.value
+                    ?: ""
+            _backgroundColors.value =
+                extractColors(backgroundColor).takeIf { it.isNotEmpty() }
+                    ?: _backgroundColors.value
         }, { Log.e(TAG, "$it") })
     }
 

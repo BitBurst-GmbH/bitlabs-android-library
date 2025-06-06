@@ -9,10 +9,10 @@ import ai.bitlabs.sdk.data.model.bitlabs.LeaveReason
 import ai.bitlabs.sdk.data.model.bitlabs.Survey
 import ai.bitlabs.sdk.data.model.bitlabs.UpdateClickBody
 import ai.bitlabs.sdk.data.model.sentry.SentryManager
+import ai.bitlabs.sdk.data.util.body
 import ai.bitlabs.sdk.util.OnExceptionListener
 import ai.bitlabs.sdk.util.OnResponseListener
 import ai.bitlabs.sdk.util.TAG
-import ai.bitlabs.sdk.data.util.body
 import android.util.Log
 import retrofit2.Call
 import retrofit2.Callback
@@ -24,7 +24,7 @@ internal class BitLabsRepository(private val bitLabsAPI: BitLabsAPI) {
         bitLabsAPI.updateClick(token, clickId, UpdateClickBody(LeaveReason(reason)))
             .enqueue(object : Callback<BitLabsResponse<Unit>> {
                 override fun onResponse(
-                    call: Call<BitLabsResponse<Unit>>, response: Response<BitLabsResponse<Unit>>
+                    call: Call<BitLabsResponse<Unit>>, response: Response<BitLabsResponse<Unit>>,
                 ) {
                     if (response.isSuccessful) Log.i(TAG, "LeaveSurvey - Success")
                     else response.errorBody()?.body<Unit>()?.error?.details?.run {
@@ -44,12 +44,12 @@ internal class BitLabsRepository(private val bitLabsAPI: BitLabsAPI) {
         token: String,
         sdk: String,
         onResponseListener: OnResponseListener<List<Survey>>,
-        onExceptionListener: OnExceptionListener
+        onExceptionListener: OnExceptionListener,
     ) = bitLabsAPI.getSurveys(token, sdk)
         .enqueue(object : Callback<BitLabsResponse<GetSurveysResponse>> {
             override fun onResponse(
                 call: Call<BitLabsResponse<GetSurveysResponse>>,
-                response: Response<BitLabsResponse<GetSurveysResponse>>
+                response: Response<BitLabsResponse<GetSurveysResponse>>,
             ) {
                 val restrictionReason = response.body()?.data?.restrictionReason
                 if (restrictionReason != null) {
@@ -82,35 +82,27 @@ internal class BitLabsRepository(private val bitLabsAPI: BitLabsAPI) {
 
     internal fun getAppSettings(
         token: String,
-        colorScheme: String,
         onResponseListener: OnResponseListener<GetAppSettingsResponse>,
-        onExceptionListener: OnExceptionListener
-    ) = bitLabsAPI.getAppSettings(token, colorScheme)
-        .enqueue(object : Callback<BitLabsResponse<GetAppSettingsResponse>> {
+        onExceptionListener: OnExceptionListener,
+    ) = bitLabsAPI.getAppSettings(
+        url = "https://dashboard.bitlabs.ai/api/public/v1/apps/$token"
+    )
+        .enqueue(object : Callback<GetAppSettingsResponse> {
             override fun onResponse(
-                call: Call<BitLabsResponse<GetAppSettingsResponse>>,
-                response: Response<BitLabsResponse<GetAppSettingsResponse>>
+                call: Call<GetAppSettingsResponse>,
+                response: Response<GetAppSettingsResponse>,
             ) {
                 if (response.isSuccessful) {
-                    response.body()?.data?.let { onResponseListener.onResponse(it) }
+                    response.body()?.let { onResponseListener.onResponse(it) }
                     return
-                }
-
-                response.errorBody()?.body<GetSurveysResponse>()?.error?.details?.run {
-                    with(Exception("GetAppSettings Error: $http - $msg")) {
-                        SentryManager.captureException(this)
-                        onExceptionListener.onException(this)
-                    }
                 }
             }
 
             override fun onFailure(
-                call: Call<BitLabsResponse<GetAppSettingsResponse>>, t: Throwable
-            ) {
-                with(Exception(t)) {
-                    SentryManager.captureException(this)
-                    onExceptionListener.onException(this)
-                }
+                call: Call<GetAppSettingsResponse>, t: Throwable,
+            ) = with(Exception(t)) {
+                SentryManager.captureException(this)
+                onExceptionListener.onException(this)
             }
         })
 }

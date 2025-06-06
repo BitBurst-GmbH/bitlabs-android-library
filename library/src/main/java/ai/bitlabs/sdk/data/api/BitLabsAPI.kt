@@ -11,6 +11,7 @@ import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
+import retrofit2.http.Url
 
 /**
  * Responsible for communication with the BitLabs API
@@ -20,18 +21,15 @@ internal interface BitLabsAPI {
     fun updateClick(
         @Header("X-Api-Token") token: String,
         @Path("clickId") clickId: String,
-        @Body click: UpdateClickBody
+        @Body click: UpdateClickBody,
     ): Call<BitLabsResponse<Unit>>
 
     @GET("v2/client/surveys?platform=MOBILE&os=ANDROID")
     fun getSurveys(
         @Header("X-Api-Token") token: String,
-        @Query("sdk") sdk: String
+        @Query("sdk") sdk: String,
     ): Call<BitLabsResponse<GetSurveysResponse>>
 
-    @GET("v1/client/settings/v2")
-    fun getAppSettings(
-        @Header("X-Api-Token") token: String,
-        @Query("color_scheme") colorScheme: String
-    ): Call<BitLabsResponse<GetAppSettingsResponse>>
+    @GET
+    fun getAppSettings(@Url url: String): Call<GetAppSettingsResponse>
 }

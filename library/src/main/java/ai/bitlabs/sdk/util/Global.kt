@@ -1,10 +1,29 @@
 package ai.bitlabs.sdk.util
 
+import ai.bitlabs.sdk.BuildConfig
+import ai.bitlabs.sdk.data.api.BitLabsAPI
+import ai.bitlabs.sdk.data.repositories.BitLabsRepository
 import android.content.res.Configuration
 import android.content.res.Resources
+import android.os.Build
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+
+
+internal fun createBitLabsRepository(token: String, uid: String): BitLabsRepository {
+    val userAgent =
+        "BitLabs/${BuildConfig.VERSION_NAME} (Android ${Build.VERSION.SDK_INT}; ${Build.MODEL}; ${deviceType()})"
+
+    val okHttpClient = buildHttpClientWithHeaders(
+        "User-Agent" to userAgent,
+        "X-Api-Token" to token,
+        "X-User-Id" to uid,
+    )
+
+    val retrofit = buildRetrofit(BASE_URL, okHttpClient)
+    return BitLabsRepository(retrofit.create(BitLabsAPI::class.java))
+}
 
 internal fun buildHttpClientWithHeaders(vararg headers: Pair<String, String>) =
     OkHttpClient.Builder()

@@ -39,7 +39,7 @@ internal object SentryManager {
 
     fun captureException(
         throwable: Throwable,
-        defaultUncaughtExceptionHandler: UncaughtExceptionHandler? = null
+        defaultUncaughtExceptionHandler: UncaughtExceptionHandler? = null,
     ) {
         sentryRepo?.sendEnvelope(throwable, defaultUncaughtExceptionHandler)
     }

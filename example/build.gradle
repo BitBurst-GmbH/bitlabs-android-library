@@ -8,7 +8,7 @@ keystore.load(project.rootProject.file('local.properties').newDataInputStream())
 android {
     namespace 'ai.bitlabs.example'
 
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         applicationId 'ai.bitlabs.example'

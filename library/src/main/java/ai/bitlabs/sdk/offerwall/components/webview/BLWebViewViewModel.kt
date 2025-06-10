@@ -1,6 +1,7 @@
 package ai.bitlabs.sdk.offerwall.components.webview
 
 import ai.bitlabs.sdk.BitLabs
+import ai.bitlabs.sdk.data.repositories.BitLabsRepository
 import ai.bitlabs.sdk.offerwall.util.OfferwallListenerManager
 import ai.bitlabs.sdk.offerwall.util.extractColors
 import ai.bitlabs.sdk.offerwall.util.getColorScheme
@@ -13,7 +14,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 
-class BLWebViewViewModel(val token: String, val listenerId: Int) : ViewModel() {
+class BLWebViewViewModel(val token: String, val uid: String, val listenerId: Int) : ViewModel() {
     var clickId = ""
     val isColorBright: Boolean
         get() = getLuminance(headerColors.value.first()) > 0.729 * 255
@@ -35,7 +36,7 @@ class BLWebViewViewModel(val token: String, val listenerId: Int) : ViewModel() {
     val backgroundColors: State<IntArray> get() = _backgroundColors
 
     init {
-        BitLabs.bitLabsRepo?.getAppSettings(token, {
+        BitLabsRepository.getAppSettings(token, {
             val config = it.configuration
             val theme = getColorScheme()
 
@@ -56,8 +57,7 @@ class BLWebViewViewModel(val token: String, val listenerId: Int) : ViewModel() {
 
     fun leaveSurvey(reason: String) {
         if (clickId.isEmpty()) return
-        // TODO: Handle leaveSurvey properly
-        BitLabs.leaveSurvey(clickId, reason)
+        BitLabsRepository.leaveSurvey(token, uid, clickId, reason)
         clickId = ""
     }
 

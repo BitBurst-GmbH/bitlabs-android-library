@@ -2,9 +2,11 @@ package ai.bitlabs.sdk.offerwall
 
 import ai.bitlabs.sdk.data.model.sentry.SentryManager
 import ai.bitlabs.sdk.offerwall.components.webview.BLWebView
+import ai.bitlabs.sdk.offerwall.components.webview.BLWebViewViewModel
 import ai.bitlabs.sdk.offerwall.util.OfferwallListenerManager
 import ai.bitlabs.sdk.util.BUNDLE_KEY_LISTENER_ID
 import ai.bitlabs.sdk.util.BUNDLE_KEY_TOKEN
+import ai.bitlabs.sdk.util.BUNDLE_KEY_UID
 import ai.bitlabs.sdk.util.BUNDLE_KEY_URL
 import ai.bitlabs.sdk.util.TAG
 import android.os.Bundle
@@ -18,9 +20,14 @@ import androidx.appcompat.app.AppCompatActivity
  */
 internal class BitLabsOfferwallActivity : AppCompatActivity() {
 
+    private var uid = ""
     private var token = ""
     private var listenerId = 0
     private lateinit var url: String
+
+    private val blViewModel: BLWebViewViewModel by lazy {
+        BLWebViewViewModel(token, uid, listenerId)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,7 +41,7 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
             return
         }
 
-        setContent { BLWebView(token, url, listenerId) }
+        setContent { BLWebView(blViewModel, url) }
     }
 
     override fun onDestroy() {
@@ -49,6 +56,10 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
 
         token = intent.getStringExtra(BUNDLE_KEY_TOKEN) ?: run {
             throw IllegalArgumentException("BitLabsOfferwallActivity - Token is null!")
+        }
+
+        uid = intent.getStringExtra(BUNDLE_KEY_UID) ?: run {
+            throw IllegalArgumentException("BitLabsOfferwallActivity - UID is null!")
         }
 
         listenerId = intent.getIntExtra(BUNDLE_KEY_LISTENER_ID, -1)

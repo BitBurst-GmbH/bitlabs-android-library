@@ -38,10 +38,8 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.WindowCompat
 
 @Composable
-fun BLWebView(token: String, url: String, listenerId: Int = 0) {
+fun BLWebView(viewModel: BLWebViewViewModel, url: String) {
     val context = LocalContext.current
-
-    val viewModel = remember { BLWebViewViewModel(token, listenerId) }
 
     var error by remember { mutableStateOf<WebViewError?>(null) }
     var isTopBarShown by remember { mutableStateOf(false) }

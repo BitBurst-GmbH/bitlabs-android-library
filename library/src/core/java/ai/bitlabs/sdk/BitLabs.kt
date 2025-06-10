@@ -1,9 +1,7 @@
 package ai.bitlabs.sdk
 
-import ai.bitlabs.sdk.BitLabs.bitLabsRepo
 import ai.bitlabs.sdk.BitLabs.token
 import ai.bitlabs.sdk.BitLabs.uid
-import ai.bitlabs.sdk.data.api.BitLabsAPI
 import ai.bitlabs.sdk.data.model.bitlabs.Survey
 import ai.bitlabs.sdk.data.model.bitlabs.WidgetType
 import ai.bitlabs.sdk.data.model.sentry.SentryManager
@@ -11,20 +9,16 @@ import ai.bitlabs.sdk.data.repositories.BitLabsRepository
 import ai.bitlabs.sdk.offerwall.BitLabsOfferwallActivity
 import ai.bitlabs.sdk.offerwall.Offerwall
 import ai.bitlabs.sdk.offerwall.util.WebActivityParams
-import ai.bitlabs.sdk.util.BASE_URL
 import ai.bitlabs.sdk.util.BUNDLE_KEY_TOKEN
+import ai.bitlabs.sdk.util.BUNDLE_KEY_UID
 import ai.bitlabs.sdk.util.BUNDLE_KEY_URL
 import ai.bitlabs.sdk.util.OnExceptionListener
 import ai.bitlabs.sdk.util.OnResponseListener
 import ai.bitlabs.sdk.util.OnSurveyRewardListener
 import ai.bitlabs.sdk.util.TAG
-import ai.bitlabs.sdk.util.buildHttpClientWithHeaders
-import ai.bitlabs.sdk.util.buildRetrofit
-import ai.bitlabs.sdk.util.deviceType
 import ai.bitlabs.sdk.views.BitLabsWidgetFragment
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.util.Log
 import androidx.fragment.app.FragmentActivity
 import com.google.android.gms.ads.identifier.AdvertisingIdClient
@@ -47,7 +41,6 @@ object BitLabs {
     @Deprecated("Use OFFERWALL MODULE instead")
     var tags = mutableMapOf<String, Any>()
 
-    internal var bitLabsRepo: BitLabsRepository? = null
     internal var onRewardListener: OnSurveyRewardListener? = null
 
     /**
@@ -65,8 +58,6 @@ object BitLabs {
 
         SentryManager.init(token, uid)
 
-        bitlabsRepoInit()
-
         determineAdvertisingInfo(context)
 
         fileProviderAuthority = "${context.packageName}.provider.bitlabs"
@@ -79,20 +70,6 @@ object BitLabs {
                 defaultHandler?.uncaughtException(Thread.currentThread(), throwable)
             }
         }
-    }
-
-    private fun bitlabsRepoInit() {
-        val userAgent =
-            "BitLabs/${BuildConfig.VERSION_NAME} (Android ${Build.VERSION.SDK_INT}; ${Build.MODEL}; ${deviceType()})"
-
-        val okHttpClient = buildHttpClientWithHeaders(
-            "User-Agent" to userAgent,
-            "X-User-Id" to uid
-        )
-
-        val retrofit = buildRetrofit(BASE_URL, okHttpClient)
-
-        bitLabsRepo = BitLabsRepository(retrofit.create(BitLabsAPI::class.java))
     }
 
     /**
@@ -109,9 +86,11 @@ object BitLabs {
     fun checkSurveys(
         onResponseListener: OnResponseListener<Boolean>, onExceptionListener: OnExceptionListener,
     ) = ifInitialised {
-        bitLabsRepo?.getSurveys(token, "NATIVE", { surveys ->
-            onResponseListener.onResponse(surveys.isNotEmpty())
-        }, onExceptionListener)
+        BitLabsRepository.getSurveys(
+            token, uid, "NATIVE",
+            { onResponseListener.onResponse(it.isNotEmpty()) },
+            onExceptionListener,
+        )
     }
 
     /**
@@ -125,7 +104,7 @@ object BitLabs {
         onResponseListener: OnResponseListener<List<Survey>>,
         onExceptionListener: OnExceptionListener,
     ) = ifInitialised {
-        bitLabsRepo?.getSurveys(token, "NATIVE", onResponseListener, onExceptionListener)
+        BitLabsRepository.getSurveys(token, uid, "NATIVE", onResponseListener, onExceptionListener)
     }
 
     /** Registers an [OnSurveyRewardListener] callback to be invoked when the OfferWall is exited by the user. */
@@ -154,6 +133,7 @@ object BitLabs {
                 BUNDLE_KEY_URL,
                 WebActivityParams(token, uid, "NATIVE", adId, tags).url
             )
+            putExtra(BUNDLE_KEY_UID, uid)
             putExtra(BUNDLE_KEY_TOKEN, token)
 
             context.startActivity(this)
@@ -182,7 +162,7 @@ object BitLabs {
     }
 
     internal fun leaveSurvey(clickId: String, reason: String) =
-        bitLabsRepo?.leaveSurvey(token, clickId, reason)
+        BitLabsRepository.leaveSurvey(token, uid, clickId, reason)
 
     private fun determineAdvertisingInfo(context: Context) = Thread {
         try {
@@ -195,11 +175,11 @@ object BitLabs {
     }.start()
 
     /**
-     * Checks whether [token] and [uid] have been set and aren't blank/empty and
-     * [bitLabsRepo] is initialised and executes the [block] accordingly.
+     * Checks whether [token] and [uid] have been set and aren't blank/empty
+     * and executes the [block] accordingly.
      */
     private inline fun ifInitialised(block: () -> Unit) {
-        val isInitialised = token.isNotBlank().and(uid.isNotBlank()).and(bitLabsRepo != null)
+        val isInitialised = token.isNotBlank().and(uid.isNotBlank())
 
         if (isInitialised) block()
         else Log.e(TAG, "You should initialise BitLabs first! Call BitLabs::init()")

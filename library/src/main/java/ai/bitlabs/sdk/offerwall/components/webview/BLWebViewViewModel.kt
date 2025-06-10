@@ -1,14 +1,21 @@
 package ai.bitlabs.sdk.offerwall.components.webview
 
 import ai.bitlabs.sdk.BitLabs
+import ai.bitlabs.sdk.BuildConfig
+import ai.bitlabs.sdk.data.api.BitLabsAPI
 import ai.bitlabs.sdk.data.repositories.BitLabsRepository
 import ai.bitlabs.sdk.offerwall.util.OfferwallListenerManager
 import ai.bitlabs.sdk.offerwall.util.extractColors
 import ai.bitlabs.sdk.offerwall.util.getColorScheme
 import ai.bitlabs.sdk.offerwall.util.getLuminance
+import ai.bitlabs.sdk.util.BASE_URL
 import ai.bitlabs.sdk.util.OnOfferwallClosedListener
 import ai.bitlabs.sdk.util.OnSurveyRewardListener
 import ai.bitlabs.sdk.util.TAG
+import ai.bitlabs.sdk.util.buildHttpClientWithHeaders
+import ai.bitlabs.sdk.util.buildRetrofit
+import ai.bitlabs.sdk.util.deviceType
+import android.os.Build
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -35,8 +42,22 @@ class BLWebViewViewModel(val token: String, val uid: String, val listenerId: Int
     private val _backgroundColors = mutableStateOf(intArrayOf(0, 0))
     val backgroundColors: State<IntArray> get() = _backgroundColors
 
+    private var repo: BitLabsRepository
+
     init {
-        BitLabsRepository.getAppSettings(token, {
+        val userAgent =
+            "BitLabs/${BuildConfig.VERSION_NAME} (Android ${Build.VERSION.SDK_INT}; ${Build.MODEL}; ${deviceType()})"
+
+        val okHttpClient = buildHttpClientWithHeaders(
+            "User-Agent" to userAgent,
+            "X-Api-Token" to token,
+            "X-User-Id" to uid,
+        )
+
+        val retrofit = buildRetrofit(BASE_URL, okHttpClient)
+        repo = BitLabsRepository(retrofit.create(BitLabsAPI::class.java))
+
+        repo.getAppSettings(token, {
             val config = it.configuration
             val theme = getColorScheme()
 
@@ -57,7 +78,7 @@ class BLWebViewViewModel(val token: String, val uid: String, val listenerId: Int
 
     fun leaveSurvey(reason: String) {
         if (clickId.isEmpty()) return
-        BitLabsRepository.leaveSurvey(token, uid, clickId, reason)
+        repo.leaveSurvey(clickId, reason)
         clickId = ""
     }
 

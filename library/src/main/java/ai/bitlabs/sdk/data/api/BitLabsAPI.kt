@@ -7,7 +7,6 @@ import ai.bitlabs.sdk.data.model.bitlabs.UpdateClickBody
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
-import retrofit2.http.HeaderMap
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -19,16 +18,12 @@ import retrofit2.http.Url
 internal interface BitLabsAPI {
     @POST("/v2/client/clicks/{clickId}")
     fun updateClick(
-        @HeaderMap headers: Map<String, String>,
         @Path("clickId") clickId: String,
         @Body click: UpdateClickBody,
     ): Call<BitLabsResponse<Unit>>
 
     @GET("v2/client/surveys?platform=MOBILE&os=ANDROID")
-    fun getSurveys(
-        @HeaderMap headers: Map<String, String>,
-        @Query("sdk") sdk: String,
-    ): Call<BitLabsResponse<GetSurveysResponse>>
+    fun getSurveys(@Query("sdk") sdk: String): Call<BitLabsResponse<GetSurveysResponse>>
 
     @GET
     fun getAppSettings(@Url url: String): Call<GetAppSettingsResponse>

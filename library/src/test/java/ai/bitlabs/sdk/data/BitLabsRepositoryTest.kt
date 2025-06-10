@@ -49,14 +49,14 @@ class BitLabsRepositoryTest {
     fun leaveSurvey_Failure() = mockkStatic(Log::class) {
         every { Log.e(any(), any()) } returns 0
 
-        every { bitLabsAPI.updateClick(any(), any(), any()) } returns object :
+        every { bitLabsAPI.updateClick(any(), any()) } returns object :
             BitLabsCall<BitLabsResponse<Unit>>() {
             override fun enqueue(callback: Callback<BitLabsResponse<Unit>>) {
                 callback.onFailure(this, Throwable())
             }
         }
 
-        bitLabsRepository.leaveSurvey("", "", "")
+        bitLabsRepository.leaveSurvey("", "")
 
         verify { Log.e(any(), any()) }
     }
@@ -70,14 +70,14 @@ class BitLabsRepositoryTest {
             "{error:{details:{http:400,msg:\"Any Request\"}}, status:\"\"}"
         )
 
-        every { bitLabsAPI.updateClick(any(), any(), any()) } returns object :
+        every { bitLabsAPI.updateClick(any(), any()) } returns object :
             BitLabsCall<BitLabsResponse<Unit>>() {
             override fun enqueue(callback: Callback<BitLabsResponse<Unit>>) {
                 callback.onResponse(this, Response.error(400, errorResponseBody))
             }
         }
 
-        bitLabsRepository.leaveSurvey("", "", "")
+        bitLabsRepository.leaveSurvey("", "")
 
         verify { Log.e(any(), any()) }
     }
@@ -86,21 +86,21 @@ class BitLabsRepositoryTest {
     fun leaveSurvey_Response_Success() = mockkStatic(Log::class) {
         every { Log.i(any(), any()) } returns 0
 
-        every { bitLabsAPI.updateClick(any(), any(), any()) } returns object :
+        every { bitLabsAPI.updateClick(any(), any()) } returns object :
             BitLabsCall<BitLabsResponse<Unit>>() {
             override fun enqueue(callback: Callback<BitLabsResponse<Unit>>) {
                 callback.onResponse(this, Response.success(getWorkingResponseBody()))
             }
         }
 
-        bitLabsRepository.leaveSurvey("", "", "")
+        bitLabsRepository.leaveSurvey("", "")
 
         verify { Log.i(any(), any()) }
     }
 
     @Test
     fun getSurveys_Failure() {
-        every { bitLabsAPI.getSurveys(any(), any()) } returns object :
+        every { bitLabsAPI.getSurveys(any()) } returns object :
             BitLabsCall<BitLabsResponse<GetSurveysResponse>>() {
             override fun enqueue(callback: Callback<BitLabsResponse<GetSurveysResponse>>) {
                 callback.onFailure(this, Throwable())
@@ -108,7 +108,7 @@ class BitLabsRepositoryTest {
 
         }
 
-        bitLabsRepository.getSurveys("", "", {}, onExceptionListener)
+        bitLabsRepository.getSurveys("", {}, onExceptionListener)
 
         verify { onExceptionListener.onException(any()) }
     }
@@ -120,14 +120,14 @@ class BitLabsRepositoryTest {
             "{error:{details:{http:400,msg:\"Any Request\"}}, status:\"\"}"
         )
 
-        every { bitLabsAPI.getSurveys(any(), any()) } returns object :
+        every { bitLabsAPI.getSurveys(any()) } returns object :
             BitLabsCall<BitLabsResponse<GetSurveysResponse>>() {
             override fun enqueue(callback: Callback<BitLabsResponse<GetSurveysResponse>>) {
                 callback.onResponse(this, Response.error(400, errorResponseBody))
             }
         }
 
-        bitLabsRepository.getSurveys("", "", {}, onExceptionListener)
+        bitLabsRepository.getSurveys("", {}, onExceptionListener)
 
         verify { onExceptionListener.onException(any()) }
     }
@@ -136,7 +136,7 @@ class BitLabsRepositoryTest {
     fun getSurveys_Response_Success() {
         val onResponseListener = mockk<OnResponseListener<List<Survey>>>(relaxed = true)
 
-        every { bitLabsAPI.getSurveys(any(), any()) } returns object :
+        every { bitLabsAPI.getSurveys(any()) } returns object :
             BitLabsCall<BitLabsResponse<GetSurveysResponse>>() {
             override fun enqueue(callback: Callback<BitLabsResponse<GetSurveysResponse>>) {
                 val mockSurveysResponse = BitLabsResponse(
@@ -149,7 +149,7 @@ class BitLabsRepositoryTest {
             }
         }
 
-        bitLabsRepository.getSurveys("", "", onResponseListener) {}
+        bitLabsRepository.getSurveys("", onResponseListener) {}
 
         verify { onResponseListener.onResponse(any()) }
     }

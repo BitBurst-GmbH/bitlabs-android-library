@@ -2,6 +2,7 @@ package ai.bitlabs.sdk
 
 import ai.bitlabs.sdk.BitLabs.token
 import ai.bitlabs.sdk.BitLabs.uid
+import ai.bitlabs.sdk.data.api.BitLabsAPI
 import ai.bitlabs.sdk.data.model.bitlabs.Survey
 import ai.bitlabs.sdk.data.model.bitlabs.WidgetType
 import ai.bitlabs.sdk.data.model.sentry.SentryManager
@@ -9,6 +10,7 @@ import ai.bitlabs.sdk.data.repositories.BitLabsRepository
 import ai.bitlabs.sdk.offerwall.BitLabsOfferwallActivity
 import ai.bitlabs.sdk.offerwall.Offerwall
 import ai.bitlabs.sdk.offerwall.util.WebActivityParams
+import ai.bitlabs.sdk.util.BASE_URL
 import ai.bitlabs.sdk.util.BUNDLE_KEY_TOKEN
 import ai.bitlabs.sdk.util.BUNDLE_KEY_UID
 import ai.bitlabs.sdk.util.BUNDLE_KEY_URL
@@ -16,9 +18,13 @@ import ai.bitlabs.sdk.util.OnExceptionListener
 import ai.bitlabs.sdk.util.OnResponseListener
 import ai.bitlabs.sdk.util.OnSurveyRewardListener
 import ai.bitlabs.sdk.util.TAG
+import ai.bitlabs.sdk.util.buildHttpClientWithHeaders
+import ai.bitlabs.sdk.util.buildRetrofit
+import ai.bitlabs.sdk.util.deviceType
 import ai.bitlabs.sdk.views.BitLabsWidgetFragment
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.util.Log
 import androidx.fragment.app.FragmentActivity
 import com.google.android.gms.ads.identifier.AdvertisingIdClient
@@ -41,6 +47,7 @@ object BitLabs {
     @Deprecated("Use OFFERWALL MODULE instead")
     var tags = mutableMapOf<String, Any>()
 
+    private var repo: BitLabsRepository? = null
     internal var onRewardListener: OnSurveyRewardListener? = null
 
     /**
@@ -72,6 +79,22 @@ object BitLabs {
         }
     }
 
+    private fun setupRepository() {
+        val userAgent =
+            "BitLabs/${BuildConfig.VERSION_NAME} (Android ${Build.VERSION.SDK_INT}; ${Build.MODEL}; ${deviceType()})"
+
+        val okHttpClient = buildHttpClientWithHeaders(
+            "User-Agent" to userAgent,
+            "X-Api-Token" to token,
+            "X-User-Id" to uid,
+        )
+
+        val retrofit = buildRetrofit(BASE_URL, okHttpClient)
+        val api = retrofit.create(BitLabsAPI::class.java)
+
+        repo = BitLabsRepository(api)
+    }
+
     /**
      * Determines whether the user can perform an action in the OfferWall
      * (either opening a survey or answering qualifications) and then executes your implementation
@@ -86,8 +109,8 @@ object BitLabs {
     fun checkSurveys(
         onResponseListener: OnResponseListener<Boolean>, onExceptionListener: OnExceptionListener,
     ) = ifInitialised {
-        BitLabsRepository.getSurveys(
-            token, uid, "NATIVE",
+        repo?.getSurveys(
+            "NATIVE",
             { onResponseListener.onResponse(it.isNotEmpty()) },
             onExceptionListener,
         )
@@ -104,7 +127,7 @@ object BitLabs {
         onResponseListener: OnResponseListener<List<Survey>>,
         onExceptionListener: OnExceptionListener,
     ) = ifInitialised {
-        BitLabsRepository.getSurveys(token, uid, "NATIVE", onResponseListener, onExceptionListener)
+        repo?.getSurveys("NATIVE", onResponseListener, onExceptionListener)
     }
 
     /** Registers an [OnSurveyRewardListener] callback to be invoked when the OfferWall is exited by the user. */
@@ -162,7 +185,7 @@ object BitLabs {
     }
 
     internal fun leaveSurvey(clickId: String, reason: String) =
-        BitLabsRepository.leaveSurvey(token, uid, clickId, reason)
+        repo?.leaveSurvey(clickId, reason)
 
     private fun determineAdvertisingInfo(context: Context) = Thread {
         try {

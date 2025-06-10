@@ -1,5 +1,8 @@
 package ai.bitlabs.sdk
 
+import ai.bitlabs.sdk.BitLabs.bitLabsRepo
+import ai.bitlabs.sdk.BitLabs.token
+import ai.bitlabs.sdk.BitLabs.uid
 import ai.bitlabs.sdk.data.api.BitLabsAPI
 import ai.bitlabs.sdk.data.model.bitlabs.Survey
 import ai.bitlabs.sdk.data.model.bitlabs.WidgetType
@@ -160,6 +163,7 @@ object BitLabs {
     /**
      * Shows a Survey Fragment in the [activity] with the [containerId] as its container.
      */
+    @Deprecated("Will be removed in future releases.")
     fun showSurvey(
         activity: FragmentActivity, containerId: Int, type: WidgetType = WidgetType.SIMPLE,
     ) = ifInitialised {
@@ -170,6 +174,7 @@ object BitLabs {
     /**
      * Shows a Leaderboard Fragment in the [activity] with the [containerId] as its container.
      */
+    @Deprecated("Will be removed in future releases.")
     fun showLeaderboard(activity: FragmentActivity, containerId: Int) = ifInitialised {
         activity.supportFragmentManager.beginTransaction()
             .replace(containerId, BitLabsWidgetFragment(uid, token, WidgetType.LEADERBOARD))

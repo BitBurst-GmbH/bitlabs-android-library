@@ -14,6 +14,7 @@ import android.webkit.WebChromeClient
 import android.webkit.WebView
 import androidx.fragment.app.Fragment
 
+@Deprecated("Will be removed in future releases.")
 class BitLabsWidgetFragment(
     uid: String,
     token: String,

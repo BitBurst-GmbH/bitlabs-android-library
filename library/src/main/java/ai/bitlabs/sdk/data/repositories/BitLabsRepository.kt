@@ -6,8 +6,6 @@ import ai.bitlabs.sdk.data.model.bitlabs.LeaveReason
 import ai.bitlabs.sdk.data.model.bitlabs.UpdateClickBody
 import ai.bitlabs.sdk.data.model.sentry.SentryManager
 import ai.bitlabs.sdk.data.util.body
-import ai.bitlabs.sdk.util.TAG
-import android.util.Log
 
 /** This class is the point of communication between the data and [BitLabs] */
 internal class BitLabsRepository(private val api: BitLabsAPI) {
@@ -18,12 +16,10 @@ internal class BitLabsRepository(private val api: BitLabsAPI) {
             throw Exception("LeaveSurvey Error: $http - $msg")
         }
 
-        Log.i(TAG, "LeaveSurvey - Success")
         Unit
     } catch (e: Exception) {
         SentryManager.captureException(e)
         throw e
-//        Log.e(TAG, "LeaveSurvey Failure - ${e.message ?: "Unknown Error"}")
     }
 
     suspend fun getSurveys(sdk: String) = try {

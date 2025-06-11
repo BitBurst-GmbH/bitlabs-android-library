@@ -67,7 +67,10 @@ internal class BLWebViewViewModel(val token: String, val uid: String, val listen
 
     fun leaveSurvey(reason: String) {
         if (clickId.isEmpty()) return
-        viewModelScope.launch { repo.leaveSurvey(clickId, reason) }
+        viewModelScope.launch {
+            repo.leaveSurvey(clickId, reason)
+            Log.d(TAG, "Survey left with reason: $reason")
+        }
         clickId = ""
     }
 

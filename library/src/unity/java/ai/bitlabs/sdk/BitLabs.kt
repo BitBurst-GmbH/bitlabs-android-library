@@ -20,6 +20,9 @@ import android.util.Log
 import com.google.android.gms.ads.identifier.AdvertisingIdClient
 import com.google.gson.GsonBuilder
 import com.unity3d.player.UnityPlayer
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -43,6 +46,8 @@ object BitLabs {
 
     internal var bitLabsRepo: BitLabsRepository? = null
     internal var onRewardListener: OnSurveyRewardListener? = null
+
+    private val coroutineScope by lazy { CoroutineScope(Dispatchers.IO) }
 
     /**
      * Initialises the connection with BitLabs API using your app [token] and [uid]
@@ -103,15 +108,23 @@ object BitLabs {
      * If you want to perform background checks if surveys are available, this is the best option.
      */
     fun checkSurveys(gameObject: String) = ifInitialised {
-        bitLabsRepo?.getSurveys(token, "UNITY", { surveys ->
-            UnityPlayer.UnitySendMessage(
-                gameObject,
-                "CheckSurveysCallback",
-                surveys.isNotEmpty().toString()
-            )
-        }, { e ->
-            UnityPlayer.UnitySendMessage(gameObject, "CheckSurveysException", e.message.toString())
-        })
+        coroutineScope.launch {
+            try {
+                val surveys = bitLabsRepo?.getSurveys("UNITY") ?: emptyList()
+                UnityPlayer.UnitySendMessage(
+                    gameObject,
+                    "CheckSurveysCallback",
+                    surveys.isNotEmpty().toString()
+                )
+            } catch (e: Exception) {
+                SentryManager.captureException(e)
+                UnityPlayer.UnitySendMessage(
+                    gameObject,
+                    "CheckSurveysException",
+                    e.message.toString()
+                )
+            }
+        }
     }
 
     /**
@@ -125,19 +138,23 @@ object BitLabs {
      * then there has been an internal error which is mostly logged with 'BitLabs' as a tag.
      */
     fun getSurveys(gameObject: String) = ifInitialised {
-        bitLabsRepo?.getSurveys(token, "UNITY", { surveys ->
-            UnityPlayer.UnitySendMessage(
-                gameObject,
-                "GetSurveysCallback",
-                GsonBuilder().create().toJson(surveys).convertKeysToCamelCase()
-            )
-        }, { exception ->
-            UnityPlayer.UnitySendMessage(
-                gameObject,
-                "GetSurveysException",
-                exception.message.toString()
-            )
-        })
+        coroutineScope.launch {
+            try {
+                val surveys = bitLabsRepo?.getSurveys("UNITY") ?: emptyList()
+                UnityPlayer.UnitySendMessage(
+                    gameObject,
+                    "GetSurveysCallback",
+                    GsonBuilder().create().toJson(surveys).convertKeysToCamelCase()
+                )
+            } catch (e: Exception) {
+                SentryManager.captureException(e)
+                UnityPlayer.UnitySendMessage(
+                    gameObject,
+                    "GetSurveysException",
+                    e.message.toString()
+                )
+            }
+        }
     }
 
     /** Registers an [OnRewardListener] callback to be invoked when the OfferWall is exited by the user. */
@@ -172,9 +189,6 @@ object BitLabs {
      * In Unity, the context is not needed as an argument, but internally it is.
      */
     internal fun launchOfferWall(context: Context) = launchOfferWall()
-
-    internal fun leaveSurvey(clickId: String, reason: String) =
-        bitLabsRepo?.leaveSurvey(token, clickId, reason)
 
     private fun determineAdvertisingInfo(context: Context) = Thread {
         try {

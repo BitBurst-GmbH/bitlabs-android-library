@@ -23,6 +23,9 @@ import android.content.Intent
 import android.util.Log
 import androidx.fragment.app.FragmentActivity
 import com.google.android.gms.ads.identifier.AdvertisingIdClient
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 /**
  * The main class including all the library functions to use in your code.
@@ -44,6 +47,8 @@ object BitLabs {
 
     private var repo: BitLabsRepository? = null
     internal var onRewardListener: OnSurveyRewardListener? = null
+
+    private val coroutineScope by lazy { CoroutineScope(Dispatchers.IO) }
 
     /**
      * Initialises the connection with BitLabs API using your app [token] and [uid]
@@ -90,11 +95,14 @@ object BitLabs {
     fun checkSurveys(
         onResponseListener: OnResponseListener<Boolean>, onExceptionListener: OnExceptionListener,
     ) = ifInitialised {
-        repo?.getSurveys(
-            "NATIVE",
-            { onResponseListener.onResponse(it.isNotEmpty()) },
-            onExceptionListener,
-        )
+        coroutineScope.launch {
+            try {
+                val surveys = repo?.getSurveys("NATIVE") ?: emptyList()
+                onResponseListener.onResponse(surveys.isNotEmpty())
+            } catch (e: Exception) {
+                onExceptionListener.onException(e)
+            }
+        }
     }
 
     /**
@@ -108,7 +116,15 @@ object BitLabs {
         onResponseListener: OnResponseListener<List<Survey>>,
         onExceptionListener: OnExceptionListener,
     ) = ifInitialised {
-        repo?.getSurveys("NATIVE", onResponseListener, onExceptionListener)
+        coroutineScope.launch {
+            try {
+                repo?.getSurveys("NATIVE")?.let {
+                    onResponseListener.onResponse(it)
+                }
+            } catch (e: Exception) {
+                onExceptionListener.onException(e)
+            }
+        }
     }
 
     /** Registers an [OnSurveyRewardListener] callback to be invoked when the OfferWall is exited by the user. */
@@ -164,9 +180,6 @@ object BitLabs {
             .replace(containerId, BitLabsWidgetFragment(uid, token, WidgetType.LEADERBOARD))
             .commit()
     }
-
-    internal fun leaveSurvey(clickId: String, reason: String) =
-        repo?.leaveSurvey(clickId, reason)
 
     private fun determineAdvertisingInfo(context: Context) = Thread {
         try {

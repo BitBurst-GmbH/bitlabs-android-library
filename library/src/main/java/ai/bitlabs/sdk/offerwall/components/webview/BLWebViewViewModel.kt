@@ -14,8 +14,11 @@ import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 
-class BLWebViewViewModel(val token: String, val uid: String, val listenerId: Int) : ViewModel() {
+internal class BLWebViewViewModel(val token: String, val uid: String, val listenerId: Int) :
+    ViewModel() {
     var clickId = ""
     val isColorBright: Boolean
         get() = getLuminance(headerColors.value.first()) > 0.729 * 255
@@ -39,28 +42,32 @@ class BLWebViewViewModel(val token: String, val uid: String, val listenerId: Int
     private var repo: BitLabsRepository = createBitLabsRepository(token, uid)
 
     init {
-        repo.getAppSettings(token, {
-            val config = it.configuration
-            val theme = getColorScheme()
+        viewModelScope.launch { fetchAppSettings() }
+    }
 
-            val navigationColor =
-                config.find { it.internalIdentifier == "app.visual.$theme.navigation_color" }?.value
-                    ?: ""
-            _headerColors.value =
-                extractColors(navigationColor).takeIf { it.isNotEmpty() } ?: _headerColors.value
+    suspend fun fetchAppSettings() = try {
+        val config = repo.getAppSettings(token).configuration
+        val theme = getColorScheme()
 
-            val backgroundColor =
-                config.find { it.internalIdentifier == "app.visual.$theme.background_color" }?.value
-                    ?: ""
-            _backgroundColors.value =
-                extractColors(backgroundColor).takeIf { it.isNotEmpty() }
-                    ?: _backgroundColors.value
-        }, { Log.e(TAG, "$it") })
+        val navigationColor =
+            config.find { it.internalIdentifier == "app.visual.$theme.navigation_color" }?.value
+                ?: ""
+        _headerColors.value =
+            extractColors(navigationColor).takeIf { it.isNotEmpty() } ?: _headerColors.value
+
+        val backgroundColor =
+            config.find { it.internalIdentifier == "app.visual.$theme.background_color" }?.value
+                ?: ""
+        _backgroundColors.value =
+            extractColors(backgroundColor).takeIf { it.isNotEmpty() }
+                ?: _backgroundColors.value
+    } catch (e: Exception) {
+        Log.e(TAG, "GetAppSettings Failed: ${e.message}", e)
     }
 
     fun leaveSurvey(reason: String) {
         if (clickId.isEmpty()) return
-        repo.leaveSurvey(clickId, reason)
+        viewModelScope.launch { repo.leaveSurvey(clickId, reason) }
         clickId = ""
     }
 

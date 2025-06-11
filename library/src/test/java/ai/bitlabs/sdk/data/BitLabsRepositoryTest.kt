@@ -108,7 +108,7 @@ class BitLabsRepositoryTest {
 
         }
 
-        bitLabsRepository.getSurveys("", {}, onExceptionListener)
+        bitLabsRepository.getSurveys("")
 
         verify { onExceptionListener.onException(any()) }
     }
@@ -127,7 +127,7 @@ class BitLabsRepositoryTest {
             }
         }
 
-        bitLabsRepository.getSurveys("", {}, onExceptionListener)
+        bitLabsRepository.getSurveys("")
 
         verify { onExceptionListener.onException(any()) }
     }
@@ -149,7 +149,7 @@ class BitLabsRepositoryTest {
             }
         }
 
-        bitLabsRepository.getSurveys("", onResponseListener) {}
+        bitLabsRepository.getSurveys("")
 
         verify { onResponseListener.onResponse(any()) }
     }
@@ -163,7 +163,7 @@ class BitLabsRepositoryTest {
             }
         }
 
-        bitLabsRepository.getAppSettings("", {}, onExceptionListener)
+        bitLabsRepository.getAppSettings("")
 
         verify { onExceptionListener.onException(any()) }
     }

@@ -38,7 +38,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.WindowCompat
 
 @Composable
-fun BLWebView(viewModel: BLWebViewViewModel, url: String) {
+internal fun BLWebView(viewModel: BLWebViewViewModel, url: String) {
     val context = LocalContext.current
 
     var error by remember { mutableStateOf<WebViewError?>(null) }

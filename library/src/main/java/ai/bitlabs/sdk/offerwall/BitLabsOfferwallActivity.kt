@@ -1,6 +1,7 @@
 package ai.bitlabs.sdk.offerwall
 
 import ai.bitlabs.sdk.data.model.sentry.SentryManager
+import ai.bitlabs.sdk.offerwall.components.webview.BLViewModelFactory
 import ai.bitlabs.sdk.offerwall.components.webview.BLWebView
 import ai.bitlabs.sdk.offerwall.components.webview.BLWebViewViewModel
 import ai.bitlabs.sdk.offerwall.util.OfferwallListenerManager
@@ -13,6 +14,7 @@ import android.os.Bundle
 import android.util.Log
 import android.webkit.URLUtil
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 
 /**
@@ -25,8 +27,8 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
     private var listenerId = 0
     private lateinit var url: String
 
-    private val blViewModel: BLWebViewViewModel by lazy {
-        BLWebViewViewModel(token, uid, listenerId)
+    private val blViewModel: BLWebViewViewModel by viewModels {
+        BLViewModelFactory(token, uid, listenerId)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

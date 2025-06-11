@@ -7,9 +7,7 @@ import ai.bitlabs.sdk.data.model.bitlabs.UpdateClickBody
 import ai.bitlabs.sdk.data.model.sentry.SentryManager
 import ai.bitlabs.sdk.data.util.body
 
-/** This class is the point of communication between the data and [BitLabs] */
 internal class BitLabsRepository(private val api: BitLabsAPI) {
-
     suspend fun leaveSurvey(clickId: String, reason: String) = try {
         val response = api.updateClick(clickId, UpdateClickBody(LeaveReason(reason)))
         response.errorBody()?.body<Unit>()?.error?.details?.run {

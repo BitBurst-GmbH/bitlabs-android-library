@@ -1,9 +1,33 @@
 package ai.bitlabs.sdk.views
 
+import ai.bitlabs.sdk.R
 import ai.bitlabs.sdk.offerwall.BitLabsOfferwallActivity
+import ai.bitlabs.sdk.offerwall.components.webview.BLWebView
+import ai.bitlabs.sdk.offerwall.components.webview.BLWebViewViewModel
+import ai.bitlabs.sdk.util.BUNDLE_KEY_TOKEN
+import ai.bitlabs.sdk.util.BUNDLE_KEY_UID
 import ai.bitlabs.sdk.util.BUNDLE_KEY_URL
+import android.content.Context
 import android.content.Intent
+import android.webkit.WebView
+import androidx.activity.ComponentActivity
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.lifecycle.Lifecycle
+import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
+import com.google.common.truth.Truth.assertThat
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
 
 private val surveyStartHookEventMessage = """
             {
@@ -14,302 +38,305 @@ private val surveyStartHookEventMessage = """
         """.trimIndent()
 private val jsCode = "window.postMessage($surveyStartHookEventMessage, '*');"
 
-//class WebActivityTest {
-//
-//    private val context = ApplicationProvider.getApplicationContext<Context>()
-//
-//    @Test
-//    fun urlExtra_No_BUNDLE_KEY_URL_DestroyActivity() {
-//        ActivityScenario.launch(BitLabsOfferwallActivity::class.java).use {
-//            Thread.sleep(500)
-//            assertThat(it.state).isEqualTo(Lifecycle.State.DESTROYED)
-//        }
-//    }
-//
-//    @Test
-//    fun urlExtra_BUNDLE_KEY_URL_EmptyString_DestroyActivity() {
-//        val intent = TestUtils.createWebActivityIntent("")
-//
-//        ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
-//            Thread.sleep(500)
-//            assertThat(it.state).isEqualTo(Lifecycle.State.DESTROYED)
-//        }
-//    }
-//
-//    @Test
-//    fun urlExtra_BUNDLE_KEY_URL_NotString_DestroyActivity() {
-//        val intent = Intent(context, BitLabsOfferwallActivity::class.java).apply {
-//            putExtra(BUNDLE_KEY_URL, 123)
-//        }
-//
-//        ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
-//            Thread.sleep(500)
-//            assertThat(it.state).isEqualTo(Lifecycle.State.DESTROYED)
-//        }
-//    }
-//
-//    @Test
-//    fun urlExtra_BUNDLE_KEY_URL_CorrectURLString_CreateActivity() {
-//        val url = "https://www.google.com"
-//        val intent = TestUtils.createWebActivityIntent(url)
-//
-//        ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
-//            Thread.sleep(500)
-//            assertThat(it.state).isEqualTo(Lifecycle.State.RESUMED)
-//        }
-//    }
-//
-////    @Test
-////    fun colorExtra_No_BUNDLE_KEY_COLOR_WhiteToolbarBackground() {
-////        // Create a WebActivity with non-OfferWall URL to show the toolbar
-////        val url = "https://www.google.com"
-////        val intent = TestUtils.createWebActivityIntent(url)
-////
-////        ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
-////            Thread.sleep(500)
-////            it.onActivity { activity ->
-////                val toolbar = activity.findViewById<Toolbar>(R.id.toolbar_bitlabs)
-////                val gradient = toolbar.background as GradientDrawable
-////                assertThat(gradient.colors).isEqualTo(intArrayOf(Color.WHITE, Color.WHITE))
-////            }
-////        }
-////    }
-//
-////    @Test
-////    fun colorExtra_BUNDLE_KEY_COLOR_Empty_WhiteToolbarBackground() {
-////        // Create a WebActivity with non-OfferWall URL to show the toolbar
-////        val url = "https://www.google.com"
-////        val intent = TestUtils.createWebActivityIntent(url)
-////
-////        ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
-////            Thread.sleep(500)
-////            it.onActivity { activity ->
-////                val toolbar = activity.findViewById<Toolbar>(R.id.toolbar_bitlabs)
-////                val gradient = toolbar.background as GradientDrawable
-////                assertThat(gradient.colors).isEqualTo(intArrayOf(Color.WHITE, Color.WHITE))
-////            }
-////        }
-////    }
-//
-////    @Test
-////    fun colorExtra_BUNDLE_KEY_COLOR_NotIntArrayOf_WhiteToolbarBackground() {
-////        // Create a WebActivity with non-OfferWall URL to show the toolbar
-////        val url = "https://www.google.com"
-////        val intent = Intent(context, BitLabsOfferwallActivity::class.java).apply {
-////            putExtra(BUNDLE_KEY_URL, url)
-////            putExtra(BUNDLE_KEY_HEADER_COLOR, 123)
-////        }
-////
-////        ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
-////            Thread.sleep(500)
-////            it.onActivity { activity ->
-////                val toolbar = activity.findViewById<Toolbar>(R.id.toolbar_bitlabs)
-////                val gradient = toolbar.background as GradientDrawable
-////                assertThat(gradient.colors).isEqualTo(intArrayOf(Color.WHITE, Color.WHITE))
-////            }
-////        }
-////    }
-//
-////    @Test
-////    fun colorExtra_BUNDLE_KEY_COLOR_CorrectIntArray_CorrectToolbarBackground() {
-////        val colors = intArrayOf(123, 123)
-////        val url = "https://www.google.com"
-////        val intent = TestUtils.createWebActivityIntent(url, colors)
-////
-////        ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
-////            Thread.sleep(500)
-////            it.onActivity { activity ->
-////                val toolbar = activity.findViewById<Toolbar>(R.id.toolbar_bitlabs)
-////                val gradient = toolbar.background as GradientDrawable
-////                assertThat(gradient.colors).isEqualTo(colors)
-////            }
-////        }
-////    }
-//
-////    @Test
-////    fun toolbar_SurveyStartEvent_IsDisplayed() {
-////        val url = "https://www.google.com"
-////        val intent = TestUtils.createWebActivityIntent(url)
-////
-////        ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
-////            Thread.sleep(500)
-////
-////            it.onActivity { activity ->
-////                activity.findViewById<WebView>(R.id.wv_bitlabs).evaluateJavascript(jsCode) {}
-////            }
-////
-////            Thread.sleep(1000)
-////            onView(withId(R.id.toolbar_bitlabs)).check(matches(isDisplayed()))
-////        }
-////    }
-//
-//    @Test
-//    fun onBackPressed_SurveyStartEvent_ShowLeaveSurveyDialog() {
-//        val url = "https://www.google.com"
-//        val intent = TestUtils.createWebActivityIntent(url)
-//
-//        ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
-//            Thread.sleep(500)
-//
-//            it.onActivity { activity ->
-//                activity.findViewById<WebView>(R.id.wv_bitlabs).evaluateJavascript(jsCode) {}
-//            }
-//
-//            Thread.sleep(500)
-//            onView(isRoot()).perform(pressBack())
-//
-//            Thread.sleep(500)
-//            onView(withId(androidx.appcompat.R.id.alertTitle)).inRoot(isDialog())
-//                .check(matches(isDisplayed()))
-//        }
-//    }
-//
-//    @Test
-//    fun leaveSurveyDialog_TechnicalReasonClicked_LeaveSurveyCalled() {
-//        val url = "https://www.google.com"
-//        val intent = TestUtils.createWebActivityIntent(url)
-//
-//        mockkObject(BitLabs) {
-//            every { BitLabs.leaveSurvey(any(), any()) } returns Unit
-//
-//            ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
-//                Thread.sleep(500)
-//
-//                it.onActivity { activity ->
-//                    activity.findViewById<WebView>(R.id.wv_bitlabs).evaluateJavascript(jsCode) {}
-//                }
-//
-//                Thread.sleep(500)
-//                onView(isRoot()).perform(pressBack())
-//
-//                Thread.sleep(500)
-//                onView(withText(R.string.leave_reason_technical)).inRoot(isDialog())
-//                    .check(matches(isDisplayed())).perform(click())
-//
-//                verify { BitLabs.leaveSurvey(any(), any()) }
-//            }
-//        }
-//    }
-//
-//    @Test
-//    fun leaveSurveyDialog_OtherReasonClicked_LeaveSurveyCalled() {
-//        val url = "https://www.google.com"
-//        val intent = TestUtils.createWebActivityIntent(url)
-//
-//        mockkObject(BitLabs) {
-//            every { BitLabs.leaveSurvey(any(), any()) } returns Unit
-//
-//            ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
-//                Thread.sleep(500)
-//
-//                it.onActivity { activity ->
-//                    activity.findViewById<WebView>(R.id.wv_bitlabs).evaluateJavascript(jsCode) {}
-//                }
-//
-//                Thread.sleep(500)
-//                onView(isRoot()).perform(pressBack())
-//
-//                Thread.sleep(500)
-//                onView(withText(R.string.leave_reason_other)).inRoot(isDialog())
-//                    .check(matches(isDisplayed())).perform(click())
-//
-//                verify { BitLabs.leaveSurvey(any(), any()) }
-//            }
-//        }
-//    }
-//
-//    @Test
-//    fun leaveSurveyDialog_TooLongReasonClicked_LeaveSurveyCalled() {
-//        val url = "https://www.google.com"
-//        val intent = TestUtils.createWebActivityIntent(url)
-//
-//        mockkObject(BitLabs) {
-//            every { BitLabs.leaveSurvey(any(), any()) } returns Unit
-//
-//            ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
-//                Thread.sleep(500)
-//
-//                it.onActivity { activity ->
-//                    activity.findViewById<WebView>(R.id.wv_bitlabs).evaluateJavascript(jsCode) {}
-//                }
-//
-//                Thread.sleep(500)
-//                onView(isRoot()).perform(pressBack())
-//
-//                Thread.sleep(500)
-//                onView(withText(R.string.leave_reason_too_long)).inRoot(isDialog())
-//                    .check(matches(isDisplayed())).perform(click())
-//
-//                verify { BitLabs.leaveSurvey(any(), any()) }
-//            }
-//        }
-//    }
-//
-//    @Test
-//    fun leaveSurveyDialog_SensitiveReasonClicked_LeaveSurveyCalled() {
-//        val url = "https://www.google.com"
-//        val intent = TestUtils.createWebActivityIntent(url)
-//
-//        mockkObject(BitLabs) {
-//            every { BitLabs.leaveSurvey(any(), any()) } returns Unit
-//
-//            ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
-//                Thread.sleep(500)
-//
-//                it.onActivity { activity ->
-//                    activity.findViewById<WebView>(R.id.wv_bitlabs).evaluateJavascript(jsCode) {}
-//                }
-//
-//                Thread.sleep(500)
-//                onView(isRoot()).perform(pressBack())
-//
-//                Thread.sleep(500)
-//                onView(withText(R.string.leave_reason_sensitive)).inRoot(isDialog())
-//                    .check(matches(isDisplayed())).perform(click())
-//
-//                verify { BitLabs.leaveSurvey(any(), any()) }
-//            }
-//        }
-//    }
-//
-//    @Test
-//    fun leaveSurveyDialog_UninterestingReasonClicked_LeaveSurveyCalled() {
-//        val url = "https://www.google.com"
-//        val intent = TestUtils.createWebActivityIntent(url)
-//
-//        mockkObject(BitLabs) {
-//            every { BitLabs.leaveSurvey(any(), any()) } returns Unit
-//
-//            ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
-//                Thread.sleep(500)
-//
-//                it.onActivity { activity ->
-//                    activity.findViewById<WebView>(R.id.wv_bitlabs).evaluateJavascript(jsCode) {}
-//                }
-//
-//                Thread.sleep(500)
-//                onView(isRoot()).perform(pressBack())
-//
-//                Thread.sleep(500)
-//                onView(withText(R.string.leave_reason_uninteresting)).inRoot(isDialog())
-//                    .check(matches(isDisplayed())).perform(click())
-//
-//                verify { BitLabs.leaveSurvey(any(), any()) }
-//            }
-//        }
-//    }
-//}
+class WebActivityTest {
 
-/**
- * Utility object for creating common Intents and Bundles for tests.
- */
-object TestUtils {
+    private val context = ApplicationProvider.getApplicationContext<Context>()
 
-    /**
-     * Creates a WebActivityIntent Intent with the given [url] and [color].
-     */
-    fun createWebActivityIntent(url: String): Intent =
-        Intent(ApplicationProvider.getApplicationContext(), BitLabsOfferwallActivity::class.java).apply {
-            putExtra(BUNDLE_KEY_URL, url)
+    @get:Rule
+    val rule = createAndroidComposeRule<ComponentActivity>()
+
+    private lateinit var viewModel: BLWebViewViewModel
+
+    @Before
+    fun setUp() {
+        // Initialize the ViewModel with mock data
+        viewModel = mockk(relaxed = true)
+
+        every { viewModel.leaveSurvey(any()) } returns Unit
+        every { viewModel.onSurveyReward(any()) } returns Unit
+        every { viewModel.onOfferwallClosed() } returns Unit
+
+        every { viewModel.headerColors } returns mutableStateOf(
+            intArrayOf(
+                Color.Blue.toArgb(),
+                Color.Green.toArgb()
+            )
+        )
+        every { viewModel.backgroundColors } returns mutableStateOf(
+            intArrayOf(
+                Color.Green.toArgb(),
+                Color.Green.toArgb()
+            )
+        )
+    }
+
+    @Test
+    fun urlExtra_No_BUNDLE_KEY_URL_DestroyActivity() {
+        val intent = MockWebActivityIntent(context)
+            .uid("valid_uid")
+            .token("valid_token")
+            .mock()
+
+        ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
+            Thread.sleep(500)
+            assertThat(it.state).isEqualTo(Lifecycle.State.DESTROYED)
         }
+    }
+
+    @Test
+    fun urlExtra_BUNDLE_KEY_URL_EmptyString_DestroyActivity() {
+        val intent = MockWebActivityIntent(context)
+            .uid("valid_uid")
+            .token("valid_token")
+            .url("")
+            .mock()
+
+        ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
+            Thread.sleep(500)
+            assertThat(it.state).isEqualTo(Lifecycle.State.DESTROYED)
+        }
+    }
+
+    @Test
+    fun urlExtra_BUNDLE_KEY_URL_NotString_DestroyActivity() {
+        val intent = MockWebActivityIntent(context)
+            .uid("valid_uid")
+            .token("valid_token")
+            .intURL(123)
+            .mock()
+
+        ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
+            Thread.sleep(500)
+            assertThat(it.state).isEqualTo(Lifecycle.State.DESTROYED)
+        }
+    }
+
+    @Test
+    fun urlExtra_BUNDLE_KEY_URL_CorrectURLString_CreateActivity() {
+        val intent = MockWebActivityIntent(context)
+            .uid("valid_uid")
+            .token("valid_token")
+            .url("https://www.google.com")
+            .mock()
+
+        ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
+            Thread.sleep(500)
+            assertThat(it.state).isEqualTo(Lifecycle.State.RESUMED)
+        }
+    }
+
+    @Test
+    fun tokenExtra_No_BUNDLE_KEY_TOKEN_DestroyActivity() {
+        val intent = MockWebActivityIntent(context)
+            .uid("valid_uid")
+            .url("https://www.google.com")
+            .mock()
+
+        // Create a WebActivity without the token extra
+        ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
+            Thread.sleep(500)
+            assertThat(it.state).isEqualTo(Lifecycle.State.DESTROYED)
+        }
+    }
+
+    @Test
+    fun tokenExtra_BUNDLE_KEY_TOKEN_NotString_DestroyActivity() {
+        val intent = MockWebActivityIntent(context)
+            .uid("valid_uid")
+            .url("https://www.google.com")
+            .intToken(123)
+            .mock()
+
+        ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
+            Thread.sleep(500)
+            assertThat(it.state).isEqualTo(Lifecycle.State.DESTROYED)
+        }
+    }
+
+    @Test
+    fun tokenExtra_BUNDLE_KEY_TOKEN_CorrectString_CreateActivity() {
+        val intent = MockWebActivityIntent(context)
+            .uid("valid_uid")
+            .url("https://www.google.com")
+            .token("valid_token")
+            .mock()
+
+        ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
+            Thread.sleep(500)
+            assertThat(it.state).isEqualTo(Lifecycle.State.RESUMED)
+        }
+    }
+
+    @Test
+    fun uidExtra_No_BUNDLE_KEY_UID_DestroyActivity() {
+        val intent = MockWebActivityIntent(context)
+            .token("valid_token")
+            .url("https://www.google.com")
+            .mock()
+
+        // Create a WebActivity without the UID extra
+        ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
+            Thread.sleep(500)
+            assertThat(it.state).isEqualTo(Lifecycle.State.DESTROYED)
+        }
+    }
+
+    @Test
+    fun uidExtra_BUNDLE_KEY_UID_NotString_DestroyActivity() {
+        val intent = MockWebActivityIntent(context)
+            .token("valid_token")
+            .url("https://www.google.com")
+            .intUid(123)
+            .mock()
+
+        ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
+            Thread.sleep(500)
+            assertThat(it.state).isEqualTo(Lifecycle.State.DESTROYED)
+        }
+    }
+
+    @Test
+    fun uidExtra_BUNDLE_KEY_UID_CorrectString_CreateActivity() {
+        val intent = MockWebActivityIntent(context)
+            .token("valid_token")
+            .url("https://www.google.com")
+            .uid("valid_uid")
+            .mock()
+
+        ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
+            Thread.sleep(500)
+            assertThat(it.state).isEqualTo(Lifecycle.State.RESUMED)
+        }
+    }
+
+    @Test
+    fun toolbar_SurveyStartEvent_IsDisplayed() {
+        val intent = MockWebActivityIntent(context)
+            .uid("valid_uid")
+            .token("valid_token")
+            .url("https://www.google.com")
+            .mock()
+
+        ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
+            Thread.sleep(500)
+
+            it.onActivity {
+                it.findViewById<WebView>(R.id.bl_webview)
+                    .evaluateJavascript(jsCode) {}
+            }
+
+            Thread.sleep(500)
+
+            // Check if the toolbar is displayed
+            rule.onNodeWithTag("BLTopBar").assertExists()
+        }
+    }
+
+    @Test
+    fun onBackPressed_SurveyStartEvent_ShowLeaveSurveyDialog() {
+        rule.setContent { BLWebView(viewModel, "https://www.google.com") }
+
+        Thread.sleep(500)
+
+        rule.runOnUiThread {
+            val webView = rule.activity.findViewById<WebView>(R.id.bl_webview)
+            webView.evaluateJavascript(jsCode) {}
+        }
+
+        Thread.sleep(500)
+
+        // Simulate back press
+        rule.runOnUiThread { rule.activity.onBackPressedDispatcher.onBackPressed() }
+
+        Thread.sleep(500)
+
+        // Check if the leave survey dialog is displayed
+        rule.onNodeWithTag("BLLeaveSurveyDialog").assertExists()
+    }
+
+    private fun testLeaveReasonClicked(reason: String) {
+        rule.setContent { BLWebView(viewModel, "https://www.google.com") }
+
+        Thread.sleep(500)
+
+        rule.runOnUiThread {
+            val webView = rule.activity.findViewById<WebView>(R.id.bl_webview)
+            webView.evaluateJavascript(jsCode) {}
+        }
+
+        Thread.sleep(500)
+
+        // Simulate back press
+        rule.runOnUiThread { rule.activity.onBackPressedDispatcher.onBackPressed() }
+
+        Thread.sleep(500)
+
+        rule.onNodeWithText(reason)
+            .assertExists()
+            .performClick()
+
+        Thread.sleep(500)
+
+        verify { viewModel.leaveSurvey(any()) }
+    }
+
+    @Test
+    fun leaveSurveyDialog_TechnicalReasonClicked_LeaveSurveyCalled() {
+        val technicalReason = context.getString(R.string.leave_reason_technical)
+        testLeaveReasonClicked(technicalReason)
+    }
+
+    @Test
+    fun leaveSurveyDialog_OtherReasonClicked_LeaveSurveyCalled() {
+        val otherReason = context.getString(R.string.leave_reason_other)
+        testLeaveReasonClicked(otherReason)
+    }
+
+    @Test
+    fun leaveSurveyDialog_TooLongReasonClicked_LeaveSurveyCalled() {
+        val tooLongReason = context.getString(R.string.leave_reason_too_long)
+        testLeaveReasonClicked(tooLongReason)
+    }
+
+    @Test
+    fun leaveSurveyDialog_SensitiveReasonClicked_LeaveSurveyCalled() {
+        val sensitiveReason = context.getString(R.string.leave_reason_sensitive)
+        testLeaveReasonClicked(sensitiveReason)
+    }
+
+    @Test
+    fun leaveSurveyDialog_UninterestingReasonClicked_LeaveSurveyCalled() {
+        val uninterestingReason = context.getString(R.string.leave_reason_uninteresting)
+        testLeaveReasonClicked(uninterestingReason)
+    }
+}
+
+class MockWebActivityIntent(context: Context) {
+    private val intent = Intent(context, BitLabsOfferwallActivity::class.java)
+
+    fun token(token: String?) = apply {
+        intent.putExtra(BUNDLE_KEY_TOKEN, token)
+    }
+
+    fun uid(uid: String?) = apply {
+        intent.putExtra(BUNDLE_KEY_UID, uid)
+    }
+
+    fun url(url: String?) = apply {
+        intent.putExtra(BUNDLE_KEY_URL, url)
+    }
+
+    fun intURL(url: Int) = apply {
+        intent.putExtra(BUNDLE_KEY_URL, url)
+    }
+
+    fun intToken(token: Int) = apply {
+        intent.putExtra(BUNDLE_KEY_TOKEN, token)
+    }
+
+    fun intUid(uid: Int) = apply {
+        intent.putExtra(BUNDLE_KEY_UID, uid)
+    }
+
+    fun mock() = intent
 }

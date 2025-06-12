@@ -45,7 +45,7 @@ internal class BLWebViewViewModel(val token: String, val uid: String, val listen
         viewModelScope.launch { fetchAppSettings() }
     }
 
-    suspend fun fetchAppSettings() = try {
+    private suspend fun fetchAppSettings() = try {
         val config = repo.getAppSettings(token).configuration
         val theme = getColorScheme()
 

@@ -3,6 +3,7 @@ package ai.bitlabs.sdk.offerwall.util
 import ai.bitlabs.sdk.offerwall.BitLabsOfferwallActivity
 import ai.bitlabs.sdk.util.TAG
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
@@ -51,7 +52,7 @@ fun WebView.setupPostMessageHandler(
 
         when (hookMessage.name) {
             HookName.SDK_CLOSE -> {
-                (context as BitLabsOfferwallActivity).finish()
+                (context as Activity).finish()
             }
 
             HookName.SURVEY_START -> {
@@ -60,7 +61,7 @@ fun WebView.setupPostMessageHandler(
                     .firstOrNull()
                 val clickId = surveyStartArgs?.clickId
                 setClickId(clickId)
-                (context as BitLabsOfferwallActivity).runOnUiThread { toggleTopBar(true) }
+                (context as Activity).runOnUiThread { toggleTopBar(true) }
                 Log.i(TAG, "Caught Survey Start event with clickId: $clickId")
             }
 

@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -36,6 +37,7 @@ fun BLTopBar(headerColors: IntArray, isColorBright: Boolean, onBackPressed: () -
             // TODO: Support gradient backgrounds
             .background(Color(headerColors.first()))
             .padding(horizontal = 16.dp)
+            .testTag("BLTopBar")
     ) {
         Row(
             modifier = Modifier.fillMaxHeight(),

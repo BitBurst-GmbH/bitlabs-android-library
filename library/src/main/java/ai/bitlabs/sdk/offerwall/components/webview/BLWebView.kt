@@ -1,5 +1,6 @@
 package ai.bitlabs.sdk.offerwall.components.webview
 
+import ai.bitlabs.sdk.R
 import ai.bitlabs.sdk.data.model.bitlabs.WebViewError
 import ai.bitlabs.sdk.offerwall.components.BLErrorQr
 import ai.bitlabs.sdk.offerwall.components.BLLeaveSurveyDialog
@@ -34,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.WindowCompat
 
@@ -48,6 +50,7 @@ internal fun BLWebView(viewModel: BLWebViewViewModel, url: String) {
 
     val webView = remember {
         WebView(context).apply {
+            id = R.id.bl_webview // For Testing purposes
             scrollBarStyle = WebView.SCROLLBARS_OUTSIDE_OVERLAY
             setup()
             webViewClient = BLWebViewClient { error = it }
@@ -115,7 +118,12 @@ internal fun BLWebView(viewModel: BLWebViewViewModel, url: String) {
             viewModel.isColorBright,
             ::onBackPressed
         )
-        AndroidView(factory = { webView }, modifier = Modifier.weight(1f))
+        AndroidView(
+            factory = { webView },
+            modifier = Modifier
+                .weight(1f)
+                .testTag("BLWebView"),
+        )
         Spacer(
             modifier = Modifier
                 .fillMaxWidth()

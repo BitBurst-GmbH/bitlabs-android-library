@@ -1,10 +1,11 @@
 package ai.bitlabs.sdk
 
-import ai.bitlabs.sdk.util.TAG
 import android.util.Log
 import android.webkit.ConsoleMessage
 import android.webkit.ConsoleMessage.MessageLevel
 
+
+private const val TAG = "BitLabs.Console"
 
 fun ConsoleMessage.log() {
     val message = "${message()} -- From line ${lineNumber()} of ${sourceId()}"

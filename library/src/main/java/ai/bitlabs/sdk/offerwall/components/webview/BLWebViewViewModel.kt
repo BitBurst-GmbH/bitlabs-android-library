@@ -9,7 +9,6 @@ import ai.bitlabs.sdk.offerwall.util.getColorScheme
 import ai.bitlabs.sdk.offerwall.util.getLuminance
 import ai.bitlabs.sdk.util.OnOfferwallClosedListener
 import ai.bitlabs.sdk.util.OnSurveyRewardListener
-import ai.bitlabs.sdk.util.TAG
 import ai.bitlabs.sdk.util.createBitLabsRepository
 import android.util.Log
 import androidx.compose.runtime.State
@@ -17,6 +16,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+
+private const val TAG = "BitLabs.Offerwall"
 
 internal class BLWebViewViewModel(val token: String, val uid: String, val listenerId: Int) :
     ViewModel() {

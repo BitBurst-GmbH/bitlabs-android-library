@@ -1,7 +1,6 @@
 package ai.bitlabs.sdk.offerwall.util
 
 import ai.bitlabs.sdk.offerwall.BitLabsOfferwallActivity
-import ai.bitlabs.sdk.util.TAG
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.os.Handler
@@ -13,6 +12,8 @@ import android.webkit.CookieManager
 import android.webkit.JavascriptInterface
 import android.webkit.WebSettings
 import android.webkit.WebView
+
+private const val TAG = "BitLabs.Offerwall"
 
 @SuppressLint("SetJavaScriptEnabled")
 fun WebView.setup() = apply {

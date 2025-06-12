@@ -1,9 +1,8 @@
 package ai.bitlabs.sdk.offerwall.components
 
 import ai.bitlabs.sdk.data.model.bitlabs.WebViewError
-import ai.bitlabs.sdk.offerwall.theme.BLStyle
 import ai.bitlabs.sdk.offerwall.shared.BLText
-import ai.bitlabs.sdk.util.TAG
+import ai.bitlabs.sdk.offerwall.theme.BLStyle
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
@@ -18,6 +17,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+
+private const val TAG = "BitLabs.Offerwall"
 
 @Composable
 fun BLErrorQr(error: WebViewError) {

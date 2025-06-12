@@ -10,7 +10,6 @@ import ai.bitlabs.sdk.offerwall.util.WebActivityParams
 import ai.bitlabs.sdk.util.BASE_URL
 import ai.bitlabs.sdk.util.BUNDLE_KEY_URL
 import ai.bitlabs.sdk.util.OnSurveyRewardListener
-import ai.bitlabs.sdk.util.TAG
 import ai.bitlabs.sdk.util.convertKeysToCamelCase
 import ai.bitlabs.sdk.util.deviceType
 import android.content.Context
@@ -26,6 +25,8 @@ import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+
+private const val TAG = "BitLabs"
 
 /**
  * The main class including all the library functions to use in your code.

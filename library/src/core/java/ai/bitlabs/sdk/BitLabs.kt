@@ -17,7 +17,6 @@ import ai.bitlabs.sdk.util.BUNDLE_KEY_URL
 import ai.bitlabs.sdk.util.OnExceptionListener
 import ai.bitlabs.sdk.util.OnResponseListener
 import ai.bitlabs.sdk.util.OnSurveyRewardListener
-import ai.bitlabs.sdk.util.TAG
 import ai.bitlabs.sdk.util.createBitLabsRepository
 import ai.bitlabs.sdk.views.BitLabsWidgetFragment
 import android.content.Context
@@ -28,6 +27,8 @@ import com.google.android.gms.ads.identifier.AdvertisingIdClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+
+private const val TAG = "BitLabs"
 
 /**
  * The main class including all the library functions to use in your code.

@@ -1,7 +1,6 @@
 package ai.bitlabs.sdk.offerwall.util
 
 import ai.bitlabs.sdk.data.model.sentry.SentryManager
-import ai.bitlabs.sdk.util.TAG
 import android.util.Log
 import androidx.annotation.Keep
 import com.google.gson.GsonBuilder
@@ -12,6 +11,7 @@ import com.google.gson.JsonParseException
 import com.google.gson.annotations.SerializedName
 import java.lang.reflect.Type
 
+private const val TAG = "BitLabs.Offerwall"
 
 /**
  * Returns a [HookMessage] object converted from JSON.

@@ -13,7 +13,6 @@ import ai.bitlabs.sdk.data.model.sentry.SentrySDK
 import ai.bitlabs.sdk.data.model.sentry.SentryStackFrame
 import ai.bitlabs.sdk.data.model.sentry.SentryStackTrace
 import ai.bitlabs.sdk.data.model.sentry.SentryUser
-import ai.bitlabs.sdk.util.TAG
 import android.util.Log
 import com.google.gson.Gson
 import okhttp3.RequestBody
@@ -25,6 +24,8 @@ import java.util.TimeZone
 import java.util.UUID
 import java.util.concurrent.Executor
 
+
+private const val TAG = "BitLabs.Sentry"
 
 internal class SentryRepository(
     private val sentryAPI: SentryAPI,

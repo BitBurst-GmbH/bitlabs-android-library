@@ -174,7 +174,6 @@ class WebActivityTest {
             .url("https://www.google.com")
             .mock()
 
-        // Create a WebActivity without the UID extra
         ActivityScenario.launch<BitLabsOfferwallActivity>(intent).use {
             Thread.sleep(500)
             assertThat(it.state).isEqualTo(Lifecycle.State.DESTROYED)

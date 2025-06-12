@@ -1,6 +1,5 @@
 package ai.bitlabs.sdk.offerwall.components.photo_chooser
 
-import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.R
 import ai.bitlabs.sdk.data.model.sentry.SentryManager
 import ai.bitlabs.sdk.offerwall.shared.BLText
@@ -64,7 +63,11 @@ fun BLPhotoChooser(uriResult: ValueCallback<Array<Uri>>? = null, onDismiss: () -
                 File.createTempFile("temp_photo", ".jpg", this)
             }
             if (tempFile == null) throw Exception("Could not create tmp photo")
-            val uri = FileProvider.getUriForFile(context, BitLabs.fileProviderAuthority, tempFile!!)
+            val uri = FileProvider.getUriForFile(
+                context,
+                "${context.packageName}.provider.bitlabs",
+                tempFile!!,
+            )
             camera.launch(uri)
         } catch (e: Exception) {
             SentryManager.captureException(e)

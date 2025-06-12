@@ -39,10 +39,9 @@ object BitLabs {
     private var uid = ""
     private var adId = ""
     private var token = ""
-    internal var fileProviderAuthority = ""
 
     /** These will be added as query parameters to the OfferWall Link */
-    @Deprecated("Use OFFERWALL MODULE instead")
+    @Deprecated("Use OFFERWALL object instead")
     var tags = mutableMapOf<String, Any>()
 
     private var repo: BitLabsRepository? = null
@@ -59,17 +58,14 @@ object BitLabs {
      * @param[token] Found on your [BitLabs Dashboard](https://dashboard.bitlabs.ai/),
      * @param[uid] Unique for every user to initialise the connection with the BitLabs API.
      */
+    @Deprecated("Use API and OFFERWALL objects instead")
     fun init(context: Context, token: String, uid: String) {
         this.token = token
         this.uid = uid
 
         SentryManager.init(token, uid)
 
-        repo = createBitLabsRepository(token, uid)
-
         determineAdvertisingInfo(context)
-
-        fileProviderAuthority = "${context.packageName}.provider.bitlabs"
 
         val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
         Thread.setDefaultUncaughtExceptionHandler { _, throwable ->
@@ -81,17 +77,7 @@ object BitLabs {
         }
     }
 
-    /**
-     * Determines whether the user can perform an action in the OfferWall
-     * (either opening a survey or answering qualifications) and then executes your implementation
-     * of the [OnResponseListener.onResponse].
-     * ######
-     * If you want to perform background checks if surveys are available, this is the best option.
-     *
-     * When a response is received, [onResponseListener] is called. Its boolean
-     * parameter is `true` if an action can be performed and `false` otherwise. If it's `null`,
-     * then there has been an internal error which is most probably logged with 'BitLabs' as a tag.
-     */
+    @Deprecated("Use API object instead")
     fun checkSurveys(
         onResponseListener: OnResponseListener<Boolean>, onExceptionListener: OnExceptionListener,
     ) = ifInitialised {
@@ -105,13 +91,7 @@ object BitLabs {
         }
     }
 
-    /**
-     * Fetches a list of surveys the user can open.
-     * ######
-     * When a response is received, [onResponseListener] is called.
-     * Its parameter is the list of surveys. If it's `null`, then there has been an internal error
-     * which is most probably logged with 'BitLabs' as a tag.
-     */
+    @Deprecated("Use API object instead")
     fun getSurveys(
         onResponseListener: OnResponseListener<List<Survey>>,
         onExceptionListener: OnExceptionListener,
@@ -128,13 +108,13 @@ object BitLabs {
     }
 
     /** Registers an [OnSurveyRewardListener] callback to be invoked when the OfferWall is exited by the user. */
-    @Deprecated("Use OFFERWALL MODULE instead")
+    @Deprecated("Use OFFERWALL object instead")
     fun setOnRewardListener(onSurveyRewardListener: OnSurveyRewardListener) {
         this.onRewardListener = onSurveyRewardListener
     }
 
     /** Adds a new ([key]:[value]) pair to [BitLabs.tags] */
-    @Deprecated("Use OFFERWALL MODULE instead")
+    @Deprecated("Use OFFERWALL object instead")
     fun addTag(key: String, value: Any) {
         tags[key] = value
     }
@@ -145,7 +125,7 @@ object BitLabs {
      * It's recommended that that you use a context you know the lifecycle of
      * in order to avoid memory leaks and other issues associated with Activities.
      */
-    @Deprecated("Use OFFERWALL MODULE instead")
+    @Deprecated("Use OFFERWALL object instead")
     fun launchOfferWall(context: Context) = ifInitialised {
         with(Intent(context, BitLabsOfferwallActivity::class.java)) {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
@@ -200,6 +180,57 @@ object BitLabs {
 
         if (isInitialised) block()
         else Log.e(TAG, "You should initialise BitLabs first! Call BitLabs::init()")
+    }
+
+    object API {
+        private var repo: BitLabsRepository? = null
+        private val coroutineScope by lazy { CoroutineScope(Dispatchers.IO) }
+
+        @JvmStatic
+        fun init(token: String, uid: String) {
+            repo = createBitLabsRepository(token, uid)
+        }
+
+        /**
+         * Checks whether [token] and [uid] have been set and aren't blank/empty
+         * and executes the [block] accordingly.
+         */
+        private inline fun ifInitialised(block: () -> Unit) {
+            val isInitialised = token.isNotBlank().and(uid.isNotBlank())
+
+            if (isInitialised) block()
+            else Log.e(TAG, "You should initialise BitLabs first! Call BitLabs::init()")
+        }
+
+        @JvmStatic
+        fun checkSurveys(
+            onResponseListener: OnResponseListener<Boolean>,
+            onExceptionListener: OnExceptionListener,
+        ) = ifInitialised {
+            coroutineScope.launch {
+                try {
+                    val surveys = repo?.getSurveys("NATIVE") ?: emptyList()
+                    onResponseListener.onResponse(surveys.isNotEmpty())
+                } catch (e: Exception) {
+                    onExceptionListener.onException(e)
+                }
+            }
+        }
+
+        fun getSurveys(
+            onResponseListener: OnResponseListener<List<Survey>>,
+            onExceptionListener: OnExceptionListener,
+        ) = BitLabs.ifInitialised {
+            coroutineScope.launch {
+                try {
+                    repo?.getSurveys("NATIVE")?.let {
+                        onResponseListener.onResponse(it)
+                    }
+                } catch (e: Exception) {
+                    onExceptionListener.onException(e)
+                }
+            }
+        }
     }
 
     object OFFERWALL {

@@ -1,7 +1,6 @@
 package ai.bitlabs.sdk.util
 
 import ai.bitlabs.sdk.data.util.body
-import android.util.Log
 import com.google.common.truth.Truth.assertThat
 import com.google.gson.JsonSyntaxException
 import okhttp3.MediaType
@@ -56,7 +55,6 @@ class ResponseBodyExtensionKtTest {
         val responseBody = ResponseBody.create(MediaType.parse("application/json"), json)
 
         val bitLabsResponse = responseBody.body<Data>()
-        Log.i(TAG, "$bitLabsResponse")
         assertThat(bitLabsResponse).isNotNull()
         assertThat(bitLabsResponse?.status).isEqualTo("success")
         assertThat(bitLabsResponse?.data).isNotNull()

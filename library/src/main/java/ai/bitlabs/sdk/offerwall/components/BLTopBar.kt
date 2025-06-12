@@ -16,9 +16,9 @@ import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.vectorResource
@@ -29,13 +29,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun BLTopBar(headerColors: IntArray, isColorBright: Boolean, onBackPressed: () -> Unit) {
+fun BLTopBar(headerColors: List<Color>, isColorBright: Boolean, onBackPressed: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(56.dp)
-            // TODO: Support gradient backgrounds
-            .background(Color(headerColors.first()))
+            .background(brush = Brush.linearGradient(headerColors))
             .padding(horizontal = 16.dp)
             .testTag("BLTopBar")
     ) {
@@ -71,7 +70,7 @@ fun BLTopBar(headerColors: IntArray, isColorBright: Boolean, onBackPressed: () -
 @Composable
 fun BLTopBarPreview() {
     BLTopBar(
-        headerColors = intArrayOf(BLColors.Primary.toArgb()),
+        headerColors = listOf(BLColors.Primary, BLColors.Accent),
         isColorBright = false,
         onBackPressed = {}
     )

@@ -32,6 +32,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
@@ -42,6 +43,8 @@ import androidx.core.view.WindowCompat
 @Composable
 internal fun BLWebView(viewModel: BLWebViewViewModel, url: String) {
     val context = LocalContext.current
+    val headerColors = viewModel.headerColors.value.map { Color(it) }
+    val backgroundColors = viewModel.backgroundColors.value.map { Color(it) }
 
     var error by remember { mutableStateOf<WebViewError?>(null) }
     var isTopBarShown by remember { mutableStateOf(false) }
@@ -110,11 +113,11 @@ internal fun BLWebView(viewModel: BLWebViewViewModel, url: String) {
         Spacer(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(color = Color(viewModel.headerColors.value.first()))
+                .background(brush = Brush.linearGradient(headerColors))
                 .statusBarsPadding()
         )
         if (isTopBarShown) BLTopBar(
-            viewModel.headerColors.value,
+            headerColors,
             viewModel.isColorBright,
             ::onBackPressed
         )
@@ -127,7 +130,7 @@ internal fun BLWebView(viewModel: BLWebViewViewModel, url: String) {
         Spacer(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(color = Color(viewModel.backgroundColors.value.first()))
+                .background(brush = Brush.linearGradient(backgroundColors))
                 .navigationBarsPadding()
         )
     }

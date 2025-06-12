@@ -23,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        bitLabs.init(this, BuildConfig.APP_TOKEN, "oblivatevariegata");
+        BitLabs.API.init(BuildConfig.APP_TOKEN, "oblivatevariegata");
 
         // bitLabs.setDebugMode(true);
 
@@ -41,12 +41,12 @@ public class MainActivity extends AppCompatActivity {
 
         offerwall.setOnOfferwallClosedListener(totalSurveyReward -> Log.i(TAG, "Offerwall closed. Total survey reward: " + totalSurveyReward));
 
-        findViewById(R.id.btn_check_surveys).setOnClickListener(view -> bitLabs.checkSurveys(
+        findViewById(R.id.btn_check_surveys).setOnClickListener(view -> BitLabs.API.checkSurveys(
                 hasSurveys -> Log.i(TAG, hasSurveys ? "Found Surveys" : "No Surveys"),
                 e -> Log.e(TAG, "CheckSurveysErr: " + e.getMessage(), e.getCause())
         ));
 
-        findViewById(R.id.btn_get_surveys).setOnClickListener(view -> bitLabs.getSurveys(
+        findViewById(R.id.btn_get_surveys).setOnClickListener(view -> BitLabs.API.getSurveys(
                 surveys -> {
                     for (Survey survey : surveys) {
                         Log.i(TAG, "Survey Id: " + survey.getId() + " in " + survey.getCategory().getName());

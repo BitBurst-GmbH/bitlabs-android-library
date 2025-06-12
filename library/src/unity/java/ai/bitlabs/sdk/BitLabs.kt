@@ -62,8 +62,6 @@ object BitLabs {
         this.token = token
         this.uid = uid
 
-        SentryManager.init(token, uid)
-
         val userAgent =
             "BitLabs/${BuildConfig.VERSION_NAME} (Android ${Build.VERSION.SDK_INT}; ${Build.MODEL}; ${deviceType()})"
 
@@ -94,7 +92,7 @@ object BitLabs {
         val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
         Thread.setDefaultUncaughtExceptionHandler { _, throwable ->
             if (throwable.stackTrace.any { it.className.startsWith("ai.bitlabs.sdk") }) {
-                SentryManager.captureException(throwable, defaultHandler)
+                SentryManager.captureException(token, uid, throwable, defaultHandler)
             } else {
                 defaultHandler?.uncaughtException(Thread.currentThread(), throwable)
             }
@@ -117,7 +115,7 @@ object BitLabs {
                     surveys.isNotEmpty().toString()
                 )
             } catch (e: Exception) {
-                SentryManager.captureException(e)
+                SentryManager.captureException(token, uid, e)
                 UnityPlayer.UnitySendMessage(
                     gameObject,
                     "CheckSurveysException",
@@ -147,7 +145,7 @@ object BitLabs {
                     GsonBuilder().create().toJson(surveys).convertKeysToCamelCase()
                 )
             } catch (e: Exception) {
-                SentryManager.captureException(e)
+                SentryManager.captureException(token, uid, e)
                 UnityPlayer.UnitySendMessage(
                     gameObject,
                     "GetSurveysException",
@@ -195,7 +193,7 @@ object BitLabs {
             adId = AdvertisingIdClient.getAdvertisingIdInfo(context).id ?: ""
             Log.d(TAG, "Advertising Id: $adId")
         } catch (e: Exception) {
-            SentryManager.captureException(e)
+            SentryManager.captureException(token, uid, e)
             Log.e(TAG, "Failed to determine Advertising Id", e)
         }
     }.start()

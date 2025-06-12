@@ -1,5 +1,7 @@
 package ai.bitlabs.sdk
 
+import ai.bitlabs.sdk.BitLabs.API.token
+import ai.bitlabs.sdk.BitLabs.API.uid
 import ai.bitlabs.sdk.BitLabs.token
 import ai.bitlabs.sdk.BitLabs.uid
 import ai.bitlabs.sdk.data.model.bitlabs.Survey
@@ -184,11 +186,16 @@ object BitLabs {
     }
 
     object API {
+        private var token = ""
+        private var uid = ""
         private var repo: BitLabsRepository? = null
         private val coroutineScope by lazy { CoroutineScope(Dispatchers.IO) }
 
         @JvmStatic
         fun init(token: String, uid: String) {
+            this.token = token
+            this.uid = uid
+
             repo = createBitLabsRepository(token, uid)
         }
 
@@ -200,7 +207,7 @@ object BitLabs {
             val isInitialised = token.isNotBlank().and(uid.isNotBlank())
 
             if (isInitialised) block()
-            else Log.e(TAG, "You should initialise BitLabs first! Call BitLabs::init()")
+            else Log.e(TAG, "You should initialise the API first! Call BitLabs.API::init()")
         }
 
         @JvmStatic
@@ -213,21 +220,24 @@ object BitLabs {
                     val surveys = repo?.getSurveys("NATIVE") ?: emptyList()
                     onResponseListener.onResponse(surveys.isNotEmpty())
                 } catch (e: Exception) {
+                    SentryManager.captureException(token, uid, e)
                     onExceptionListener.onException(e)
                 }
             }
         }
 
+        @JvmStatic
         fun getSurveys(
             onResponseListener: OnResponseListener<List<Survey>>,
             onExceptionListener: OnExceptionListener,
-        ) = BitLabs.ifInitialised {
+        ) = ifInitialised {
             coroutineScope.launch {
                 try {
                     repo?.getSurveys("NATIVE")?.let {
                         onResponseListener.onResponse(it)
                     }
                 } catch (e: Exception) {
+                    SentryManager.captureException(token, uid, e)
                     onExceptionListener.onException(e)
                 }
             }

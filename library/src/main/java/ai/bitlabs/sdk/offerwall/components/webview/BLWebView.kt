@@ -62,6 +62,7 @@ internal fun BLWebView(viewModel: BLWebViewViewModel, url: String) {
                 addReward = { viewModel.onSurveyReward(it) },
                 setClickId = { viewModel.clickId = it ?: "" },
                 toggleTopBar = { isTopBarShown = it },
+                viewModel.token, viewModel.uid
             )
             loadUrl(url)
         }
@@ -158,6 +159,7 @@ internal fun BLWebView(viewModel: BLWebViewViewModel, url: String) {
         BLPhotoChooser(
             uriResult,
             onDismiss = { uriResult = null },
+            viewModel.token, viewModel.uid
         )
     }
 }

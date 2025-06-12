@@ -28,17 +28,19 @@ import java.util.concurrent.Executor
 
 internal class SentryRepository(
     private val sentryAPI: SentryAPI,
-    private val token: String,
-    private val uid: String,
-    private val executor: Executor
+    private val executor: Executor,
 ) {
 
     fun sendEnvelope(
-        throwable: Throwable, defaultUncaughtExceptionHandler: UncaughtExceptionHandler?
+        token: String, uid: String,
+        throwable: Throwable, defaultUncaughtExceptionHandler: UncaughtExceptionHandler?,
     ) {
 
         val envelope =
-            createEnvelopeJson(throwable, isHandled = defaultUncaughtExceptionHandler == null)
+            createEnvelopeJson(
+                token, uid,
+                throwable, isHandled = defaultUncaughtExceptionHandler == null
+            )
 
         executor.execute {
             try {
@@ -60,7 +62,10 @@ internal class SentryRepository(
         }
     }
 
-    private fun createEnvelopeJson(throwable: Throwable, isHandled: Boolean): RequestBody {
+    private fun createEnvelopeJson(
+        token: String, uid: String,
+        throwable: Throwable, isHandled: Boolean,
+    ): RequestBody {
         Gson()
 
         val evenId = UUID.randomUUID().toString().replace("-", "")

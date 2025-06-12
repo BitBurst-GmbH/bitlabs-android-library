@@ -2,10 +2,10 @@ package ai.bitlabs.sdk.offerwall.components.photo_chooser
 
 import ai.bitlabs.sdk.R
 import ai.bitlabs.sdk.data.model.sentry.SentryManager
+import ai.bitlabs.sdk.offerwall.TAG
 import ai.bitlabs.sdk.offerwall.shared.BLText
 import ai.bitlabs.sdk.offerwall.theme.BLColors
 import ai.bitlabs.sdk.offerwall.theme.BLStyle
-import ai.bitlabs.sdk.util.TAG
 import android.Manifest
 import android.net.Uri
 import android.util.Log
@@ -36,9 +36,14 @@ import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import java.io.File
 
-@Preview
+
 @Composable
-fun BLPhotoChooser(uriResult: ValueCallback<Array<Uri>>? = null, onDismiss: () -> Unit = {}) {
+fun BLPhotoChooser(
+    uriResult: ValueCallback<Array<Uri>>? = null,
+    onDismiss: () -> Unit = {},
+    token: String, // For Sentry
+    uid: String, // For Sentry
+) {
     var tempFile: File? = null
     val context = LocalContext.current
 
@@ -70,7 +75,7 @@ fun BLPhotoChooser(uriResult: ValueCallback<Array<Uri>>? = null, onDismiss: () -
             )
             camera.launch(uri)
         } catch (e: Exception) {
-            SentryManager.captureException(e)
+            SentryManager.captureException(token, uid, e)
             Log.e(TAG, e.message, e)
         }
     }
@@ -107,6 +112,17 @@ fun BLPhotoChooser(uriResult: ValueCallback<Array<Uri>>? = null, onDismiss: () -
     if (shouldShowPermissionDialog) {
         BLPermissionDialog(onDismiss = { shouldShowPermissionDialog = false })
     }
+}
+
+@Preview
+@Composable
+private fun BLPhotoChooserPreview() {
+    BLPhotoChooser(
+        uriResult = null,
+        onDismiss = {},
+        token = "test_token",
+        uid = "test_uid"
+    )
 }
 
 @Preview

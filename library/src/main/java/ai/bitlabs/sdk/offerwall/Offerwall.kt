@@ -36,7 +36,7 @@ data class Offerwall(
         Log.d(TAG, "Advertising Id: $id")
         id
     } catch (e: Exception) {
-        SentryManager.captureException(e)
+        SentryManager.captureException(token, uid, e)
         Log.e(TAG, "Failed to determine Advertising Id", e)
         ""
     }

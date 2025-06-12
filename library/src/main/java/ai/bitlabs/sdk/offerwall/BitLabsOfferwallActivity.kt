@@ -9,7 +9,6 @@ import ai.bitlabs.sdk.util.BUNDLE_KEY_LISTENER_ID
 import ai.bitlabs.sdk.util.BUNDLE_KEY_TOKEN
 import ai.bitlabs.sdk.util.BUNDLE_KEY_UID
 import ai.bitlabs.sdk.util.BUNDLE_KEY_URL
-import ai.bitlabs.sdk.util.TAG
 import android.os.Bundle
 import android.util.Log
 import android.webkit.URLUtil
@@ -37,7 +36,7 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
         try {
             getDataFromIntent()
         } catch (e: IllegalArgumentException) {
-            SentryManager.captureException(e)
+            SentryManager.captureException(token, uid, e)
             Log.e(TAG, e.message.toString())
             finish()
             return
@@ -52,16 +51,16 @@ internal class BitLabsOfferwallActivity : AppCompatActivity() {
     }
 
     private fun getDataFromIntent() {
-        url = intent.getStringExtra(BUNDLE_KEY_URL).takeIf { URLUtil.isValidUrl(it) } ?: run {
-            throw IllegalArgumentException("BitLabsOfferwallActivity - Invalid url!")
-        }
-
         token = intent.getStringExtra(BUNDLE_KEY_TOKEN) ?: run {
             throw IllegalArgumentException("BitLabsOfferwallActivity - Token is null!")
         }
 
         uid = intent.getStringExtra(BUNDLE_KEY_UID) ?: run {
             throw IllegalArgumentException("BitLabsOfferwallActivity - UID is null!")
+        }
+
+        url = intent.getStringExtra(BUNDLE_KEY_URL).takeIf { URLUtil.isValidUrl(it) } ?: run {
+            throw IllegalArgumentException("BitLabsOfferwallActivity - Invalid url!")
         }
 
         listenerId = intent.getIntExtra(BUNDLE_KEY_LISTENER_ID, -1)

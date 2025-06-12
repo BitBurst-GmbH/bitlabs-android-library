@@ -63,14 +63,15 @@ object BitLabs {
         this.token = token
         this.uid = uid
 
-        SentryManager.init(token, uid)
-
         determineAdvertisingInfo(context)
 
         val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
         Thread.setDefaultUncaughtExceptionHandler { _, throwable ->
             if (throwable.stackTrace.any { it.className.startsWith("ai.bitlabs.sdk") }) {
-                SentryManager.captureException(throwable, defaultHandler)
+                SentryManager.captureException(
+                    token, uid,
+                    throwable, defaultHandler
+                )
             } else {
                 defaultHandler?.uncaughtException(Thread.currentThread(), throwable)
             }
@@ -166,7 +167,7 @@ object BitLabs {
             adId = AdvertisingIdClient.getAdvertisingIdInfo(context).id ?: ""
             Log.d(TAG, "Advertising Id: $adId")
         } catch (e: Exception) {
-            SentryManager.captureException(e)
+            SentryManager.captureException(token, uid, e)
             Log.e(TAG, "Failed to determine Advertising Id", e)
         }
     }.start()

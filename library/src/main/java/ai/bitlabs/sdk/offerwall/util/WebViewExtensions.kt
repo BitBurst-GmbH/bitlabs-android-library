@@ -43,10 +43,11 @@ fun WebView.setupPostMessageHandler(
     addReward: (reward: Double) -> Unit,
     setClickId: (clickId: String?) -> Unit,
     toggleTopBar: (Boolean) -> Unit,
+    token: String, uid: String,
 ) = addJavascriptInterface(object {
     @JavascriptInterface
     fun postMessage(message: String) {
-        val hookMessage = message.asHookMessage() ?: return
+        val hookMessage = message.asHookMessage(token, uid) ?: return
 
         if (hookMessage.type != "hook") return
 

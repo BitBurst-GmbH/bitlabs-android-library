@@ -1,6 +1,7 @@
 package ai.bitlabs.sdk.offerwall.components.webview
 
 import ai.bitlabs.sdk.BitLabs
+import ai.bitlabs.sdk.data.model.sentry.SentryManager
 import ai.bitlabs.sdk.data.repositories.BitLabsRepository
 import ai.bitlabs.sdk.offerwall.util.OfferwallListenerManager
 import ai.bitlabs.sdk.offerwall.util.extractColors
@@ -62,14 +63,22 @@ internal class BLWebViewViewModel(val token: String, val uid: String, val listen
             extractColors(backgroundColor).takeIf { it.isNotEmpty() }
                 ?: _backgroundColors.value
     } catch (e: Exception) {
-        Log.e(TAG, "GetAppSettings Failed: ${e.message}", e)
+        val error = Exception("FetchAppSettings Failed: ${e.message}")
+        SentryManager.captureException(token, uid, error)
+        Log.e(TAG, error.message, error)
     }
 
     fun leaveSurvey(reason: String) {
         if (clickId.isEmpty()) return
         viewModelScope.launch {
-            repo.leaveSurvey(clickId, reason)
-            Log.d(TAG, "Survey left with reason: $reason")
+            try {
+                repo.leaveSurvey(clickId, reason)
+                Log.d(TAG, "Survey left with reason: $reason")
+            } catch (e: Exception) {
+                val error = Exception("LeaveSurvey Failed: ${e.message}")
+                SentryManager.captureException(token, uid, error)
+                Log.e(TAG, error.message, error)
+            }
         }
         clickId = ""
     }

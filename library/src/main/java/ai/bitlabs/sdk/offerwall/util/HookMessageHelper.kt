@@ -17,13 +17,13 @@ import java.lang.reflect.Type
  * Returns a [HookMessage] object converted from JSON.
  * @receiver The post message data string that received from the webview
  */
-internal fun String.asHookMessage(): HookMessage<*>? = try {
+internal fun String.asHookMessage(token: String, uid: String): HookMessage<*>? = try {
     GsonBuilder()
         .registerTypeAdapter(HookMessage::class.java, HookMessageDeserializer())
         .create()
         .fromJson(this, HookMessage::class.java)
 } catch (e: Exception) {
-    SentryManager.captureException(e)
+    SentryManager.captureException(token, uid, e)
     Log.e(TAG, e.toString())
     null
 }
@@ -33,7 +33,7 @@ internal fun String.asHookMessage(): HookMessage<*>? = try {
  */
 internal class HookMessageDeserializer : JsonDeserializer<HookMessage<*>> {
     override fun deserialize(
-        json: JsonElement?, typeOfT: Type?, context: JsonDeserializationContext?
+        json: JsonElement?, typeOfT: Type?, context: JsonDeserializationContext?,
     ): HookMessage<*>? {
         val jsonObject = json?.asJsonObject ?: throw JsonParseException("Invalid JSON")
 
@@ -88,7 +88,7 @@ internal fun JsonElement.isHookMessage(): Boolean {
  */
 @Keep
 internal data class HookMessage<T>(
-    val type: String, val name: HookName, val args: List<T>
+    val type: String, val name: HookName, val args: List<T>,
 )
 
 /**
@@ -119,7 +119,7 @@ internal enum class HookName {
  */
 @Keep
 internal data class RewardArgs(
-    val reward: Float
+    val reward: Float,
 )
 
 /**
@@ -127,5 +127,5 @@ internal data class RewardArgs(
  */
 @Keep
 internal data class SurveyStartArgs(
-    val clickId: String, val link: String
+    val clickId: String, val link: String,
 )

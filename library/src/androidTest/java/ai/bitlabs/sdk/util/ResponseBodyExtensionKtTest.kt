@@ -3,8 +3,10 @@ package ai.bitlabs.sdk.util
 import ai.bitlabs.sdk.data.util.body
 import android.util.Log
 import com.google.common.truth.Truth.assertThat
+import com.google.gson.JsonSyntaxException
 import okhttp3.MediaType
 import okhttp3.ResponseBody
+import org.junit.Assert.assertThrows
 import org.junit.Test
 
 class ResponseBodyExtensionKtTest {
@@ -15,9 +17,9 @@ class ResponseBodyExtensionKtTest {
 
         val responseBody = ResponseBody.create(MediaType.parse("application/json"), json)
 
-        val bitLabsResponse = responseBody.body<Unit>()
-
-        assertThat(bitLabsResponse).isNull()
+        assertThrows(JsonSyntaxException::class.java) {
+            responseBody.body<Unit>()
+        }
     }
 
     @Test

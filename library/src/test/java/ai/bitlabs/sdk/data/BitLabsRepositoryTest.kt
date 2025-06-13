@@ -2,29 +2,26 @@ package ai.bitlabs.sdk.data
 
 import ai.bitlabs.sdk.data.api.BitLabsAPI
 import ai.bitlabs.sdk.data.model.bitlabs.BitLabsResponse
+import ai.bitlabs.sdk.data.model.bitlabs.Category
+import ai.bitlabs.sdk.data.model.bitlabs.Configuration
 import ai.bitlabs.sdk.data.model.bitlabs.GetAppSettingsResponse
-import ai.bitlabs.sdk.data.model.bitlabs.GetLeaderboardResponse
 import ai.bitlabs.sdk.data.model.bitlabs.GetSurveysResponse
+import ai.bitlabs.sdk.data.model.bitlabs.RestrictionReason
 import ai.bitlabs.sdk.data.model.bitlabs.Survey
 import ai.bitlabs.sdk.data.repositories.BitLabsRepository
-import ai.bitlabs.sdk.util.OnExceptionListener
-import ai.bitlabs.sdk.util.OnResponseListener
-import android.util.Log
+import com.google.common.truth.Truth.assertThat
 import io.mockk.MockKAnnotations
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
-import io.mockk.mockkStatic
-import io.mockk.verify
+import kotlinx.coroutines.test.runTest
 import okhttp3.MediaType
-import okhttp3.Request
 import okhttp3.ResponseBody
-import okio.Timeout
+import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
-import retrofit2.Call
-import retrofit2.Callback
 import retrofit2.Response
 
 class BitLabsRepositoryTest {
@@ -32,14 +29,37 @@ class BitLabsRepositoryTest {
     @MockK
     private lateinit var bitLabsAPI: BitLabsAPI
 
-    @MockK(relaxed = true)
-    private lateinit var onExceptionListener: OnExceptionListener
-
     @InjectMockKs
     private lateinit var bitLabsRepository: BitLabsRepository
 
-    private inline fun <reified T : Any> getWorkingResponseBody() =
-        BitLabsResponse(mockk<T>(relaxed = true), null, "", "")
+    private inline fun <reified T : Any> createBitLabsResponse(data: T) =
+        BitLabsResponse(data, null, "", "")
+
+    private inline fun <reified T : Any> createBitLabsErrorResponse(): Response<BitLabsResponse<T>> {
+        val errorJson = """
+        {
+            "error": {
+                "details": {
+                    "http": 400,
+                    "msg": "Mock Request Error"
+                },
+                "status": ""
+            }
+        }
+        """.trimIndent()
+
+        val errorResponseBody = ResponseBody.create(
+            MediaType.parse("application/json"),
+            errorJson
+        )
+
+        return mockk(relaxed = true) {
+            every { isSuccessful } returns false
+            every { body() } returns null
+            every { errorBody() } returns errorResponseBody
+        }
+    }
+
 
     @Before
     fun setUp() {
@@ -47,176 +67,195 @@ class BitLabsRepositoryTest {
     }
 
     @Test
-    fun leaveSurvey_Failure() = mockkStatic(Log::class) {
-        every { Log.e(any(), any()) } returns 0
+    fun leaveSurvey_Failure() = runTest {
+        coEvery { bitLabsAPI.updateClick(any(), any()) } throws
+                Exception("Unexpected Error")
 
-        every { bitLabsAPI.updateClick(any(), any()) } returns object :
-            BitLabsCall<BitLabsResponse<Unit>>() {
-            override fun enqueue(callback: Callback<BitLabsResponse<Unit>>) {
-                callback.onFailure(this, Throwable())
-            }
+        try {
+            bitLabsRepository.leaveSurvey("clickId", "mockReason")
+            fail("Expected an exception to be thrown")
+        } catch (e: Exception) {
+            assertThat(e.message).contains("Unexpected Error")
         }
-
-        bitLabsRepository.leaveSurvey("", "")
-
-        verify { Log.e(any(), any()) }
     }
 
     @Test
-    fun leaveSurvey_Response_Error() = mockkStatic(Log::class) {
-        every { Log.e(any(), any()) } returns 0
+    fun leaveSurvey_Response_Error() = runTest {
+        val mockResponse = createBitLabsErrorResponse<Unit>()
 
-        val errorResponseBody = ResponseBody.create(
-            MediaType.parse("application/json"),
-            "{error:{details:{http:400,msg:\"Any Request\"}}, status:\"\"}"
-        )
+        coEvery { bitLabsAPI.updateClick(any(), any()) } returns mockResponse
 
-        every { bitLabsAPI.updateClick(any(), any()) } returns object :
-            BitLabsCall<BitLabsResponse<Unit>>() {
-            override fun enqueue(callback: Callback<BitLabsResponse<Unit>>) {
-                callback.onResponse(this, Response.error(400, errorResponseBody))
-            }
+        try {
+            bitLabsRepository.leaveSurvey("clickId", "mockReason")
+            fail("Expected an exception to be thrown")
+        } catch (e: Exception) {
+            assertThat(e.message).contains("400")
+            assertThat(e.message).contains("Mock Request Error")
         }
-
-        bitLabsRepository.leaveSurvey("", "")
-
-        verify { Log.e(any(), any()) }
     }
 
     @Test
-    fun leaveSurvey_Response_Success() = mockkStatic(Log::class) {
-        every { Log.i(any(), any()) } returns 0
+    fun leaveSurvey_Response_Success() = runTest {
+        val mockBitLabsResponse = createBitLabsResponse(mockk<Unit>())
 
-        every { bitLabsAPI.updateClick(any(), any()) } returns object :
-            BitLabsCall<BitLabsResponse<Unit>>() {
-            override fun enqueue(callback: Callback<BitLabsResponse<Unit>>) {
-                callback.onResponse(this, Response.success(getWorkingResponseBody()))
-            }
+        val mockResponse = Response.success(mockBitLabsResponse)
+
+        coEvery { bitLabsAPI.updateClick(any(), any()) } returns mockResponse
+
+        try {
+            bitLabsRepository.leaveSurvey("", "")
+        } catch (e: Exception) {
+            fail("Expected no exception, but got: ${e.message}")
         }
-
-        bitLabsRepository.leaveSurvey("", "")
-
-        verify { Log.i(any(), any()) }
     }
 
     @Test
-    fun getSurveys_Failure() {
-        every { bitLabsAPI.getSurveys(any()) } returns object :
-            BitLabsCall<BitLabsResponse<GetSurveysResponse>>() {
-            override fun enqueue(callback: Callback<BitLabsResponse<GetSurveysResponse>>) {
-                callback.onFailure(this, Throwable())
-            }
+    fun getSurveys_Failure() = runTest {
+        coEvery { bitLabsAPI.getSurveys(any()) } throws
+                Exception("Unexpected Error")
 
+        try {
+            bitLabsRepository.getSurveys("")
+            fail("Expected an exception to be thrown")
+        } catch (e: Exception) {
+            assertThat(e.message).contains("Unexpected Error")
         }
-
-        bitLabsRepository.getSurveys("", {}, onExceptionListener)
-
-        verify { onExceptionListener.onException(any()) }
     }
 
     @Test
-    fun getSurveys_Response_Error() {
-        val errorResponseBody = ResponseBody.create(
-            MediaType.parse("application/json"),
-            "{error:{details:{http:400,msg:\"Any Request\"}}, status:\"\"}"
-        )
+    fun getSurveys_Response_Error() = runTest {
+        val mockResponse = createBitLabsErrorResponse<GetSurveysResponse>()
 
-        every { bitLabsAPI.getSurveys(any()) } returns object :
-            BitLabsCall<BitLabsResponse<GetSurveysResponse>>() {
-            override fun enqueue(callback: Callback<BitLabsResponse<GetSurveysResponse>>) {
-                callback.onResponse(this, Response.error(400, errorResponseBody))
-            }
+        coEvery { bitLabsAPI.getSurveys(any()) } returns mockResponse
+
+        try {
+            bitLabsRepository.getSurveys("")
+            fail("Expected an exception to be thrown")
+        } catch (e: Exception) {
+            assertThat(e.message).contains("400")
+            assertThat(e.message).contains("Mock Request Error")
         }
-
-        bitLabsRepository.getSurveys("", {}, onExceptionListener)
-
-        verify { onExceptionListener.onException(any()) }
     }
 
     @Test
-    fun getSurveys_Response_Success() {
-        val onResponseListener = mockk<OnResponseListener<List<Survey>>>(relaxed = true)
-
-        every { bitLabsAPI.getSurveys(any()) } returns object :
-            BitLabsCall<BitLabsResponse<GetSurveysResponse>>() {
-            override fun enqueue(callback: Callback<BitLabsResponse<GetSurveysResponse>>) {
-                val mockSurveysResponse = BitLabsResponse(
-                    data = GetSurveysResponse(null, mockk<List<Survey>>(relaxed = true)),
-                    error = null,
-                    status = "",
-                    traceId = "",
+    fun getSurveys_Response_Success() = runTest {
+        val mockSurveysResponse = GetSurveysResponse(
+            surveys = listOf(
+                Survey(
+                    id = "mockId",
+                    type = "mockType",
+                    clickUrl = "https://example.com/survey1",
+                    cpi = "mockCPI",
+                    value = "mockValue",
+                    loi = 1.0,
+                    country = "mockCountry",
+                    language = "mockLanguage",
+                    rating = 3,
+                    category = mockk<Category>(),
+                    tags = listOf("mockTag"),
                 )
-                callback.onResponse(this, Response.success(mockSurveysResponse))
-            }
-        }
-
-        bitLabsRepository.getSurveys("", onResponseListener) {}
-
-        verify { onResponseListener.onResponse(any()) }
-    }
-
-    @Test
-    fun getAppSettings_Failure() {
-        every { bitLabsAPI.getAppSettings(any()) } returns object :
-            BitLabsCall<GetAppSettingsResponse>() {
-            override fun enqueue(callback: Callback<GetAppSettingsResponse>) {
-                callback.onFailure(this, Throwable())
-            }
-        }
-
-        bitLabsRepository.getAppSettings("", {}, onExceptionListener)
-
-        verify { onExceptionListener.onException(any()) }
-    }
-
-    @Test
-    fun getLeaderboard_Failure() {
-        every { bitLabsAPI.getLeaderboard() } returns object :
-            BitLabsCall<BitLabsResponse<GetLeaderboardResponse>>() {
-            override fun enqueue(callback: Callback<BitLabsResponse<GetLeaderboardResponse>>) {
-                callback.onFailure(this, Throwable())
-            }
-        }
-
-        bitLabsRepository.getLeaderboard({}, onExceptionListener)
-
-        verify { onExceptionListener.onException(any()) }
-    }
-
-    @Test
-    fun getLeaderboard_Response_Error() {
-        val errorResponseBody = ResponseBody.create(
-            MediaType.parse("application/json"),
-            "{error:{details:{http:400,msg:\"Any Request\"}}, status:\"\"}"
+            ),
+            restrictionReason = null
         )
 
-        every { bitLabsAPI.getLeaderboard() } returns object :
-            BitLabsCall<BitLabsResponse<GetLeaderboardResponse>>() {
-            override fun enqueue(callback: Callback<BitLabsResponse<GetLeaderboardResponse>>) {
-                callback.onResponse(this, Response.error(400, errorResponseBody))
-            }
+        val mockBitLabsResponse = createBitLabsResponse(mockSurveysResponse)
+
+        val mockResponse = Response.success(mockBitLabsResponse)
+
+        coEvery { bitLabsAPI.getSurveys(any()) } returns mockResponse
+
+        try {
+            val surveys = bitLabsRepository.getSurveys("")
+            assertThat(surveys).isNotEmpty()
+            assertThat(surveys[0].id).isEqualTo("mockId")
+            assertThat(surveys[0].type).isEqualTo("mockType")
+            assertThat(surveys[0].clickUrl).isEqualTo("https://example.com/survey1")
+            assertThat(surveys[0].cpi).isEqualTo("mockCPI")
+            assertThat(surveys[0].value).isEqualTo("mockValue")
+            assertThat(surveys[0].loi).isEqualTo(1.0)
+            assertThat(surveys[0].country).isEqualTo("mockCountry")
+            assertThat(surveys[0].language).isEqualTo("mockLanguage")
+            assertThat(surveys[0].rating).isEqualTo(3)
+            assertThat(surveys[0].tags).containsExactly("mockTag")
+            assertThat(surveys[0].category).isNotNull()
+        } catch (e: Exception) {
+            fail("Expected no exception, but got: ${e.message}")
         }
-
-        bitLabsRepository.getLeaderboard({}, onExceptionListener)
-
-        verify { onExceptionListener.onException(any()) }
-    }
-}
-
-abstract class BitLabsCall<T> : Call<T> {
-    override fun clone() = this
-
-    override fun execute(): Response<T> {
-        TODO("Not yet implemented")
     }
 
-    override fun isExecuted() = false
+    @Test
+    fun getSurveys_Response_Restriction() = runTest {
+        var expectedRestrictionReason = RestrictionReason(
+            reason = "Mock Restriction Reason",
+            notVerified = true,
+            usingVpn = null,
+            bannedUntil = null,
+            unsupportedCountry = null,
+        )
 
-    override fun cancel() {}
+        val mockSurveysResponse = GetSurveysResponse(
+            surveys = emptyList(),
+            restrictionReason = expectedRestrictionReason
+        )
 
-    override fun isCanceled() = false
+        val mockBitLabsResponse = createBitLabsResponse(mockSurveysResponse)
 
-    override fun request(): Request = Request.Builder().build()
+        val mockResponse = Response.success(mockBitLabsResponse)
 
-    override fun timeout() = Timeout()
+        coEvery { bitLabsAPI.getSurveys(any()) } returns mockResponse
+
+        try {
+            bitLabsRepository.getSurveys("")
+            fail("Expected an exception to be thrown")
+        } catch (e: Exception) {
+            assertThat(e.message).contains(expectedRestrictionReason.prettyPrint())
+        }
+    }
+
+
+    @Test
+    fun getAppSettings_Failure() = runTest {
+        coEvery { bitLabsAPI.getAppSettings(any()) } throws
+                Exception("Unexpected Error")
+
+        try {
+            bitLabsRepository.getAppSettings("")
+            fail("Expected an exception to be thrown")
+        } catch (e: Exception) {
+            assertThat(e.message).contains("Unexpected Error")
+        }
+    }
+
+
+    @Test
+    fun getAppSettings_Response_Success() = runTest {
+        val expectedConfiguration = listOf(
+            Configuration(
+                internalIdentifier = "app.visual.light.navigation_color",
+                value = "#FFFFFF"
+            ),
+            Configuration(
+                internalIdentifier = "app.visual.light.background_color",
+                value = "#000000"
+            )
+        )
+
+        val mockResponse = GetAppSettingsResponse(configuration = expectedConfiguration)
+
+        coEvery { bitLabsAPI.getAppSettings(any()) } returns mockResponse
+
+        try {
+            val config = bitLabsRepository.getAppSettings("").configuration
+            assertThat(config).isNotEmpty()
+            assertThat(config).containsExactlyElementsIn(expectedConfiguration)
+
+            assertThat(config.find { it.internalIdentifier == "app.visual.light.navigation_color" }?.value)
+                .isEqualTo("#FFFFFF")
+
+            assertThat(config.find { it.internalIdentifier == "app.visual.light.background_color" }?.value)
+                .isEqualTo("#000000")
+        } catch (e: Exception) {
+            fail("Expected no exception, but got: ${e.message}")
+        }
+    }
 }

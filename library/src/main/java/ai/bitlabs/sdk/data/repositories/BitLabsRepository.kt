@@ -1,191 +1,34 @@
 package ai.bitlabs.sdk.data.repositories
 
-import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.data.api.BitLabsAPI
-import ai.bitlabs.sdk.data.model.bitlabs.BitLabsResponse
-import ai.bitlabs.sdk.data.model.bitlabs.GetAppSettingsResponse
-import ai.bitlabs.sdk.data.model.bitlabs.GetLeaderboardResponse
 import ai.bitlabs.sdk.data.model.bitlabs.GetSurveysResponse
 import ai.bitlabs.sdk.data.model.bitlabs.LeaveReason
 import ai.bitlabs.sdk.data.model.bitlabs.Survey
 import ai.bitlabs.sdk.data.model.bitlabs.UpdateClickBody
-import ai.bitlabs.sdk.data.model.sentry.SentryManager
-import ai.bitlabs.sdk.util.OnExceptionListener
-import ai.bitlabs.sdk.util.OnResponseListener
-import ai.bitlabs.sdk.util.TAG
-import ai.bitlabs.sdk.util.extensions.body
-import android.content.res.Resources
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
-import android.util.Log
-import com.caverock.androidsvg.SVG
-import okhttp3.ResponseBody
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import ai.bitlabs.sdk.data.util.body
 
-/** This class is the point of communication between the data and [BitLabs] */
-internal class BitLabsRepository(private val bitLabsAPI: BitLabsAPI) {
-    internal fun leaveSurvey(clickId: String, reason: String) =
-        bitLabsAPI.updateClick(clickId, UpdateClickBody(LeaveReason(reason)))
-            .enqueue(object : Callback<BitLabsResponse<Unit>> {
-                override fun onResponse(
-                    call: Call<BitLabsResponse<Unit>>, response: Response<BitLabsResponse<Unit>>,
-                ) {
-                    if (response.isSuccessful) Log.i(TAG, "LeaveSurvey - Success")
-                    else response.errorBody()?.body<Unit>()?.error?.details?.run {
-                        val errMessage = "LeaveSurvey Error: $http - $msg"
-                        SentryManager.captureException(Exception(errMessage))
-                        Log.e(TAG, errMessage)
-                    }
-                }
+internal class BitLabsRepository(private val api: BitLabsAPI) {
+    suspend fun leaveSurvey(clickId: String, reason: String) {
+        val response = api.updateClick(clickId, UpdateClickBody(LeaveReason(reason)))
+        response.errorBody()?.body<Unit>()?.error?.details?.run {
+            throw Exception("LeaveSurvey Error: $http - $msg")
+        }
+    }
 
-                override fun onFailure(call: Call<BitLabsResponse<Unit>>, t: Throwable) {
-                    SentryManager.captureException(t)
-                    Log.e(TAG, "LeaveSurvey Failure - ${t.message ?: "Unknown Error"}")
-                }
-            })
-
-    internal fun getSurveys(
-        sdk: String,
-        onResponseListener: OnResponseListener<List<Survey>>,
-        onExceptionListener: OnExceptionListener,
-    ) = bitLabsAPI.getSurveys(sdk).enqueue(object : Callback<BitLabsResponse<GetSurveysResponse>> {
-        override fun onResponse(
-            call: Call<BitLabsResponse<GetSurveysResponse>>,
-            response: Response<BitLabsResponse<GetSurveysResponse>>,
-        ) {
-            val restrictionReason = response.body()?.data?.restrictionReason
-            if (restrictionReason != null) {
-                with(Exception("GetSurveys Error: ${restrictionReason.prettyPrint()}")) {
-                    SentryManager.captureException(this)
-                    onExceptionListener.onException(this)
-                }
-                return
-            }
-
-            val surveys = response.body()?.data?.surveys ?: emptyList()
-            if (surveys.isNotEmpty()) {
-                onResponseListener.onResponse(surveys)
-                return
-            }
-
-            response.errorBody()?.body<GetSurveysResponse>()?.error?.details?.run {
-                with(Exception("GetSurveys Error: $http - $msg")) {
-                    SentryManager.captureException(this)
-                    onExceptionListener.onException(this)
-                }
-            }
+    suspend fun getSurveys(sdk: String): List<Survey> {
+        val response = api.getSurveys(sdk)
+        val restrictionReason = response.body()?.data?.restrictionReason
+        if (restrictionReason != null) {
+            throw Exception("GetSurveys Error: ${restrictionReason.prettyPrint()}")
         }
 
-        override fun onFailure(call: Call<BitLabsResponse<GetSurveysResponse>>, t: Throwable) {
-            SentryManager.captureException(t)
-            onExceptionListener.onException(Exception(t))
-        }
-    })
-
-    internal fun getAppSettings(
-        token: String,
-        onResponseListener: OnResponseListener<GetAppSettingsResponse>,
-        onExceptionListener: OnExceptionListener,
-    ) = bitLabsAPI.getAppSettings(
-        url = "https://dashboard.bitlabs.ai/api/public/v1/apps/$token"
-    )
-        .enqueue(object : Callback<GetAppSettingsResponse> {
-            override fun onResponse(
-                call: Call<GetAppSettingsResponse>,
-                response: Response<GetAppSettingsResponse>,
-            ) {
-                if (response.isSuccessful) {
-                    response.body()?.let { onResponseListener.onResponse(it) }
-                    return
-                }
-            }
-
-            override fun onFailure(
-                call: Call<GetAppSettingsResponse>, t: Throwable,
-            ) = with(Exception(t)) {
-                SentryManager.captureException(this)
-                onExceptionListener.onException(this)
-            }
-        })
-
-    internal fun getLeaderboard(
-        onResponseListener: OnResponseListener<GetLeaderboardResponse>,
-        onExceptionListener: OnExceptionListener,
-    ) = bitLabsAPI.getLeaderboard()
-        .enqueue(object : Callback<BitLabsResponse<GetLeaderboardResponse>> {
-            override fun onResponse(
-                call: Call<BitLabsResponse<GetLeaderboardResponse>>,
-                response: Response<BitLabsResponse<GetLeaderboardResponse>>,
-            ) {
-                if (response.isSuccessful) {
-                    response.body()?.data?.let { onResponseListener.onResponse(it) }
-                    return
-                }
-
-                response.errorBody()?.body<GetLeaderboardResponse>()?.error?.details?.run {
-                    with(Exception("GetLeaderboard Error: $http - $msg")) {
-                        SentryManager.captureException(this)
-                        onExceptionListener.onException(this)
-                    }
-                }
-            }
-
-            override fun onFailure(
-                call: Call<BitLabsResponse<GetLeaderboardResponse>>, t: Throwable,
-            ) {
-                with(Exception(t)) {
-                    SentryManager.captureException(this)
-                    onExceptionListener.onException(this)
-                }
-            }
-        })
-
-    internal fun getCurrencyIcon(
-        url: String, resources: Resources, onResponseListener: OnResponseListener<Drawable?>,
-    ) = bitLabsAPI.getCurrencyIcon(url).enqueue(object : Callback<ResponseBody> {
-        override fun onResponse(
-            call: Call<ResponseBody>, response: Response<ResponseBody>,
-        ) {
-            if (response.isSuccessful) {
-                response.body()?.let {
-                    val drawable = if (it.contentType()
-                            ?.subtype() == "svg+xml"
-                    ) with(SVG.getFromString(it.string())) {
-                        val bitmap = Bitmap.createBitmap(
-                            documentWidth.toInt(),
-                            documentHeight.toInt(),
-                            Bitmap.Config.ARGB_8888
-                        )
-
-                        val canvas = Canvas(bitmap)
-                        canvas.drawRGB(255, 255, 255)
-
-                        renderToCanvas(canvas)
-
-                        BitmapDrawable(resources, bitmap)
-                    }
-                    else BitmapDrawable(resources, it.byteStream())
-
-                    onResponseListener.onResponse(drawable)
-                }
-                return
-            }
-
-            val errMessage =
-                "GetCurrencyIcon Error: ${response.errorBody()?.string() ?: "Unknown Error"}"
-
-            SentryManager.captureException(Exception(errMessage))
-            Log.e(TAG, errMessage)
-            onResponseListener.onResponse(null)
+        response.errorBody()?.body<GetSurveysResponse>()?.error?.details?.run {
+            throw Exception("GetSurveys Error: $http - $msg")
         }
 
-        override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-            SentryManager.captureException(t)
-            Log.e(TAG, "GetCurrencyIcon Failure: ${t.message ?: "Unknown Error"}")
-        }
-    })
+        return response.body()?.data?.surveys ?: emptyList()
+    }
+
+    suspend fun getAppSettings(token: String) =
+        api.getAppSettings(url = "https://dashboard.bitlabs.ai/api/public/v1/apps/$token")
 }

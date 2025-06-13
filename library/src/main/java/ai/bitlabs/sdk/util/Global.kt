@@ -1,38 +1,28 @@
 package ai.bitlabs.sdk.util
 
-import ai.bitlabs.sdk.data.model.sentry.SentryManager
+import ai.bitlabs.sdk.BuildConfig
+import ai.bitlabs.sdk.data.api.BitLabsAPI
+import ai.bitlabs.sdk.data.repositories.BitLabsRepository
 import android.content.res.Configuration
 import android.content.res.Resources
-import android.graphics.Bitmap
-import android.graphics.Color
-import android.util.Log
-import android.util.TypedValue
-import android.widget.ImageView
-import androidx.core.graphics.toColorInt
-import com.google.zxing.BarcodeFormat
-import com.google.zxing.qrcode.QRCodeWriter
+import android.os.Build
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.math.BigDecimal
-import java.math.RoundingMode
 
-internal const val TAG = "BitLabs"
 
-internal const val BASE_URL = "https://api.bitlabs.ai/"
+internal fun createBitLabsRepository(token: String, uid: String): BitLabsRepository {
+    val userAgent =
+        "BitLabs/${BuildConfig.VERSION_NAME} (Android ${Build.VERSION.SDK_INT}; ${Build.MODEL}; ${deviceType()})"
 
-internal const val BUNDLE_KEY_HEADER_COLOR = "bundle-key-header-color"
+    val okHttpClient = buildHttpClientWithHeaders(
+        "User-Agent" to userAgent,
+        "X-Api-Token" to token,
+        "X-User-Id" to uid,
+    )
 
-internal const val BUNDLE_KEY_BACKGROUND_COLOR = "bundle-key-background-color"
-
-internal const val BUNDLE_KEY_URL = "bundle-key-url"
-
-internal fun getColorScheme(): String {
-    val darkModeFlags =
-        Resources.getSystem().configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
-    val isDarkMode = darkModeFlags == Configuration.UI_MODE_NIGHT_YES
-
-    return if (isDarkMode) "dark" else "light"
+    val retrofit = buildRetrofit(BASE_URL, okHttpClient)
+    return BitLabsRepository(retrofit.create(BitLabsAPI::class.java))
 }
 
 internal fun buildHttpClientWithHeaders(vararg headers: Pair<String, String>) =
@@ -59,24 +49,6 @@ internal fun deviceType(): String {
     return if (isTablet) "tablet" else "phone"
 }
 
-
-internal fun getLuminance(color: Int) =
-    0.2126 * Color.red(color) + 0.7152 * Color.green(color) + 0.0722 * Color.blue(color)
-
-/**
- * @param color - Can be in the form of a css linear-gradient or a single hex color
- * @return - An array of two colors. If the input is a single color, the array will contain the same two colors
- */
-internal fun extractColors(color: String) =
-    Regex("""linear-gradient\((\d+)deg,\s*(.+)\)""").find(color)?.run {
-        groupValues[2].replace("([0-9]+)%".toRegex(), "")
-            .split(",\\s".toRegex())
-            .map { it.trim().toColorInt() }
-            .toIntArray()
-    } ?: Regex("""#([0-9a-fA-F]{6})""").find(color)?.run {
-        intArrayOf(groupValues[0].toColorInt(), groupValues[0].toColorInt())
-    } ?: intArrayOf()
-
 internal fun String.snakeToCamelCase() = lowercase()
     .split("_")
     .joinToString("") { it.replaceFirstChar { c -> c.uppercase() } }
@@ -84,31 +56,3 @@ internal fun String.snakeToCamelCase() = lowercase()
 
 internal fun String.convertKeysToCamelCase() = Regex("\"([a-z]+(?:_[a-z]+)+)\":")
     .replace(this) { match -> match.groupValues[1].snakeToCamelCase().let { "\"$it\":" } }
-
-internal fun Number.toPx() = TypedValue.applyDimension(
-    TypedValue.COMPLEX_UNIT_DIP,
-    this.toFloat(),
-    Resources.getSystem().displayMetrics
-)
-
-internal fun String.rounded(): String {
-    try {
-        with(BigDecimal(this).setScale(2, RoundingMode.DOWN)) {
-            return if (this.scale() == 0) toPlainString()
-            else stripTrailingZeros().toPlainString()
-        }
-    } catch (e: NumberFormatException) {
-        SentryManager.captureException(e)
-        Log.e(TAG, "rounded: Tried to round non-number!", e)
-        return this
-    }
-}
-
-internal fun ImageView.setQRCodeBitmap(value: String) = Bitmap
-    .createBitmap(512, 512, Bitmap.Config.RGB_565)
-    .apply {
-        val bitMtx = QRCodeWriter().encode(value, BarcodeFormat.QR_CODE, 512, 512)
-        for (x in 0 until 512)
-            for (y in 0 until 512)
-                setPixel(x, y, if (bitMtx.get(x, y)) Color.BLACK else Color.WHITE)
-    }.let { setImageBitmap(it) }

@@ -3,7 +3,7 @@ package ai.bitlabs.sdk.views
 import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.R
 import ai.bitlabs.sdk.data.model.bitlabs.WidgetType
-import ai.bitlabs.sdk.util.extensions.log
+import ai.bitlabs.sdk.log
 import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
@@ -14,6 +14,7 @@ import android.webkit.WebChromeClient
 import android.webkit.WebView
 import androidx.fragment.app.Fragment
 
+@Deprecated("Will be removed in future releases.")
 class BitLabsWidgetFragment(
     uid: String,
     token: String,

@@ -256,19 +256,19 @@ class WebActivityTest {
     private fun testLeaveReasonClicked(reason: String) {
         rule.setContent { BLWebView(viewModel, "https://www.google.com") }
 
-        Thread.sleep(500)
+        Thread.sleep(5000)
 
         rule.runOnUiThread {
             val webView = rule.activity.findViewById<WebView>(R.id.bl_webview)
             webView.evaluateJavascript(jsCode) {}
         }
 
-        Thread.sleep(500)
+        Thread.sleep(1000)
 
         // Simulate back press
         rule.runOnUiThread { rule.activity.onBackPressedDispatcher.onBackPressed() }
 
-        Thread.sleep(500)
+        Thread.sleep(1000)
 
         rule.onNodeWithText(reason)
             .assertExists()

@@ -13,14 +13,9 @@ import ai.bitlabs.sdk.data.model.sentry.SentrySDK
 import ai.bitlabs.sdk.data.model.sentry.SentryStackFrame
 import ai.bitlabs.sdk.data.model.sentry.SentryStackTrace
 import ai.bitlabs.sdk.data.model.sentry.SentryUser
-import ai.bitlabs.sdk.util.TAG
 import android.util.Log
 import com.google.gson.Gson
 import okhttp3.RequestBody
-import okhttp3.ResponseBody
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import java.lang.Thread.UncaughtExceptionHandler
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -28,22 +23,25 @@ import java.util.Locale
 import java.util.TimeZone
 import java.util.UUID
 import java.util.concurrent.Executor
-import java.util.concurrent.Executors
 
+
+private const val TAG = "BitLabs.Sentry"
 
 internal class SentryRepository(
     private val sentryAPI: SentryAPI,
-    private val token: String,
-    private val uid: String,
-    private val executor: Executor
+    private val executor: Executor,
 ) {
 
     fun sendEnvelope(
-        throwable: Throwable, defaultUncaughtExceptionHandler: UncaughtExceptionHandler?
+        token: String, uid: String,
+        throwable: Throwable, defaultUncaughtExceptionHandler: UncaughtExceptionHandler?,
     ) {
 
         val envelope =
-            createEnvelopeJson(throwable, isHandled = defaultUncaughtExceptionHandler == null)
+            createEnvelopeJson(
+                token, uid,
+                throwable, isHandled = defaultUncaughtExceptionHandler == null
+            )
 
         executor.execute {
             try {
@@ -65,8 +63,11 @@ internal class SentryRepository(
         }
     }
 
-    private fun createEnvelopeJson(throwable: Throwable, isHandled: Boolean): RequestBody {
-        val gson = Gson()
+    private fun createEnvelopeJson(
+        token: String, uid: String,
+        throwable: Throwable, isHandled: Boolean,
+    ): RequestBody {
+        Gson()
 
         val evenId = UUID.randomUUID().toString().replace("-", "")
         val now = with(SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZZZ", Locale.US)) {

@@ -8,12 +8,12 @@ keystore.load(project.rootProject.file('local.properties').newDataInputStream())
 android {
     namespace 'ai.bitlabs.example'
 
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         applicationId 'ai.bitlabs.example'
 
-        minSdk 19
+        minSdk 21
         targetSdk 35
         versionCode 59
         versionName '3.2.6'

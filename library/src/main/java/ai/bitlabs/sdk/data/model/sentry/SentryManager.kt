@@ -19,9 +19,9 @@ internal object SentryManager {
 
     private val url = "$protocol://$host/"
 
-    private var sentryRepo: SentryRepository? = null
+    private val sentryRepo: SentryRepository? by lazy {
+        if (BuildConfig.DEBUG) null
 
-    fun init(token: String, uid: String) {
         val okHttpClient = buildHttpClientWithHeaders(
             "X-Sentry-Auth" to "Sentry sentry_version=7, sentry_key=$publicKey, sentry_client=bitlabs-sdk/0.1.0",
             "User-Agent" to "bitlabs-sdk/0.1.0"
@@ -29,18 +29,14 @@ internal object SentryManager {
 
         val retrofit = buildRetrofit(url, okHttpClient)
 
-        sentryRepo = SentryRepository(
+        SentryRepository(
             retrofit.create(SentryAPI::class.java),
-            token,
-            uid,
             Executors.newSingleThreadExecutor()
         )
     }
 
     fun captureException(
-        throwable: Throwable,
-        defaultUncaughtExceptionHandler: UncaughtExceptionHandler? = null
-    ) {
-        sentryRepo?.sendEnvelope(throwable, defaultUncaughtExceptionHandler)
-    }
+        token: String, uid: String,
+        throwable: Throwable, defaultUncaughtExceptionHandler: UncaughtExceptionHandler? = null,
+    ) = sentryRepo?.sendEnvelope(token, uid, throwable, defaultUncaughtExceptionHandler)
 }

@@ -3,20 +3,15 @@ package ai.bitlabs.sdk
 import ai.bitlabs.sdk.BitLabs.token
 import ai.bitlabs.sdk.BitLabs.uid
 import ai.bitlabs.sdk.data.api.BitLabsAPI
-import ai.bitlabs.sdk.data.model.bitlabs.WebActivityParams
 import ai.bitlabs.sdk.data.model.sentry.SentryManager
 import ai.bitlabs.sdk.data.repositories.BitLabsRepository
+import ai.bitlabs.sdk.offerwall.BitLabsOfferwallActivity
+import ai.bitlabs.sdk.offerwall.util.WebActivityParams
 import ai.bitlabs.sdk.util.BASE_URL
-import ai.bitlabs.sdk.util.BUNDLE_KEY_BACKGROUND_COLOR
-import ai.bitlabs.sdk.util.BUNDLE_KEY_HEADER_COLOR
 import ai.bitlabs.sdk.util.BUNDLE_KEY_URL
-import ai.bitlabs.sdk.util.OnRewardListener
-import ai.bitlabs.sdk.util.TAG
+import ai.bitlabs.sdk.util.OnSurveyRewardListener
 import ai.bitlabs.sdk.util.convertKeysToCamelCase
 import ai.bitlabs.sdk.util.deviceType
-import ai.bitlabs.sdk.util.extractColors
-import ai.bitlabs.sdk.util.getColorScheme
-import ai.bitlabs.sdk.views.BitLabsOfferwallActivity
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -24,9 +19,14 @@ import android.util.Log
 import com.google.android.gms.ads.identifier.AdvertisingIdClient
 import com.google.gson.GsonBuilder
 import com.unity3d.player.UnityPlayer
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+
+private const val TAG = "BitLabs"
 
 /**
  * The main class including all the library functions to use in your code.
@@ -36,23 +36,19 @@ import retrofit2.converter.gson.GsonConverterFactory
  */
 object BitLabs {
     var debugMode = false
-    var shouldSupportEdgeToEdge = true
 
     private var uid = ""
     private var adId = ""
     private var token = ""
-    private var currencyIconUrl = ""
-    private var bonusPercentage = 0.0
     internal var fileProviderAuthority = ""
-    private var widgetColor = intArrayOf(0, 0)
-    private var headerColor = intArrayOf(0, 0)
-    private var backgroundColors = intArrayOf(0, 0)
 
     /** These will be added as query parameters to the OfferWall Link */
     var tags = mutableMapOf<String, Any>()
 
-    private var bitLabsRepo: BitLabsRepository? = null
-    internal var onRewardListener: OnRewardListener? = null
+    internal var bitLabsRepo: BitLabsRepository? = null
+    internal var onRewardListener: OnSurveyRewardListener? = null
+
+    private val coroutineScope by lazy { CoroutineScope(Dispatchers.IO) }
 
     /**
      * Initialises the connection with BitLabs API using your app [token] and [uid]
@@ -67,8 +63,6 @@ object BitLabs {
         this.token = token
         this.uid = uid
 
-        SentryManager.init(token, uid)
-
         val userAgent =
             "BitLabs/${BuildConfig.VERSION_NAME} (Android ${Build.VERSION.SDK_INT}; ${Build.MODEL}; ${deviceType()})"
 
@@ -76,7 +70,6 @@ object BitLabs {
             .addInterceptor { chain ->
                 val request = chain.request().newBuilder()
                     .addHeader("User-Agent", userAgent)
-                    .addHeader("X-Api-Token", token)
                     .addHeader("X-User-Id", uid)
                     .build()
 
@@ -96,46 +89,16 @@ object BitLabs {
 
         fileProviderAuthority = "${UnityPlayer.currentActivity.packageName}.provider.bitlabs"
 
-        getAppSettings()
 
         val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
         Thread.setDefaultUncaughtExceptionHandler { _, throwable ->
             if (throwable.stackTrace.any { it.className.startsWith("ai.bitlabs.sdk") }) {
-                SentryManager.captureException(throwable, defaultHandler)
+                SentryManager.captureException(token, uid, throwable, defaultHandler)
             } else {
                 defaultHandler?.uncaughtException(Thread.currentThread(), throwable)
             }
         }
     }
-
-    /**
-     * Gets the app settings from the BitLabs API.
-     */
-    private fun getAppSettings() = bitLabsRepo?.getAppSettings(token, { app ->
-        val theme = getColorScheme()
-        app.configuration.run {
-            val navigationColor =
-                find { it.internalIdentifier == "app.visual.$theme.navigation_color" }?.value ?: ""
-            headerColor =
-                extractColors(navigationColor).takeIf { it.isNotEmpty() } ?: headerColor
-
-            val surveyIconColor =
-                find { it.internalIdentifier == "app.visual.$theme.survey_icon_color" }?.value ?: ""
-            widgetColor =
-                extractColors(surveyIconColor).takeIf { it.isNotEmpty() } ?: widgetColor
-
-            val backgroundColor =
-                find { it.internalIdentifier == "app.visual.$theme.background_color" }?.value ?: ""
-            backgroundColors =
-                extractColors(backgroundColor).takeIf { it.isNotEmpty() } ?: backgroundColors
-
-            val isImage =
-                find { it.internalIdentifier == "general.currency.symbol.is_image" }?.value ?: "0"
-            val content =
-                find { it.internalIdentifier == "general.currency.symbol.content" }?.value ?: ""
-            currencyIconUrl = content.takeIf { isImage == "1" } ?: ""
-        }
-    }, { Log.e(TAG, "$it") })
 
     /** Determines whether the user can perform an action in the OfferWall
      * (either opening a survey or answering qualifications) and then executes your implementation
@@ -144,15 +107,23 @@ object BitLabs {
      * If you want to perform background checks if surveys are available, this is the best option.
      */
     fun checkSurveys(gameObject: String) = ifInitialised {
-        bitLabsRepo?.getSurveys("UNITY", { surveys ->
-            UnityPlayer.UnitySendMessage(
-                gameObject,
-                "CheckSurveysCallback",
-                surveys.isNotEmpty().toString()
-            )
-        }, { e ->
-            UnityPlayer.UnitySendMessage(gameObject, "CheckSurveysException", e.message.toString())
-        })
+        coroutineScope.launch {
+            try {
+                val surveys = bitLabsRepo?.getSurveys("UNITY") ?: emptyList()
+                UnityPlayer.UnitySendMessage(
+                    gameObject,
+                    "CheckSurveysCallback",
+                    surveys.isNotEmpty().toString()
+                )
+            } catch (e: Exception) {
+                SentryManager.captureException(token, uid, e)
+                UnityPlayer.UnitySendMessage(
+                    gameObject,
+                    "CheckSurveysException",
+                    e.message.toString()
+                )
+            }
+        }
     }
 
     /**
@@ -166,41 +137,28 @@ object BitLabs {
      * then there has been an internal error which is mostly logged with 'BitLabs' as a tag.
      */
     fun getSurveys(gameObject: String) = ifInitialised {
-        bitLabsRepo?.getSurveys("UNITY", { surveys ->
-            UnityPlayer.UnitySendMessage(
-                gameObject,
-                "GetSurveysCallback",
-                GsonBuilder().create().toJson(surveys).convertKeysToCamelCase()
-            )
-        }, { exception ->
-            UnityPlayer.UnitySendMessage(
-                gameObject,
-                "GetSurveysException",
-                exception.message.toString()
-            )
-        })
-    }
-
-    /**
-     * Fetches the leaderboard.
-     * ######
-     * The getLeaderBoardCallback() is executed when a response is received.
-     * Its parameter is the String in format of JSON list of surveys in . If it's `null`,
-     * then there has been an internal error which is mostly logged with 'BitLabs' as a tag.
-     */
-    fun getLeaderboard(gameObject: String) = ifInitialised {
-        bitLabsRepo?.getLeaderboard({ leaderBoard ->
-            UnityPlayer.UnitySendMessage(
-                gameObject,
-                "GetLeaderboardCallback",
-                GsonBuilder().create().toJson(leaderBoard).convertKeysToCamelCase()
-            )
-        }, { Log.e(TAG, "$it") })
+        coroutineScope.launch {
+            try {
+                val surveys = bitLabsRepo?.getSurveys("UNITY") ?: emptyList()
+                UnityPlayer.UnitySendMessage(
+                    gameObject,
+                    "GetSurveysCallback",
+                    GsonBuilder().create().toJson(surveys).convertKeysToCamelCase()
+                )
+            } catch (e: Exception) {
+                SentryManager.captureException(token, uid, e)
+                UnityPlayer.UnitySendMessage(
+                    gameObject,
+                    "GetSurveysException",
+                    e.message.toString()
+                )
+            }
+        }
     }
 
     /** Registers an [OnRewardListener] callback to be invoked when the OfferWall is exited by the user. */
     fun setOnRewardListener(gameObject: String) {
-        onRewardListener = OnRewardListener { payout ->
+        onRewardListener = OnSurveyRewardListener { payout ->
             UnityPlayer.UnitySendMessage(gameObject, "RewardCallback", payout.toString())
         }
     }
@@ -209,12 +167,6 @@ object BitLabs {
     fun addTag(key: String, value: Any) {
         tags[key] = value
     }
-
-    fun getColor() = widgetColor
-
-    fun getCurrencyIconUrl() = currencyIconUrl
-
-    fun getBonusPercentage() = bonusPercentage
 
     /**
      * Launches the OfferWall from the currentActivity.
@@ -228,8 +180,6 @@ object BitLabs {
                 BUNDLE_KEY_URL,
                 WebActivityParams(token, uid, "UNITY", adId, tags).url
             )
-            putExtra(BUNDLE_KEY_HEADER_COLOR, headerColor)
-            putExtra(BUNDLE_KEY_BACKGROUND_COLOR, backgroundColors)
             context.startActivity(this)
         }
     }
@@ -239,15 +189,12 @@ object BitLabs {
      */
     internal fun launchOfferWall(context: Context) = launchOfferWall()
 
-    internal fun leaveSurvey(clickId: String, reason: String) =
-        bitLabsRepo?.leaveSurvey(clickId, reason)
-
     private fun determineAdvertisingInfo(context: Context) = Thread {
         try {
             adId = AdvertisingIdClient.getAdvertisingIdInfo(context).id ?: ""
             Log.d(TAG, "Advertising Id: $adId")
         } catch (e: Exception) {
-            SentryManager.captureException(e)
+            SentryManager.captureException(token, uid, e)
             Log.e(TAG, "Failed to determine Advertising Id", e)
         }
     }.start()

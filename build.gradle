@@ -1,7 +1,7 @@
 buildscript {
     ext {
-        agp_version = '7.2.0'
-        kotlin_version = '1.8.22'
+        agp_version = '8.6.0'
+        kotlin_version = '2.1.21'
     }
 
     repositories {
@@ -24,5 +24,5 @@ allprojects {
 }
 
 tasks.register('clean', Delete) {
-    delete rootProject.buildDir
+    delete rootProject.layout.buildDirectory
 }

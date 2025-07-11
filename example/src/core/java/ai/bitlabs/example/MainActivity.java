@@ -23,11 +23,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        BitLabs.API.init(BuildConfig.APP_TOKEN, "oblivatevariegata");
+        String UID = "oblivatevariegata";
+        bitLabs.init(this, BuildConfig.APP_TOKEN, UID);
+        BitLabs.API.init(BuildConfig.APP_TOKEN, UID);
 
         // bitLabs.setDebugMode(true);
 
-        Offerwall offerwall = BitLabs.OFFERWALL.create(BuildConfig.APP_TOKEN, "oblivatevariegata");
+        Offerwall offerwall = BitLabs.OFFERWALL.create(BuildConfig.APP_TOKEN, UID);
 
         // optionally add custom tags to your users
         Map<String, Object> tags = new HashMap<>();

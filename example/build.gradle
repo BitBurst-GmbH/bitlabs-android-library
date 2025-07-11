@@ -38,6 +38,6 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 
     // NOTE: you want to use the commented-out implementation for your app
-    // implementation 'com.github.BitBurst-GmbH.bitlabs-android-library:core:<VERSION-HERE>'
+//     implementation 'com.github.BitBurst-GmbH.bitlabs-android-library:core:4.0.0'
     implementation project(':library')
 }

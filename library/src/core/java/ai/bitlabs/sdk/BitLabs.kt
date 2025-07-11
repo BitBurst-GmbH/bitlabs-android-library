@@ -66,6 +66,8 @@ object BitLabs {
         this.token = token
         this.uid = uid
 
+        repo = createBitLabsRepository(token, uid)
+
         determineAdvertisingInfo(context)
 
         val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()

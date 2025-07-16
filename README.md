@@ -9,6 +9,19 @@ reference on how to integrate this SDK. Take a look at `/example` for more detai
 
 ### Dependencies
 
+#### Maven Central (Recommended)
+
+In your project's `build.gradle` file, add the following:
+
+```Groovy
+dependencies {
+    // Other dependencies...
+    implementation 'com.prodege.bitlabs:core:5.0.0'
+    // Other dependencies...
+}
+```
+#### JitPack (Will be deprecated in future releases)
+
 Add the following above the **dependencies** section of your app level build.gradle file:
 
 ```Groovy
@@ -23,7 +36,7 @@ Then add the dependency in the same file:
 
 ```Groovy
 dependencies {
-    implementation 'com.github.BitBurst-GmbH.bitlabs-android-library:core:3.2.13'
+    implementation 'com.github.BitBurst-GmbH.bitlabs-android-library:core:4.0.1'
 }
 ```
 

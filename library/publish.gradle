@@ -1,0 +1,95 @@
+def mainPom = { pom ->
+    pom.name = 'BitLabs Android SDK'
+    pom.description = 'SDK for BitLabs monetization solutions'
+    pom.url = 'https://github.com/BitBurst-GmbH/bitlabs-android-library'
+
+    pom.licenses {
+        license {
+            name = 'The Apache License, Version 2.0'
+            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+        }
+    }
+
+    pom.developers {
+        developer {
+            name = 'Prodege, LLC'
+            url = 'https://www.prodege.com'
+        }
+    }
+
+    pom.scm {
+        connection = 'scm:git:git://github.com/BitBurst-GmbH/bitlabs-android-library.git'
+        developerConnection = 'scm:git:ssh://github.com/BitBurst-GmbH/bitlabs-android-library.git'
+        url = 'https://github.com/BitBurst-GmbH/bitlabs-android-library'
+    }
+}
+
+afterEvaluate {
+    publishing {
+        publications { // Creates two publications with different artifactIds
+            core(MavenPublication) {
+                from components.coreRelease
+                artifactId = 'core'
+
+                pom {
+                    mainPom(delegate)
+                }
+            }
+
+            unity(MavenPublication) {
+                from components.unityRelease
+                artifactId = 'unity'
+
+                pom {
+                    mainPom(delegate)
+
+                    name = 'BitLabs Android SDK - Unity'
+                    description = 'SDK for BitLabs monetization solutions with Unity support'
+                }
+            }
+        }
+
+        repositories {
+            maven {
+                name = 'staging'
+                url = layout.buildDirectory.dir('staging')
+            }
+        }
+
+        signing {
+            def signingKey = keystore.getProperty('signing.keyId')
+            def signingPassword = keystore.getProperty('signing.password')
+            def signingSecretKeyBase64 = keystore.getProperty('signing.secretKey.base64')
+
+            if (signingKey && signingPassword && signingSecretKeyBase64) {
+                def signingSecretKey = new String(Base64.decoder.decode(signingSecretKeyBase64))
+                useInMemoryPgpKeys(signingKey, signingSecretKey, signingPassword)
+                sign publishing.publications
+            } else {
+                logger.warn("Signing properties not found. Skipping signing of artifacts.")
+            }
+        }
+    }
+}
+
+tasks.register('generateMavenCentralBundle', Zip) {
+    group = 'publishing'
+    description = 'Creates a zip file with the necessary files for publishing to Maven Central'
+
+    dependsOn 'publishAllPublicationsToStagingRepository'
+
+    archiveFileName = "bitlabs-android-sdk-${version}.zip"
+    destinationDirectory = layout.buildDirectory.dir('bundles')
+
+    from(layout.buildDirectory.dir('staging')) {
+        include '**/*'
+    }
+
+    doLast {
+        def bundle = archiveFile.get().asFile
+        def sizeInMB = String.format("%.2f", bundle.length() / 1024.0 / 1024.0)
+        logger.lifecycle("📦 Bundle created: ${bundle.name} (${sizeInMB} MB)")
+        logger.lifecycle("📍 Location: ${bundle.absolutePath}")
+        logger.lifecycle("📥 Upload this bundle to https://central.sonatype.com/")
+    }
+}

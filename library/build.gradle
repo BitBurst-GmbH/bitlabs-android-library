@@ -2,14 +2,16 @@ plugins {
     id 'com.android.library'
     id 'kotlin-android'
     id 'maven-publish'
+    id 'signing'
     id 'org.jetbrains.kotlin.plugin.compose' version "$kotlin_version"
 }
 
 def keystore = new Properties()
 keystore.load(project.rootProject.file('local.properties').newDataInputStream())
+project.ext.keystore = keystore
 
-version = '4.0.1'
-group = 'ai.bitlabs.sdk'
+version = '5.0.0'
+group = 'com.prodege.bitlabs'
 
 android {
     namespace 'ai.bitlabs.sdk'
@@ -69,7 +71,7 @@ android {
 }
 
 dependencies {
-    def composeBom = platform('androidx.compose:compose-bom:2025.06.00')
+    def composeBom = platform('androidx.compose:compose-bom:2025.06.01')
     implementation composeBom
     debugImplementation composeBom
 
@@ -87,42 +89,28 @@ dependencies {
     unityCompileOnly files('libs/classes.jar')
 
     // API Calls
-    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
-    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    implementation 'com.squareup.retrofit2:retrofit:3.0.0'
+    implementation 'com.squareup.retrofit2:converter-gson:3.0.0'
 
     // Error parsing to QRCode Bitmap
-    implementation 'com.google.zxing:core:3.5.2'
+    implementation 'com.google.zxing:core:3.5.3'
 
     // Fetch Advertising ID
     implementation 'com.google.android.gms:play-services-ads-identifier:18.2.0'
 
     // Unit Testing
     testImplementation 'junit:junit:4.13.2'
-    testImplementation 'io.mockk:mockk:1.13.1'
-    testImplementation 'com.google.truth:truth:1.1.4'
+    testImplementation 'io.mockk:mockk:1.14.4'
+    testImplementation 'com.google.truth:truth:1.4.4'
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2'
 
     // Instrumentation Testing
     androidTestImplementation 'androidx.test:rules:1.6.1'
     androidTestImplementation 'androidx.test:runner:1.6.2'
-    androidTestImplementation 'io.mockk:mockk-android:1.13.1'
+    androidTestImplementation 'io.mockk:mockk-android:1.14.4'
     androidTestImplementation 'androidx.test.ext:truth:1.6.0'
     debugImplementation 'androidx.compose.ui:ui-test-manifest'
     androidTestImplementation 'androidx.compose.ui:ui-test-junit4'
 }
 
-afterEvaluate {
-    publishing {
-        publications { // Creates two publications with different artifactIds
-            core(MavenPublication) {
-                from components.coreRelease
-                artifactId = 'core'
-            }
-
-            unity(MavenPublication) {
-                from components.unityRelease
-                artifactId = 'unity'
-            }
-        }
-    }
-}
+apply from: 'publish.gradle'

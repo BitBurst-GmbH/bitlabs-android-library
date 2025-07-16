@@ -1,8 +1,9 @@
 package ai.bitlabs.sdk.data.model.sentry
 
 import com.google.gson.Gson
-import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 
 interface SentryEnvelopeItem
 
@@ -23,9 +24,7 @@ data class SentryEnvelope(
         """.trimIndent()
     }
 
-    fun toRequestBody(): RequestBody = RequestBody.create(
-        MediaType.parse("application/x-sentry-envelope"),
-        toString()
-    )
+    fun toRequestBody(): RequestBody = toString()
+        .toRequestBody("application/x-sentry-envelope".toMediaTypeOrNull())
 
 }

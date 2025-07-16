@@ -17,8 +17,8 @@ import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
-import okhttp3.MediaType
-import okhttp3.ResponseBody
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
@@ -48,10 +48,8 @@ class BitLabsRepositoryTest {
         }
         """.trimIndent()
 
-        val errorResponseBody = ResponseBody.create(
-            MediaType.parse("application/json"),
-            errorJson
-        )
+        val errorResponseBody = errorJson
+            .toResponseBody("application/json".toMediaTypeOrNull())
 
         return mockk(relaxed = true) {
             every { isSuccessful } returns false

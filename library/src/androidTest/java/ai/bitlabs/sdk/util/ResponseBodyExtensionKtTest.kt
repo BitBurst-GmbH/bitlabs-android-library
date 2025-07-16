@@ -3,8 +3,8 @@ package ai.bitlabs.sdk.util
 import ai.bitlabs.sdk.data.util.body
 import com.google.common.truth.Truth.assertThat
 import com.google.gson.JsonSyntaxException
-import okhttp3.MediaType
-import okhttp3.ResponseBody
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertThrows
 import org.junit.Test
 
@@ -14,7 +14,7 @@ class ResponseBodyExtensionKtTest {
     fun errorBody_NonBitLabsResponseBody_ReturnsNull() {
         val json = "Response body that isn't a BitLabsResponse body"
 
-        val responseBody = ResponseBody.create(MediaType.parse("application/json"), json)
+        val responseBody = json.toResponseBody("application/json".toMediaTypeOrNull())
 
         assertThrows(JsonSyntaxException::class.java) {
             responseBody.body<Unit>()
@@ -25,7 +25,7 @@ class ResponseBodyExtensionKtTest {
     fun errorBody_BitLabsResponseBody_ReturnsParsedObject() {
         val json = """{ error:{details:{http:400,msg:"Any Request"}}, status:""}""".trimIndent()
 
-        val responseBody = ResponseBody.create(MediaType.parse("application/json"), json)
+        val responseBody = json.toResponseBody("application/json".toMediaTypeOrNull())
 
         val bitLabsResponse = responseBody.body<Unit>()
 
@@ -40,7 +40,7 @@ class ResponseBodyExtensionKtTest {
     fun errorBody_EmptyBody_ReturnsNull() {
         val json = ""
 
-        val responseBody = ResponseBody.create(MediaType.parse("application/json"), json)
+        val responseBody = json.toResponseBody("application/json".toMediaTypeOrNull())
 
         val bitLabsResponse = responseBody.body<Unit>()
 
@@ -52,7 +52,7 @@ class ResponseBodyExtensionKtTest {
     @Test
     fun body_ValidBitLabsResponseBodyWithData_ReturnsParsedObject() {
         val json = """{"error": null, "status": "success", "data": {"id": 1, "name": "Sample"}}"""
-        val responseBody = ResponseBody.create(MediaType.parse("application/json"), json)
+        val responseBody = json.toResponseBody("application/json".toMediaTypeOrNull())
 
         val bitLabsResponse = responseBody.body<Data>()
         assertThat(bitLabsResponse).isNotNull()
@@ -66,7 +66,7 @@ class ResponseBodyExtensionKtTest {
     fun body_BitLabsResponseBodyWithPartialData_ReturnsParsedObjectWithNullField() {
         val json =
             """{"error": {"details": {"msg": "Any Request"}}, "status": ""}""" // missing "http"
-        val responseBody = ResponseBody.create(MediaType.parse("application/json"), json)
+        val responseBody = json.toResponseBody("application/json".toMediaTypeOrNull())
         val bitLabsResponse = responseBody.body<Unit>()
         assertThat(bitLabsResponse).isNotNull()
         assertThat(bitLabsResponse?.error).isNotNull()

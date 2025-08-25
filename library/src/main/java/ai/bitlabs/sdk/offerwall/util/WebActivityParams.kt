@@ -14,21 +14,20 @@ internal data class WebActivityParams(
     private val uid: String,
     private val sdk: String,
     private val maid: String,
-    private val tags: Map<String, Any> = mapOf()
+    private val tags: Map<String, Any> = mapOf(),
 ) {
-    var url: String = ""
-        get() = field.takeIf { it.isNotEmpty() } ?: buildUrl()
-        private set
 
-    /** Returns a string representation of the URL with all necessary parameters. */
-    private fun buildUrl() = "https://web.bitlabs.ai".toUri().buildUpon()
+    val url: String by lazy { baseUri().build().toString() }
+
+    fun offerUrl(offerId: String) = baseUri().appendPath("offers")
+        .appendQueryParameter("offer-id", offerId)
+        .build().toString()
+
+    private fun baseUri() = "https://web.bitlabs.ai".toUri().buildUpon()
         .appendQueryParameter("os", "ANDROID")
         .appendQueryParameter("token", token)
         .appendQueryParameter("uid", uid)
         .appendQueryParameter("sdk", sdk)
         .apply { if (maid.isNotEmpty()) appendQueryParameter("maid", maid) }
         .apply { tags.forEach { tag -> appendQueryParameter(tag.key, tag.value.toString()) } }
-        .build()
-        .toString()
-        .also { url = it }
 }

@@ -1,6 +1,13 @@
 package ai.bitlabs.sdk.offerwall.util
 
 import ai.bitlabs.sdk.data.model.sentry.SentryManager
+import ai.bitlabs.sdk.offerwall.util.HookName.INIT
+import ai.bitlabs.sdk.offerwall.util.HookName.OFFER_MODAL_CLOSE
+import ai.bitlabs.sdk.offerwall.util.HookName.SDK_CLOSE
+import ai.bitlabs.sdk.offerwall.util.HookName.SURVEY_COMPLETE
+import ai.bitlabs.sdk.offerwall.util.HookName.SURVEY_SCREENOUT
+import ai.bitlabs.sdk.offerwall.util.HookName.SURVEY_START
+import ai.bitlabs.sdk.offerwall.util.HookName.SURVEY_START_BONUS
 import android.util.Log
 import androidx.annotation.Keep
 import com.google.gson.GsonBuilder
@@ -46,28 +53,14 @@ internal class HookMessageDeserializer : JsonDeserializer<HookMessage<*>> {
         val argsJsonArray = jsonObject.getAsJsonArray("args")
 
         val args: List<Any> = when (name) {
-            HookName.INIT -> argsJsonArray.map {
-                context.deserialize<Unit>(it, Unit::class.java)
+            INIT, OFFER_MODAL_CLOSE, SDK_CLOSE -> argsJsonArray.map { }
+
+            SURVEY_START -> argsJsonArray.map {
+                context.deserialize(it, SurveyStartArgs::class.java)
             }
 
-            HookName.SDK_CLOSE -> argsJsonArray.map {
-                context.deserialize<Unit>(it, Unit::class.java)
-            }
-
-            HookName.SURVEY_START -> argsJsonArray.map {
-                context.deserialize<SurveyStartArgs>(it, SurveyStartArgs::class.java)
-            }
-
-            HookName.SURVEY_COMPLETE -> argsJsonArray.map {
-                context.deserialize<RewardArgs>(it, RewardArgs::class.java)
-            }
-
-            HookName.SURVEY_SCREENOUT -> argsJsonArray.map {
-                context.deserialize<RewardArgs>(it, RewardArgs::class.java)
-            }
-
-            HookName.SURVEY_START_BONUS -> argsJsonArray.map {
-                context.deserialize<RewardArgs>(it, RewardArgs::class.java)
+            SURVEY_COMPLETE, SURVEY_SCREENOUT, SURVEY_START_BONUS -> argsJsonArray.map {
+                context.deserialize(it, RewardArgs::class.java)
             }
         }
 
@@ -112,6 +105,9 @@ internal enum class HookName {
 
     @SerializedName("offerwall-surveys:survey.start-bonus")
     SURVEY_START_BONUS,
+
+    @SerializedName("offerwall-offers:offer.modal-close")
+    OFFER_MODAL_CLOSE,
 }
 
 /**

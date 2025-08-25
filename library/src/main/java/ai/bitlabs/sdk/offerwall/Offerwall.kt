@@ -46,6 +46,18 @@ data class Offerwall(
         val adId = determineAdvertisingInfo(context)
 
         val url = WebActivityParams(token, uid, sdk, adId, tags).url
+
+        withContext(Dispatchers.Main) { launchWithUrl(url, context) }
+    }
+
+    fun openOffer(context: Context, offerId: String) = coroutineScope.launch {
+        val adId = determineAdvertisingInfo(context)
+
+        val url = WebActivityParams(token, uid, "NATIVE", adId, tags).offerUrl(offerId)
+        withContext(Dispatchers.Main) { launchWithUrl(url, context) }
+    }
+
+    private fun launchWithUrl(url: String, context: Context) {
         val intent = Intent(context, BitLabsOfferwallActivity::class.java).apply {
             putExtra(BUNDLE_KEY_URL, url)
             putExtra(BUNDLE_KEY_UID, uid)
@@ -59,6 +71,6 @@ data class Offerwall(
             onOfferwallClosedListener
         )
 
-        withContext(Dispatchers.Main) { context.startActivity(intent) }
+        context.startActivity(intent)
     }
 }

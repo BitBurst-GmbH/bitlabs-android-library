@@ -64,7 +64,9 @@ public class MainActivity extends AppCompatActivity {
                 bitLabs.showSurvey(this, R.id.container_survey_widget, WidgetType.SIMPLE)
         );
 
-        findViewById(R.id.btn_launch_offerwall).setOnClickListener(view -> offerwall.launch(this));
+        findViewById(R.id.btn_launch_offerwall).setOnClickListener(view ->
+                offerwall.openOffer(this, "1157746")
+        );
 
         findViewById(R.id.btn_show_leaderboard).setOnClickListener(view ->
                 bitLabs.showLeaderboard(this, R.id.container_leaderboard)

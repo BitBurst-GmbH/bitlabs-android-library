@@ -6,32 +6,34 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/container_leaderboard"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
-        app:layout_constraintBottom_toTopOf="@+id/btn_show_leaderboard"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:layout="@layout/fragment_widget_bitlabs" />
-
     <Button
-        android:id="@+id/btn_show_leaderboard"
+        android:id="@+id/btn_open_shopping_offer"
         android:layout_width="180dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
-        android:text="Show Leaderboard"
-        app:layout_constraintBottom_toTopOf="@id/btn_launch_offerwall"
+        android:text="Open Shopping Offer: 311768"
+        app:layout_constraintBottom_toTopOf="@id/btn_open_offer"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
-        android:id="@+id/btn_check_surveys"
+        android:id="@+id/btn_open_shopping_merchant"
         android:layout_width="180dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="10dp"
-        android:text="Check Surveys"
+        android:text="Open Shopping Merchant: 7"
+        app:layout_constraintBottom_toTopOf="@id/btn_open_offer"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+
+    <Button
+        android:id="@+id/btn_open_offer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:layout_marginStart="10dp"
+        android:text="Open Offer with id: 1671485"
         app:layout_constraintBottom_toTopOf="@id/btn_launch_offerwall"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <Button
@@ -56,21 +58,11 @@
         app:layout_constraintTop_toBottomOf="@id/btn_launch_offerwall" />
 
     <Button
-        android:id="@+id/btn_show_survey_widget"
+        android:id="@+id/btn_check_surveys"
         android:layout_width="180dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="10dp"
-        android:text="Show Survey Widget"
+        android:text="Check Surveys"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/btn_launch_offerwall" />
-
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/container_survey_widget"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btn_show_survey_widget" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>

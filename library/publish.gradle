@@ -72,11 +72,18 @@ afterEvaluate {
     }
 }
 
+tasks.register('cleanStaging', Delete) {
+    group = 'publishing'
+    description = 'Cleans the staging artifects directory'
+
+    delete layout.buildDirectory.dir('staging')
+}
+
 tasks.register('generateMavenCentralBundle', Zip) {
     group = 'publishing'
     description = 'Creates a zip file with the necessary files for publishing to Maven Central'
 
-    dependsOn 'publishAllPublicationsToStagingRepository'
+    dependsOn 'cleanStaging', 'publishAllPublicationsToStagingRepository'
 
     archiveFileName = "bitlabs-android-sdk-${version}.zip"
     destinationDirectory = layout.buildDirectory.dir('bundles')

@@ -6,7 +6,7 @@ import ai.bitlabs.sdk.data.api.BitLabsAPI
 import ai.bitlabs.sdk.data.model.sentry.SentryManager
 import ai.bitlabs.sdk.data.repositories.BitLabsRepository
 import ai.bitlabs.sdk.offerwall.BitLabsOfferwallActivity
-import ai.bitlabs.sdk.offerwall.util.WebActivityParams
+import ai.bitlabs.sdk.offerwall.util.OfferwallUrl
 import ai.bitlabs.sdk.util.BASE_URL
 import ai.bitlabs.sdk.util.BUNDLE_KEY_URL
 import ai.bitlabs.sdk.util.OnSurveyRewardListener
@@ -178,7 +178,7 @@ object BitLabs {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
             putExtra(
                 BUNDLE_KEY_URL,
-                WebActivityParams(token, uid, "UNITY", adId, tags).url
+                OfferwallUrl(token, uid, "UNITY", adId, tags).url
             )
             context.startActivity(this)
         }

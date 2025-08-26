@@ -53,9 +53,7 @@ fun WebView.setupPostMessageHandler(
         if (hookMessage.type != "hook") return
 
         when (hookMessage.name) {
-            HookName.SDK_CLOSE -> {
-                (context as Activity).finish()
-            }
+            HookName.SDK_CLOSE -> (context as Activity).finish()
 
             HookName.SURVEY_START -> {
                 val surveyStartArgs = hookMessage.args
@@ -100,6 +98,8 @@ fun WebView.setupPostMessageHandler(
                     }, 1000
                 )
             }
+
+            else -> Log.i(TAG, "Unhandled hook message: ${hookMessage.name}")
         }
     }
 }, "AndroidWebView")

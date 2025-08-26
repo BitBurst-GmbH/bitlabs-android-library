@@ -10,7 +10,7 @@ def keystore = new Properties()
 keystore.load(project.rootProject.file('local.properties').newDataInputStream())
 project.ext.keystore = keystore
 
-version = '5.0.0'
+version = '5.1.0'
 group = 'com.prodege.bitlabs'
 
 android {

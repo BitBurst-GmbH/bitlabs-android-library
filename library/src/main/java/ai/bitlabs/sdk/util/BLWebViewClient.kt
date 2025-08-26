@@ -2,10 +2,8 @@ package ai.bitlabs.sdk.util
 
 import ai.bitlabs.sdk.BitLabs
 import ai.bitlabs.sdk.data.model.bitlabs.WebViewError
-import ai.bitlabs.sdk.offerwall.TAG
 import android.graphics.Bitmap
 import android.os.Build
-import android.util.Log
 import android.webkit.CookieManager
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
@@ -24,8 +22,6 @@ class BLWebViewClient(private val onError: (error: WebViewError) -> Unit) : WebV
             });
             """.trimIndent()
         ) {}
-
-        Log.d(TAG, "onPageStarted: $url")
     }
 
     override fun onPageFinished(view: WebView?, url: String?) {

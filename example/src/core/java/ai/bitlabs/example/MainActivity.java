@@ -11,7 +11,6 @@ import java.util.Map;
 import ai.bitlabs.sdk.BitLabs;
 import ai.bitlabs.sdk.offerwall.Offerwall;
 import ai.bitlabs.sdk.data.model.bitlabs.Survey;
-import ai.bitlabs.sdk.data.model.bitlabs.WidgetType;
 
 public class MainActivity extends AppCompatActivity {
     private final String TAG = "Example";
@@ -60,16 +59,20 @@ public class MainActivity extends AppCompatActivity {
                         exception.getCause()))
         );
 
-        findViewById(R.id.btn_show_survey_widget).setOnClickListener(view ->
-                bitLabs.showSurvey(this, R.id.container_survey_widget, WidgetType.SIMPLE)
+        findViewById(R.id.btn_open_offer).setOnClickListener(view ->
+                offerwall.openOffer(this, "1671485")
         );
 
         findViewById(R.id.btn_launch_offerwall).setOnClickListener(view ->
-                offerwall.openOffer(this, "1157746")
+                offerwall.launch(this)
         );
 
-        findViewById(R.id.btn_show_leaderboard).setOnClickListener(view ->
-                bitLabs.showLeaderboard(this, R.id.container_leaderboard)
+        findViewById(R.id.btn_open_shopping_merchant).setOnClickListener(view ->
+                offerwall.openMagicReceiptsMerchant(this, "7")
+        );
+
+        findViewById(R.id.btn_open_shopping_offer).setOnClickListener(view ->
+                offerwall.openMagicReceiptsOffer(this, "311768")
         );
     }
 }

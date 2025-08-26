@@ -2,7 +2,7 @@ package ai.bitlabs.sdk.offerwall
 
 import ai.bitlabs.sdk.data.model.sentry.SentryManager
 import ai.bitlabs.sdk.offerwall.util.OfferwallListenerManager
-import ai.bitlabs.sdk.offerwall.util.WebActivityParams
+import ai.bitlabs.sdk.offerwall.util.OfferwallUrl
 import ai.bitlabs.sdk.util.BUNDLE_KEY_LISTENER_ID
 import ai.bitlabs.sdk.util.BUNDLE_KEY_TOKEN
 import ai.bitlabs.sdk.util.BUNDLE_KEY_UID
@@ -45,7 +45,7 @@ data class Offerwall(
     fun launch(context: Context, sdk: String = "NATIVE") = coroutineScope.launch {
         val adId = determineAdvertisingInfo(context)
 
-        val url = WebActivityParams(token, uid, sdk, adId, tags).url
+        val url = OfferwallUrl(token, uid, sdk, adId, tags).url
 
         withContext(Dispatchers.Main) { launchWithUrl(url, context) }
     }
@@ -53,7 +53,27 @@ data class Offerwall(
     fun openOffer(context: Context, offerId: String) = coroutineScope.launch {
         val adId = determineAdvertisingInfo(context)
 
-        val url = WebActivityParams(token, uid, "NATIVE", adId, tags).offerUrl(offerId)
+        val url = OfferwallUrl(token, uid, "NATIVE", adId, tags)
+            .offerUrl(offerId)
+
+        withContext(Dispatchers.Main) { launchWithUrl(url, context) }
+    }
+
+    fun openMagicReceiptsOffer(context: Context, offerId: String) = coroutineScope.launch {
+        val adId = determineAdvertisingInfo(context)
+
+        val url = OfferwallUrl(token, uid, "NATIVE", adId, tags)
+            .magicReceiptsOfferUrl(offerId)
+
+        withContext(Dispatchers.Main) { launchWithUrl(url, context) }
+    }
+
+    fun openMagicReceiptsMerchant(context: Context, merchantId: String) = coroutineScope.launch {
+        val adId = determineAdvertisingInfo(context)
+
+        val url = OfferwallUrl(token, uid, "NATIVE", adId, tags)
+            .magicReceiptsMerchantUrl(merchantId)
+
         withContext(Dispatchers.Main) { launchWithUrl(url, context) }
     }
 

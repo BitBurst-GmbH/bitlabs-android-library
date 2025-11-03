@@ -1,8 +1,6 @@
 package ai.bitlabs.sdk.data.model.bitlabs
 
 
-import ai.bitlabs.sdk.BitLabs
-import android.content.Context
 import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
 
@@ -32,6 +30,4 @@ data class Survey(
     val rating: Int,
     val category: Category,
     val tags: List<String>,
-) {
-    fun open(context: Context) = BitLabs.launchOfferWall(context)
-}
+)

@@ -30,6 +30,7 @@ afterEvaluate {
             core(MavenPublication) {
                 from components.coreRelease
                 artifactId = 'core'
+                version = coreVersion
 
                 pom {
                     mainPom(delegate)
@@ -39,6 +40,7 @@ afterEvaluate {
             unity(MavenPublication) {
                 from components.unityRelease
                 artifactId = 'unity'
+                version = unityVersion
 
                 pom {
                     mainPom(delegate)
@@ -79,24 +81,56 @@ tasks.register('cleanStaging', Delete) {
     delete layout.buildDirectory.dir('staging')
 }
 
-tasks.register('generateMavenCentralBundle', Zip) {
+tasks.register('generateCoreBundle', Zip) {
     group = 'publishing'
-    description = 'Creates a zip file with the necessary files for publishing to Maven Central'
+    description = 'Creates a zip file with the core SDK artifacts'
 
-    dependsOn 'cleanStaging', 'publishAllPublicationsToStagingRepository'
+    dependsOn 'cleanStaging', 'publishCorePublicationToStagingRepository'
 
-    archiveFileName = "bitlabs-android-sdk-${version}.zip"
+    archiveFileName = "bitlabs-android-sdk-core-${coreVersion}.zip"
     destinationDirectory = layout.buildDirectory.dir('bundles')
 
     from(layout.buildDirectory.dir('staging')) {
-        include '**/*'
+        include 'com/prodege/bitlabs/core/**'
     }
 
     doLast {
         def bundle = archiveFile.get().asFile
         def sizeInMB = String.format("%.2f", bundle.length() / 1024.0 / 1024.0)
-        logger.lifecycle("📦 Bundle created: ${bundle.name} (${sizeInMB} MB)")
+        logger.lifecycle("📦 Core bundle created: ${bundle.name} (${sizeInMB} MB)")
         logger.lifecycle("📍 Location: ${bundle.absolutePath}")
-        logger.lifecycle("📥 Upload this bundle to https://central.sonatype.com/")
+    }
+}
+
+tasks.register('generateUnityBundle', Zip) {
+    group = 'publishing'
+    description = 'Creates a zip file with the Unity SDK artifacts'
+
+    dependsOn 'cleanStaging', 'publishUnityPublicationToStagingRepository'
+
+    archiveFileName = "bitlabs-android-sdk-unity-${unityVersion}.zip"
+    destinationDirectory = layout.buildDirectory.dir('bundles')
+
+    from(layout.buildDirectory.dir('staging')) {
+        include 'com/prodege/bitlabs/unity/**'
+    }
+
+    doLast {
+        def bundle = archiveFile.get().asFile
+        def sizeInMB = String.format("%.2f", bundle.length() / 1024.0 / 1024.0)
+        logger.lifecycle("📦 Unity bundle created: ${bundle.name} (${sizeInMB} MB)")
+        logger.lifecycle("📍 Location: ${bundle.absolutePath}")
+    }
+}
+
+tasks.register('generateMavenCentralBundle') {
+    group = 'publishing'
+    description = 'Creates zip files for both Core and Unity artifacts'
+
+    dependsOn 'generateCoreBundle', 'generateUnityBundle'
+
+    doLast {
+        def bundlesDir = layout.buildDirectory.dir('bundles').get().asFile
+        logger.lifecycle("📦 Bundles created in: ${bundlesDir.absolutePath}")
     }
 }

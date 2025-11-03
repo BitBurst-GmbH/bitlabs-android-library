@@ -139,7 +139,7 @@ object BitLabs {
     }
 
 
-    /** Registers an [OnRewardListener] callback to be invoked when the OfferWall is exited by the user. */
+    /** Registers an [OnSurveyRewardListener] callback to be invoked when the OfferWall is exited by the user. */
     fun setOnRewardListener(listener: OnSurveyRewardListener) {
         onRewardListener = listener
     }
@@ -166,11 +166,6 @@ object BitLabs {
             context.startActivity(this)
         }
     }
-
-    /** This overload is used internally to tackle the difference between the Core and Unity variants.
-     * In Unity, the context is not needed as an argument, but internally it is.
-     */
-    internal fun launchOfferWall(context: Context) = launchOfferWall()
 
     private fun determineAdvertisingInfo(context: Context) = Thread {
         try {

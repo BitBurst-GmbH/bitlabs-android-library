@@ -10,7 +10,8 @@ def keystore = new Properties()
 keystore.load(project.rootProject.file('local.properties').newDataInputStream())
 project.ext.keystore = keystore
 
-version = '5.1.0'
+ext.coreVersion = '5.1.0'
+ext.unityVersion = '5.1.1'
 group = 'com.prodege.bitlabs'
 
 android {
@@ -24,7 +25,6 @@ android {
         multiDexEnabled true
 
         buildConfigField 'String', 'APP_TOKEN', keystore.getProperty('appToken', '"APP_TOKEN"')
-        buildConfigField 'String', 'VERSION_NAME', "\"${version}\""
 
         testApplicationId System.getProperty('testApplicationId', 'ai.bitlabs.sdk.test')
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -35,9 +35,11 @@ android {
     productFlavors {
         core {
             buildConfigField 'String', 'DSN', '"https://74f1bae2ec6ab9e73a91f2d8e92c8f08@o494432.ingest.us.sentry.io/4508375634345985"'
+            buildConfigField 'String', 'VERSION_NAME', "\"${coreVersion}\""
         }
         unity {
             buildConfigField 'String', 'DSN', '"https://669f0df0ec50d3860eded78dad6eda63@o494432.ingest.us.sentry.io/4508652840091648"'
+            buildConfigField 'String', 'VERSION_NAME', "\"${unityVersion}\""
         }
     }
 

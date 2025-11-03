@@ -2,19 +2,22 @@ package ai.bitlabs.sdk
 
 import ai.bitlabs.sdk.BitLabs.token
 import ai.bitlabs.sdk.BitLabs.uid
-import ai.bitlabs.sdk.data.api.BitLabsAPI
 import ai.bitlabs.sdk.data.model.sentry.SentryManager
 import ai.bitlabs.sdk.data.repositories.BitLabsRepository
 import ai.bitlabs.sdk.offerwall.BitLabsOfferwallActivity
 import ai.bitlabs.sdk.offerwall.util.OfferwallUrl
-import ai.bitlabs.sdk.util.BASE_URL
+import ai.bitlabs.sdk.util.BUNDLE_KEY_TOKEN
+import ai.bitlabs.sdk.util.BUNDLE_KEY_UID
 import ai.bitlabs.sdk.util.BUNDLE_KEY_URL
+import ai.bitlabs.sdk.util.OnBooleanResponseListener
+import ai.bitlabs.sdk.util.OnExceptionListener
+import ai.bitlabs.sdk.util.OnInitResponseListener
+import ai.bitlabs.sdk.util.OnStringResponseListener
 import ai.bitlabs.sdk.util.OnSurveyRewardListener
 import ai.bitlabs.sdk.util.convertKeysToCamelCase
-import ai.bitlabs.sdk.util.deviceType
+import ai.bitlabs.sdk.util.createBitLabsRepository
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.util.Log
 import com.google.android.gms.ads.identifier.AdvertisingIdClient
 import com.google.gson.GsonBuilder
@@ -22,9 +25,6 @@ import com.unity3d.player.UnityPlayer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import okhttp3.OkHttpClient
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 private const val TAG = "BitLabs"
 
@@ -59,44 +59,35 @@ object BitLabs {
      * @param[token] Found on your [BitLabs Dashboard](https://dashboard.bitlabs.ai/),
      * @param[uid] Unique for every user to initialise the connection with the BitLabs API.
      */
-    fun init(token: String, uid: String) {
-        this.token = token
-        this.uid = uid
+    fun init(
+        token: String, uid: String,
+        onResponseListener: OnInitResponseListener,
+        onExceptionListener: OnExceptionListener,
+    ) {
+        try {
+            this.token = token
+            this.uid = uid
 
-        val userAgent =
-            "BitLabs/${BuildConfig.VERSION_NAME} (Android ${Build.VERSION.SDK_INT}; ${Build.MODEL}; ${deviceType()})"
+            bitLabsRepo = createBitLabsRepository(token, uid)
 
-        val okHttpClient = OkHttpClient.Builder()
-            .addInterceptor { chain ->
-                val request = chain.request().newBuilder()
-                    .addHeader("User-Agent", userAgent)
-                    .addHeader("X-User-Id", uid)
-                    .build()
+            determineAdvertisingInfo(UnityPlayer.currentActivity)
 
-                chain.proceed(request)
+            fileProviderAuthority = "${UnityPlayer.currentActivity.packageName}.provider.bitlabs"
+
+
+            val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
+            Thread.setDefaultUncaughtExceptionHandler { _, throwable ->
+                if (throwable.stackTrace.any { it.className.startsWith("ai.bitlabs.sdk") }) {
+                    SentryManager.captureException(token, uid, throwable, defaultHandler)
+                } else {
+                    defaultHandler?.uncaughtException(Thread.currentThread(), throwable)
+                }
             }
-            .build()
 
-        val retrofit = Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .client(okHttpClient)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-
-        bitLabsRepo = BitLabsRepository(retrofit.create(BitLabsAPI::class.java))
-
-        determineAdvertisingInfo(UnityPlayer.currentActivity)
-
-        fileProviderAuthority = "${UnityPlayer.currentActivity.packageName}.provider.bitlabs"
-
-
-        val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
-        Thread.setDefaultUncaughtExceptionHandler { _, throwable ->
-            if (throwable.stackTrace.any { it.className.startsWith("ai.bitlabs.sdk") }) {
-                SentryManager.captureException(token, uid, throwable, defaultHandler)
-            } else {
-                defaultHandler?.uncaughtException(Thread.currentThread(), throwable)
-            }
+            onResponseListener.onResponse()
+        } catch (e: Exception) {
+            SentryManager.captureException(token, uid, e)
+            onExceptionListener.onException(e)
         }
     }
 
@@ -106,22 +97,17 @@ object BitLabs {
      * ######
      * If you want to perform background checks if surveys are available, this is the best option.
      */
-    fun checkSurveys(gameObject: String) = ifInitialised {
+    fun checkSurveys(
+        onResponseListener: OnBooleanResponseListener,
+        onExceptionListener: OnExceptionListener,
+    ) = ifInitialised {
         coroutineScope.launch {
             try {
                 val surveys = bitLabsRepo?.getSurveys("UNITY") ?: emptyList()
-                UnityPlayer.UnitySendMessage(
-                    gameObject,
-                    "CheckSurveysCallback",
-                    surveys.isNotEmpty().toString()
-                )
+                onResponseListener.onResponse(surveys.isNotEmpty())
             } catch (e: Exception) {
                 SentryManager.captureException(token, uid, e)
-                UnityPlayer.UnitySendMessage(
-                    gameObject,
-                    "CheckSurveysException",
-                    e.message.toString()
-                )
+                onExceptionListener.onException(e)
             }
         }
     }
@@ -136,31 +122,26 @@ object BitLabs {
      * Its parameter is the String in format of JSON list of surveys in . If it's `null`,
      * then there has been an internal error which is mostly logged with 'BitLabs' as a tag.
      */
-    fun getSurveys(gameObject: String) = ifInitialised {
+    fun getSurveys(
+        onResponseListener: OnStringResponseListener,
+        onExceptionListener: OnExceptionListener,
+    ) = ifInitialised {
         coroutineScope.launch {
             try {
                 val surveys = bitLabsRepo?.getSurveys("UNITY") ?: emptyList()
-                UnityPlayer.UnitySendMessage(
-                    gameObject,
-                    "GetSurveysCallback",
-                    GsonBuilder().create().toJson(surveys).convertKeysToCamelCase()
-                )
+                val json = GsonBuilder().create().toJson(surveys).convertKeysToCamelCase()
+                onResponseListener.onResponse(json)
             } catch (e: Exception) {
                 SentryManager.captureException(token, uid, e)
-                UnityPlayer.UnitySendMessage(
-                    gameObject,
-                    "GetSurveysException",
-                    e.message.toString()
-                )
+                onExceptionListener.onException(e)
             }
         }
     }
 
-    /** Registers an [OnRewardListener] callback to be invoked when the OfferWall is exited by the user. */
-    fun setOnRewardListener(gameObject: String) {
-        onRewardListener = OnSurveyRewardListener { payout ->
-            UnityPlayer.UnitySendMessage(gameObject, "RewardCallback", payout.toString())
-        }
+
+    /** Registers an [OnSurveyRewardListener] callback to be invoked when the OfferWall is exited by the user. */
+    fun setOnRewardListener(listener: OnSurveyRewardListener) {
+        onRewardListener = listener
     }
 
     /** Adds a new tag([key]:[value] pair) to [BitLabs.tags] */
@@ -180,14 +161,11 @@ object BitLabs {
                 BUNDLE_KEY_URL,
                 OfferwallUrl(token, uid, "UNITY", adId, tags).url
             )
+            putExtra(BUNDLE_KEY_UID, uid)
+            putExtra(BUNDLE_KEY_TOKEN, token)
             context.startActivity(this)
         }
     }
-
-    /** This overload is used internally to tackle the difference between the Core and Unity variants.
-     * In Unity, the context is not needed as an argument, but internally it is.
-     */
-    internal fun launchOfferWall(context: Context) = launchOfferWall()
 
     private fun determineAdvertisingInfo(context: Context) = Thread {
         try {
